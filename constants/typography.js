@@ -65,22 +65,22 @@ export const typography = {
     'button-lg': {
       fontSize: 16,
       lineHeight: 32,
-      fontWeight: '700',
+      fontWeight: '600',
     },
     'button-md': {
       fontSize: 16,
       lineHeight: 24,
-      fontWeight: '700',
+      fontWeight: '600',
     },
     'button-sm': {
       fontSize: 14,
       lineHeight: 20,
-      fontWeight: '700',
+      fontWeight: '600',
     },
     'button-xsm': {
       fontSize: 12,
       lineHeight: 16,
-      fontWeight: '700',
+      fontWeight: '600',
     },
   },
 };

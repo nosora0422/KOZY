@@ -1,3 +1,4 @@
+import { BottomSheet } from 'react-native-elements';
 import { baseColors } from './base';
 
 export const semanticColors = {
@@ -7,6 +8,12 @@ export const semanticColors = {
     disabled: baseColors.gray400,
     placeholder: baseColors.gray400,
     error: baseColors.warning,
+  },
+
+  bottomSheet: {
+    backdrop: 'rgba(0, 0, 0, 0.5)',
+    background: baseColors.gray900,
+    handleIndicator: baseColors.gray400,
   },
 
   input: {

@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, Platform, FlatList, Image, Dimensions, ScrollView, Alert } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { DATA } from '@/data/mockListData';
 import DisplayField from '@/components/ui/displayField';
 import AppButton from '@/components/ui/appButton';
@@ -173,8 +173,17 @@ export default function DetailScreen() {
           onPress={() => {
             Alert.alert(
               'Request Sent',
-              'Your chat request has been sent successfully.',
-              [{ text: 'Close' }]
+              'To send a chat request, please upload a photo and set your preferences. This helps build trust and improves your match quality.',
+              [{
+                text: 'Close',
+                style: 'cancel',
+              },
+              {
+                text: 'Coomplete Profile',
+                onPress: () => {
+                  router.push('/(tabs)/account/editProfile');
+                },
+              },]
             );
           }}
         />

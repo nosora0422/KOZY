@@ -55,7 +55,6 @@ const styles = StyleSheet.create({
     height: 40,
     paddingHorizontal: 14,
     borderRadius: 999,
-    backgroundColor: colors.semantic.input.bg,
     color: colors.semantic.input.text,
   },
   authInput: {

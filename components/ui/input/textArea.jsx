@@ -1,4 +1,5 @@
 // components/input/TextArea.jsx
+import React, { useState } from "react";
 import { TextInput, StyleSheet } from "react-native";
 import { colors } from '@/constants/colors';
 import { typography } from '@/constants/typography';
@@ -34,7 +35,7 @@ export default function TextArea({
       onFocus={() => setFocused(true)}
       onBlur={() => setFocused(false)}
       style={[
-        styles.input,
+        styles.textarea,
         typography.body['body-xsm'],
         {
           borderColor: border.color,
@@ -51,7 +52,6 @@ const styles = StyleSheet.create({
     height: 120,
     padding: 14,
     borderRadius: 16,
-    backgroundColor: colors.semantic.input.bg,
     color: colors.semantic.input.text,
     textAlignVertical: "top",
   },

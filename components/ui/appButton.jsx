@@ -1,6 +1,12 @@
 import React from 'react';
 import { Pressable, Text, StyleSheet } from 'react-native';
 import { colors } from '@/constants/colors';
+import { getTypeStyle } from '@/constants/typographyStyles';
+
+const buttonTextVariantMap = {
+  lg: 'button-sm',
+  sm: 'button-xsm',
+};
 
 export default function AppButton({
   text,
@@ -8,6 +14,7 @@ export default function AppButton({
   type = 'primary',   // primary | secondary | ghost | bare
   state = 'normal',   // normal | pressed | disabled
   onPress,
+  ...props
 }) {
   const isDisabled = state === 'disabled';
 
@@ -19,6 +26,7 @@ export default function AppButton({
 
   return (
     <Pressable
+      {...props}
       disabled={isDisabled}
       onPress={onPress}
       style={({ pressed }) => [
@@ -33,7 +41,12 @@ export default function AppButton({
         },
       ]}
     >
-      <Text style={[styles.text, { color: colorSet.text }]}>
+      <Text 
+        style={[
+          getTypeStyle(buttonTextVariantMap[size] ?? 'button-lg'),
+          { color: colorSet.text },
+        ]}
+      >
         {text}
       </Text>
     </Pressable>
@@ -61,10 +74,5 @@ const styles = StyleSheet.create({
 
   barePadding: {
     paddingHorizontal: 0,
-  },
-  
-  text: {
-    fontSize: 16,
-    fontWeight: '500',
   },
 });

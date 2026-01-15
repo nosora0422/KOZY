@@ -1,12 +1,12 @@
+import 'react-native-gesture-handler';
 import {
   ThemeProvider as NavigationThemeProvider,
   DarkTheme,
   DefaultTheme,
 } from '@react-navigation/native';
+import { useFonts } from 'expo-font';
 
-import {
-  ThemeProvider as RNEThemeProvider,
-} from 'react-native-elements';
+import { ThemeProvider as RNEThemeProvider, } from 'react-native-elements';
 
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
@@ -14,7 +14,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Slot } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import 'react-native-reanimated';
+
 
 import { appTheme } from '@/constants/index';
 
@@ -29,6 +29,13 @@ const AppDarkTheme = {
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
+  const [fontsLoaded] = useFonts({
+    OpenSans_400Regular: require('../assets/fonts/OpenSans-Regular.ttf'),
+    OpenSans_600SemiBold: require('../assets/fonts/OpenSans-SemiBold.ttf'),
+    OpenSans_700Bold: require('../assets/fonts/OpenSans-Bold.ttf'),
+  });
+
+  if (!fontsLoaded) return null;
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
