@@ -18,10 +18,13 @@ const AppDrawer = forwardRef(
       secondaryActionText,
       description,
       align,
-      buttonText
+      primaryDisabled,
+      secondaryDisabled
     },
     ref
   ) => {
+
+    
 
     return (
       <BottomSheet
@@ -66,12 +69,22 @@ const AppDrawer = forwardRef(
             {/* Footer */}
             {primaryAction && (
                 <View style={[styles.footer, { marginBottom: 12 }]}>
-                    <AppButton text={primaryActionText || "Save"} onPress={primaryAction} type="primary" />
+                    <AppButton 
+                      text={primaryActionText || "Save"} 
+                      onPress={primaryAction} 
+                      type="primary" 
+                      state={primaryDisabled ? "disabled" : "normal"} 
+                    />
                 </View>
             )}
             {secondaryAction && (
                 <View style={styles.footer}>
-                    <AppButton text={secondaryActionText || "Save"} onPress={secondaryAction} type="secondary" />
+                    <AppButton 
+                      text={secondaryActionText || "Save"} 
+                      onPress={secondaryAction} 
+                      type="secondary" 
+                      state={secondaryDisabled ? "disabled" : "normal"}
+                    />
                 </View>
             )}
         </BottomSheetView>

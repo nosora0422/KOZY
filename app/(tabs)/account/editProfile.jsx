@@ -17,6 +17,10 @@ import Dropdown from '@/components/ui/input/dropdown';
 import TextField from '@/components/ui/input/textField';
 import TextArea from '@/components/ui/input/textArea';
 import AppButton from '@/components/ui/appButton';
+import { Feather } from '@expo/vector-icons';
+import MediaInput from '@/components/ui/input/mediaInput';
+import mockPickImage from '@/services/mockMediaUpload';
+import validateImage from '@/utils/mediaValidation';
 
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -28,7 +32,7 @@ const IMAGE_HEIGHT = 228;
 export default function EditProfile() {
     const navigation = useNavigation();
     const { id } = useLocalSearchParams();
-    const item = DATA[1];
+    const item = DATA[0];
     const genderDrawerRef = useRef(null);
     const personalityDrawerRef = useRef(null);
     const jobDrawerRef = useRef(null);
@@ -38,6 +42,8 @@ export default function EditProfile() {
     const emailConfirmDrawerRef = useRef(null);
     const emailEditDrawerRef = useRef(null);
     const emailCheckDrawerRef = useRef(null);
+    const photoDrawerRef = useRef(null);
+    const photoConfirmDrawerRef = useRef(null);
     const [personality, setPersonality] = useState([]);
     const [lifestylePreferences, setLifestylePreferences] = useState([]);
     const [gender, setGender] = useState(null);
@@ -45,21 +51,59 @@ export default function EditProfile() {
     const [aboutMe, setAboutMe] = useState('');
     const [error, setError] = useState(null);
     const [myEmail, setMyEmail] = useState(null);
+    // const [photos, setPhotos] = useState(
+    //       (item.owner.avatar ?? []).slice(0, 2).map(uri => ({
+    //         uri,
+    //         type: 'image/jpeg',
+    //         fileSize: 0, // existing avatar, not newly uploaded
+    //       }))
+    //     );
+    const [photos, setPhotos] = useState([]);
+    const [photoError, setPhotoError] = useState(null);
 
     useFocusEffect(
-    useCallback(() => {
-      const parent = navigation.getParent();
-      parent?.setOptions({
-        tabBarStyle: { display: 'none' },
-      });
-
-      return () => {
+      useCallback(() => {
+        const parent = navigation.getParent();
         parent?.setOptions({
-          tabBarStyle: undefined,
+          tabBarStyle: { display: 'none' },
         });
-      };
-    }, [])
-  );
+
+        return () => {
+          parent?.setOptions({
+            tabBarStyle: undefined,
+          });
+        };
+      }, [])
+    );
+
+  const addPhoto = async () => {
+    if (photos.length >= 2) {
+      setPhotoError('You can upload up to 2 profile photos.');
+      return;
+    }
+
+    try {
+      const files = await mockPickImage();
+
+      for (const file of files) {
+        if (photos.length >= 2) break;
+
+        const error = validateImage(file);
+        if (error) {
+          setPhotoError(error);
+          return;
+        }
+
+        setPhotos(prev => [...prev, file]);
+      }
+
+      setPhotoError(null);
+    } catch {
+      // cancelled
+    }
+  };
+
+
   return (
     <View style={{ flex: 1, overflow: 'visible' }}>
       <FlatList
@@ -68,34 +112,41 @@ export default function EditProfile() {
         keyboardShouldPersistTaps="always"
         renderItem={() => (
           <View style={styles.container}>
-            <AppText variant="headline-md" color="primary">
-              Edit Profile
-            </AppText>
+            <View style={styles.sliderContainer}>
+              {/* Image carousel */}
+              <FlatList
+                data={item.owner.avatar}
+                horizontal
+                pagingEnabled
+                showsHorizontalScrollIndicator={false}
+                snapToInterval={ITEM_WIDTH + ITEM_SPACING}
+                decelerationRate="fast"
+                keyExtractor={(uri, index) => `${uri}-${index}`}
+                contentContainerStyle={{
+                  paddingRight: (SCREEN_WIDTH - ITEM_WIDTH) / 2,
+                  paddingVertical: 20,
+                }}
+                renderItem={({ item: image }) => (
+                  <View style={{ width: ITEM_WIDTH, marginRight: ITEM_SPACING }}>
+                    <Image
+                      source={{ uri: image }}
+                      style={styles.image}
+                      contentFit="cover"
+                    />
+                  </View>
+                )}
+              />
+              <View style={styles.uploadButtonContainer}>
+                <AppButton 
+                  text="Upload" 
+                  onPress={() => photoDrawerRef.current?.snapToIndex(0)} 
+                  type="secondary" 
+                  size='sm'
+                />
+              </View>
+            </View>
 
-            {/* Image carousel */}
-            <FlatList
-              data={item.images}
-              horizontal
-              pagingEnabled
-              showsHorizontalScrollIndicator={false}
-              snapToInterval={ITEM_WIDTH + ITEM_SPACING}
-              decelerationRate="fast"
-              keyExtractor={(uri, index) => `${uri}-${index}`}
-              contentContainerStyle={{
-                paddingRight: (SCREEN_WIDTH - ITEM_WIDTH) / 2,
-              }}
-              renderItem={({ item: image }) => (
-                <View style={{ width: ITEM_WIDTH, marginRight: ITEM_SPACING }}>
-                  <Image
-                    source={{ uri: image }}
-                    style={styles.image}
-                    contentFit="cover"
-                  />
-                </View>
-              )}
-            />
-
-            <DisplayField title="My Profile">
+            <DisplayField title="My Profile" style={{ marginBottom: 16 }}>
               Keeping your ID, photo, and profile details up to date helps us build trust in the KOZY community.
             </DisplayField>
 
@@ -103,32 +154,36 @@ export default function EditProfile() {
             <DisplayInput
               label="Gender"
               value={gender}
-              placeHolder="Select an option"
+              placeholder="Select an option"
               onPress={() => genderDrawerRef.current?.snapToIndex(0)}
             />
             <DisplayInput
               label="Job or Profession"
               value={job}
-              placeHolder="Enter your job or profession"
+              placeholder="Enter your job or profession"
               onPress={() => jobDrawerRef.current?.snapToIndex(0)}
             />
             <DisplayInput
               label="Personality"
-              value={personality.join(', ')}
-              placeHolder="Select an option"
+              value={personality}
+              isMulti={true}
+              max={3}
+              placeholder="+"
               onPress={() => personalityDrawerRef.current?.snapToIndex(0)}
             />
             <DisplayInput
               label="Lifestyle Preferences"
-              value={lifestylePreferences.join(', ')}
-              placeHolder="Select an option"
+              value={lifestylePreferences}
+              isMulti={true}
+              max={3}
+              placeholder="+"
               onPress={() => lifestyleDrawerRef.current?.snapToIndex(0)}
             />
             <DisplayInput
               label="About Me"
               value={aboutMe}
               isTextArea={true}
-              placeHolder="Tap to write"
+              placeholder="Tap to write"
               onPress={() => aboutMeDrawerRef.current?.snapToIndex(0)}
             />
             <View style={styles.idVerificationContainer}>
@@ -149,9 +204,10 @@ export default function EditProfile() {
                 label="My Email"
                 value={myEmail}
                 onChangeText={setMyEmail}
-                placeHolder="Please Verify your email."
+                placeholder="Please Verify your email."
+                style={{ flex: 1 }}
               />
-              <View style={{ width: 92, marginBottom: 12 }}>
+              <View style={{ width: 92, marginBottom: 14 }}>
                   <AppButton 
                     text="Edit Email"
                     size="sm"
@@ -240,9 +296,7 @@ export default function EditProfile() {
             primaryAction={() => aboutMeDrawerRef.current?.close()}
           >
             <FormField label="" error={error}>
-              <InputRow>
                 <TextArea placeholder="ex: Software Engineer" error={!!error}/>
-              </InputRow>
             </FormField>
       </AppDrawer>
       <AppDrawer
@@ -292,9 +346,7 @@ export default function EditProfile() {
             </View>
             <View style={{ marginTop: 54 }}>
               <FormField label="" error={error}>
-                <InputRow>
-                  <TextField placeholder="ex: Software Engineer" error={!!error}/>
-                </InputRow>
+                  <TextField placeholder="youremail@gmail.com" error={!!error} type="auth"/>
               </FormField>
             </View>
       </AppDrawer>
@@ -314,9 +366,27 @@ export default function EditProfile() {
           >
             
           <FormField label="" error={error}>
-            <InputRow>
-              <TextField placeholder="ex: Software Engineer" error={!!error}/>
-            </InputRow>
+              <TextField placeholder="youremail@gmail.com" error={!!error} type="auth"/>
+          </FormField>
+      </AppDrawer>
+      <AppDrawer
+            ref={photoDrawerRef}
+            title="Upload Profile Pictures"
+            align="center"
+            description="Upload 2 clear face photos to build trust and increase your match chances."
+            primaryActionText="Save"
+            primaryDisabled={photos.length === 0}
+            primaryAction={() => {
+              photoDrawerRef.current?.close();
+              photoConfirmDrawerRef.current?.snapToIndex(0);
+            }}
+          >
+          <FormField label="" error={photoError}>
+            <MediaInput 
+              error={!!photoError}
+              onPress={addPhoto}
+              photos={photos.map(p => p.uri)}
+            />
           </FormField>
       </AppDrawer>
     </View>
@@ -358,7 +428,7 @@ const styles = StyleSheet.create({
   },
   emailContainer:{
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    gap: 12,
     alignItems: 'flex-end',
   },
   image: {
@@ -366,4 +436,12 @@ const styles = StyleSheet.create({
     height: IMAGE_HEIGHT,
     borderRadius: 4,
   },
+  sliderContainer: {
+    position: 'relative',
+  },
+  uploadButtonContainer:{
+    position: 'absolute',
+    bottom: 28,
+    right: 12,
+  }
 });

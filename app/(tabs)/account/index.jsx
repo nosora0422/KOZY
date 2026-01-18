@@ -32,7 +32,7 @@ export default function Account() {
               </AppText>
             </View>
           </Pressable>
-          <Pressable>
+          <Pressable onPress={() => router.push('/(tabs)/account/savedList')}>
             <View style={styles.manuButton}>
               <Feather name="bookmark" size={20} color='#fff' />
               <AppText variant="body-md" color="primary">
@@ -42,7 +42,7 @@ export default function Account() {
           </Pressable>
         </View>
         <View style={styles.manuContainer}>
-          <Pressable>
+          <Pressable onPress={() => router.push('/(tabs)/account/notification')}>
             <View style={styles.manuButton}>
               <Feather name="bell" size={20} color='#fff' />
               <AppText variant="body-md" color="primary">
@@ -50,7 +50,7 @@ export default function Account() {
               </AppText>
             </View>
           </Pressable>
-          <Pressable>
+          <Pressable onPress={() => router.push('/(tabs)/account/privacyPolicy')}>
             <View style={styles.manuButton}>
               <Feather name="lock" size={20} color='#fff' />
               <AppText variant="body-md" color="primary">
@@ -58,7 +58,7 @@ export default function Account() {
               </AppText>
             </View>
           </Pressable>
-          <Pressable>
+          <Pressable onPress={() => router.push('/(tabs)/account/contactUs')}>
             <View style={styles.manuButton}>
               <Feather name="mail" size={20} color='#fff' />
               <AppText variant="body-md" color="primary">
@@ -73,6 +73,7 @@ export default function Account() {
 
 const styles = StyleSheet.create({
   container :{
+    flex: 1,
     paddingHorizontal: 16,
   },
   imgPlaceHolder:{

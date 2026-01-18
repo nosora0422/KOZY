@@ -145,6 +145,7 @@ const styles = StyleSheet.create({
   },
   bottomCTA: {
     marginTop: 12,
+    width: 67,
   },
   username: {
     color: 'white',

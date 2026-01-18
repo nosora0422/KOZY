@@ -1,4 +1,3 @@
-import { BottomSheet } from 'react-native-elements';
 import { baseColors } from './base';
 
 export const semanticColors = {

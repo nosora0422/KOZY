@@ -14,6 +14,7 @@ export default function AppButton({
   type = 'primary',   // primary | secondary | ghost | bare
   state = 'normal',   // normal | pressed | disabled
   onPress,
+  style,
   ...props
 }) {
   const isDisabled = state === 'disabled';
@@ -23,7 +24,6 @@ export default function AppButton({
 
   const hasBorder = colorSet.border !== 'transparent';
   const isBare = type === 'bare';
-
   return (
     <Pressable
       {...props}
@@ -39,8 +39,10 @@ export default function AppButton({
           borderWidth: hasBorder ? 1 : 0,
           opacity: pressed && !isDisabled ? 0.85 : 1,
         },
+        style
       ]}
     >
+      
       <Text 
         style={[
           getTypeStyle(buttonTextVariantMap[size] ?? 'button-lg'),
@@ -58,8 +60,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 999,
-    maxWidth: 300,
     width: '100%',
+    maxWidth: 300,
+    marginHorizontal: 'auto'
   },
 
   lg: {
