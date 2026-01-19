@@ -3,7 +3,7 @@ import { View, StyleSheet } from 'react-native';
 import BottomSheet from '@gorhom/bottom-sheet';
 import AppText from '@/components/ui/appText';
 import AppButton from '@/components/ui/appButton';
-import { BottomSheetView, BottomSheetBackdrop } from '@gorhom/bottom-sheet';
+import { BottomSheetView, BottomSheetBackdrop, BottomSheetScrollView } from '@gorhom/bottom-sheet';
 
 import { colors } from '@/constants/colors';
 
@@ -19,7 +19,8 @@ const AppDrawer = forwardRef(
       description,
       align,
       primaryDisabled,
-      secondaryDisabled
+      secondaryDisabled,
+      snapPoints,
     },
     ref
   ) => {
@@ -30,7 +31,7 @@ const AppDrawer = forwardRef(
       <BottomSheet
         ref={ref}
         index={-1}
-        snapPoints={['60%', '85%']}
+        snapPoints={snapPoints ?? ['60%', '80%']}
         enablePanDownToClose
         backgroundStyle={{
             backgroundColor: colors.semantic.bottomSheet.background,
@@ -49,11 +50,12 @@ const AppDrawer = forwardRef(
         handleIndicatorStyle ={{ backgroundColor: colors.semantic.bottomSheet.handleIndicator }}
       >
         
-        <BottomSheetView style={ styles.sheetContainer }>
+        <BottomSheetScrollView style={ styles.sheetContainer }>
             {/* Header */}
-            <View style={styles.header}>
+            {title && (
+              <View style={styles.header}>
                 <AppText variant="headline-md" style={ align == "center" ? {textAlign: 'center'} : null }>{title}</AppText>
-            </View>
+              </View>)}
             
             {/* Description */}
             {description && 
@@ -87,7 +89,7 @@ const AppDrawer = forwardRef(
                     />
                 </View>
             )}
-        </BottomSheetView>
+        </BottomSheetScrollView>
       </BottomSheet>
     );
   }

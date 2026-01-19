@@ -2,25 +2,42 @@
 import { View, StyleSheet } from "react-native";
 import Pill from "./pill";
 
-export default function PillGroup({ items = [], value = [], onChange }) {
-  const toggle = (v) => {
-    onChange(
-      value.includes(v)
-        ? value.filter((x) => x !== v)
-        : [...value, v]
-    );
+export default function PillGroup({ 
+  items = [], 
+  value = [], 
+  onChange,
+  isMulti = true
+}) {
+  const handlePress = (itemValue) => {
+    if (isMulti) {
+      const current = Array.isArray(value) ? value : [];
+
+      if (current.includes(itemValue)) {
+        onChange(current.filter(v => v !== itemValue));
+      } else {
+        onChange([...current, itemValue]);
+      }
+    } else {
+      onChange(itemValue);
+    }
   };
 
   return (
     <View style={styles.group}>
-      {items.map((item) => (
-        <Pill
-          key={item.value}
-          label={item.label}
-          selected={value.includes(item.value)}
-          onPress={() => toggle(item.value)}
-        />
-      ))}
+      {items.map((item) => {
+        const isSelected = isMulti
+          ? Array.isArray(value) && value.includes(item.value)
+          : value === item.value;
+
+        return (
+          <Pill
+            key={item.value}
+            label={item.label}
+            selected={isSelected}
+            onPress={() => handlePress(item.value)}
+          />
+        );
+      })}
     </View>
   );
 }

@@ -2,7 +2,6 @@
 
 import { View, StyleSheet,Text } from "react-native";
 import React from "react";
-import { colors } from '@/constants/colors';
 
 export default function InputRow({ children, columns = 3, title }) {
   return (
@@ -20,7 +19,7 @@ export default function InputRow({ children, columns = 3, title }) {
 const styles = StyleSheet.create({
   row: {
     flexDirection: "row",
-    gap: 12,
+    gap: 4,
   },
   
 });

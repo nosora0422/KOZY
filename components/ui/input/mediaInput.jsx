@@ -14,7 +14,8 @@ export default function MediaInput({
   photos = [],
   error,
   disabled,
-  onPress
+  onPress,
+  style
 }) {
 
     const [focused, setFocused] = useState(false);
@@ -37,14 +38,17 @@ export default function MediaInput({
             onBlur={() => setFocused(false)}
         >
             <View 
-                style={{ 
-                    width: '100%', 
-                    aspectRatio: 1, 
-                    alignItems: 'center', 
-                    justifyContent: 'center', 
-                    borderWidth: border.width, 
-                    borderColor: border.color, 
-                    borderRadius: 10 }}
+                style={[
+                    {
+                        width: '100%', 
+                        aspectRatio: 1, 
+                        alignItems: 'center', 
+                        justifyContent: 'center', 
+                        borderWidth: border.width, 
+                        borderColor: border.color, 
+                        borderRadius: 10,
+                    }, style 
+                    ]}
             >
                 <View style={{ flexDirection: 'column', alignItems: 'center', gap: 8 }}>
                     <Feather name="plus" size={20} color={colors.semantic.text.primary} />

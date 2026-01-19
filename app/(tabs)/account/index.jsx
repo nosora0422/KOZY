@@ -6,7 +6,7 @@ import Badge from "@/components/ui/badge";
 import { Feather } from "@expo/vector-icons";
 
 
-export default function Account() {
+export default function AccountScreen() {
   const insets = useSafeAreaInsets();
 
   return (
@@ -37,6 +37,14 @@ export default function Account() {
               <Feather name="bookmark" size={20} color='#fff' />
               <AppText variant="body-md" color="primary">
                 Saved List
+              </AppText>
+            </View>
+          </Pressable>
+          <Pressable onPress={() => router.push('/(tabs)/account/savedList')}>
+            <View style={styles.manuButton}>
+              <Feather name="list" size={20} color='#fff' />
+              <AppText variant="body-md" color="primary">
+                My Listings
               </AppText>
             </View>
           </Pressable>
@@ -107,8 +115,8 @@ const styles = StyleSheet.create({
     borderRadius: 16,
   },
   manuButton: {
-    display: 'flex',
     flexDirection: 'row',
+    alignItems: 'center',
     gap: 16,
     paddingHorizontal: 24,
     paddingVertical: 12

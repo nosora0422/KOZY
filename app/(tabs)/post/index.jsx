@@ -5,9 +5,10 @@ import AppText from '@/components/ui/appText';
 import AppButton from '@/components/ui/appButton';
 
 
-export default function Post() {
+export default function PostScreen() {
   const insets = useSafeAreaInsets();
   const pathname = usePathname();
+  const isLogedIn = true;
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
@@ -39,15 +40,27 @@ export default function Post() {
                   • Get matched with compatible seekers
               </AppText>            
             </View>
+
+          {!isLogedIn && 
+            <AppButton 
+              text='Sign Up / Log In'
+              onPress={() => {
+                router.push({
+                  pathname: "/(auth)/login",
+                  params: { redirect: pathname },
+                });
+              }} 
+            />}
+          {isLogedIn && 
           <AppButton 
-            text='Sign Up / Log In'
+            text='Start Listing Now'
             onPress={() => {
               router.push({
-                pathname: "/(auth)/login",
+                pathname: "/post/stepOne",
                 params: { redirect: pathname },
               });
             }} 
-          />
+          />}
         </View>
     </View>
   );
@@ -57,7 +70,6 @@ const styles = StyleSheet.create({
   container :{
     flex: 1,
     paddingHorizontal: 16,
-    paddingBottom: Platform.OS === 'ios' ? 100 : 16,
   },
   content: {
     flex: 1,

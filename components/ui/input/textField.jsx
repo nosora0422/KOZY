@@ -11,6 +11,7 @@ export default function TextField({
   disabled,
   onChangeText,
   type,
+  style,
   ...props
 }) {
 
@@ -44,6 +45,7 @@ export default function TextField({
           borderColor: border.color,
           borderWidth: border.width,
         },
+        style
       ]}
     />
   );
