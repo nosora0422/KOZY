@@ -49,6 +49,7 @@ export default function EmailScreen() {
           </View>
           <FormField error={error}>
             <TextField
+              error={error}
               value={signup.email}
               placeholder="Enter your email"
               type="auth"
@@ -59,7 +60,7 @@ export default function EmailScreen() {
             />
           </FormField>
         </View>
-        <View>
+        <View style={{ width: '100%'}}>
           <AppButton
             text="Send Verification Code"
             onPress={() => {

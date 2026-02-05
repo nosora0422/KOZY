@@ -40,7 +40,7 @@ export default function AccountScreen() {
               </AppText>
             </View>
           </Pressable>
-          <Pressable onPress={() => router.push('/(tabs)/account/savedList')}>
+          <Pressable onPress={() => router.push('/(tabs)/account/myListings')}>
             <View style={styles.manuButton}>
               <Feather name="list" size={20} color='#fff' />
               <AppText variant="body-md" color="primary">

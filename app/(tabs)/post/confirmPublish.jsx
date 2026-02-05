@@ -1,14 +1,17 @@
-import { router, usePathname } from "expo-router";
+import { router, usePathname, useLocalSearchParams } from "expo-router";
 import { Platform, StyleSheet, View} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AppText from '@/components/ui/appText';
 import AppButton from '@/components/ui/appButton';
 import { Feather } from "@expo/vector-icons";
+import { DATA } from "@/data/mockListData";
 
 
 export default function ConfrimPublish() {
   const insets = useSafeAreaInsets();
   const pathname = usePathname();
+  //const { id } = useLocalSearchParams();
+  const id = DATA[0].id;
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
@@ -34,20 +37,14 @@ export default function ConfrimPublish() {
                     text='View My List'
                     type='secondary'
                     onPress={() => {
-                    router.push({
-                        pathname: "/(auth)/login",
-                        params: { redirect: pathname },
-                        });
+                    router.push(`/(tabs)/post/uploadedPost/${id}`);
                     }} 
                 />
                 <AppButton 
                     text='Go to My Listings'
                     type='secondary'
                     onPress={() => {
-                        router.push({
-                        pathname: "/post/stepOne",
-                        params: { redirect: pathname },
-                        });
+                        router.push("/(tabs)/account/myListings");
                     }} 
                 />
             </View>

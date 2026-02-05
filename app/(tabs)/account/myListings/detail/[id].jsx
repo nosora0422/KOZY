@@ -1,17 +1,38 @@
-import { View, Text, StyleSheet, Platform, FlatList, Image, Dimensions, ScrollView, Alert } from 'react-native';
-import { router, useLocalSearchParams } from 'expo-router';
+import { View, Text, StyleSheet, Platform, FlatList, Image, Dimensions, ScrollView } from 'react-native';
+import { router, useLocalSearchParams, useFocusEffect, useNavigation } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Feather } from '@expo/vector-icons';
 import { DATA } from '@/data/mockListData';
 import DisplayField from '@/components/ui/displayField';
 import AppButton from '@/components/ui/appButton';
+import AppIconButton from '@/components/ui/appIconButton';
+import { useCallback } from 'react';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const ITEM_WIDTH = SCREEN_WIDTH * 0.8;
 const ITEM_SPACING = 12;
 const IMAGE_HEIGHT = 228;
 
-export default function DetailScreen() {
+export default function MyPostDetail() {
+  const navigation = useNavigation();
+  const insets = useSafeAreaInsets();
   const { id } = useLocalSearchParams();
   const item = DATA.find(d => d.id === id);
+
+  useFocusEffect(
+    useCallback(() => {
+      const parent = navigation.getParent();
+      parent?.setOptions({
+        tabBarStyle: { display: 'none' },
+      });
+
+      return () => {
+        parent?.setOptions({
+          tabBarStyle: undefined,
+        });
+      };
+    }, [navigation])
+  );
 
   if (!item) {
     return (
@@ -22,34 +43,34 @@ export default function DetailScreen() {
   }
 
   return (
-    <ScrollView 
-      contentContainerStyle={styles.container}
-      keyboardShouldPersistTaps="handled"
-    >
-      <Text style={styles.sectionTitle}>Room Details</Text>
-      <FlatList
-        data={item.images}
-        horizontal
-        pagingEnabled
-        showsHorizontalScrollIndicator={false}
-        snapToInterval={ITEM_WIDTH + ITEM_SPACING}
-        decelerationRate="fast"
-        contentContainerStyle={{
-            paddingRight: (SCREEN_WIDTH - ITEM_WIDTH) / 2,
-        }}
-        keyExtractor={(uri, index) => `${uri}-${index}`}
-        renderItem={({ item: image }) => (
-          <View style={{ width: ITEM_WIDTH, marginRight: ITEM_SPACING }}>
-            <Image
-                source={{ uri: image }}
-                style={styles.image}
-                resizeMode="cover"
-            />
-          </View>
-        )}
-      />
-      
-      {/* Details */}
+      <ScrollView 
+        contentContainerStyle={styles.container}
+        keyboardShouldPersistTaps="handled"
+      >
+        <Text style={styles.sectionTitle}>Room Details</Text>
+        <FlatList
+          data={item.images}
+          horizontal
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+          snapToInterval={ITEM_WIDTH + ITEM_SPACING}
+          decelerationRate="fast"
+          contentContainerStyle={{
+              paddingRight: (SCREEN_WIDTH - ITEM_WIDTH) / 2,
+          }}
+          keyExtractor={(uri, index) => `${uri}-${index}`}
+          renderItem={({ item: image }) => (
+            <View style={{ width: ITEM_WIDTH, marginRight: ITEM_SPACING }}>
+              <Image
+                  source={{ uri: image }}
+                  style={styles.image}
+                  resizeMode="cover"
+              />
+            </View>
+          )}
+        />
+        
+        {/* Details */}
         <View style={styles.content}>
           <DisplayField title="Location">
             {`${item.street}, ${item.city}, ${item.province}`}
@@ -58,7 +79,7 @@ export default function DetailScreen() {
             source={require('@/assets/images/map-placeholder.png')}
             style={styles.mapImage}
             resizeMode="cover"
-            />
+          />
           <DisplayField title="Price">
             ${item.price} / month
           </DisplayField>
@@ -104,9 +125,9 @@ export default function DetailScreen() {
             <Text style={styles.spec}>📐 {item.sizeSqft} sqft</Text>
           </View>
 
-          <View style={styles.divider}></View>
+          {/* <View style={styles.divider}></View> */}
 
-          {/* Owner */}
+          {/* Owner
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Roommate Information</Text>
             <FlatList
@@ -157,37 +178,14 @@ export default function DetailScreen() {
             <DisplayField title="About Me">
               {item.owner.aboutMe}
             </DisplayField>
-
-            {/* <View style={styles.ownerRow}>
-              <Image
-                source={{ uri: item.owner.avatar[0] }}
-                style={styles.avatar}
-              />
-              <Text style={styles.ownerName}>{item.owner.name}</Text>
-            </View> */}
-          </View>
-        </View>
+          </View>*/}
+        </View> 
         <AppButton 
-          text="Send Chat Request" 
-          type="primary" 
-          onPress={() => {
-            Alert.alert(
-              'Request Sent',
-              'To send a chat request, please upload a photo and set your preferences. This helps build trust and improves your match quality.',
-              [{
-                text: 'Close',
-                style: 'cancel',
-              },
-              {
-                text: 'Complete Profile',
-                onPress: () => {
-                  router.push('/(tabs)/account/editProfile');
-                },
-              },]
-            );
-          }}
+          text="Edit Listing" 
+          type="secondary" 
+          onPress={() => router.push('/(tabs)/post')}
         />
-    </ScrollView>
+      </ScrollView>
   );
 }
 
@@ -197,26 +195,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingBottom: Platform.OS === 'ios' ? 100 : 16,
     overflow: 'hidden'
-  },
-  title: {
-    color: 'white',
-    fontSize: 20,
-    fontWeight: '700',
-    marginBottom: 6,
-  },
-  price: {
-    color: 'white',
-    fontSize: 18,
-    fontWeight: '600',
-  },
-  location: {
-    color: '#bbb',
-    marginBottom: 12,
-  },
-  description: {
-    color: 'white',
-    lineHeight: 20,
-    marginBottom: 16,
   },
   specRow: {
     flexDirection: 'row',
@@ -242,20 +220,6 @@ const styles = StyleSheet.create({
     color: '#ccc',
     marginBottom: 4,
   },
-  ownerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  avatar: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-  },
-  ownerName: {
-    color: 'white',
-    fontSize: 16,
-  },
   center: {
     flex: 1,
     alignItems: 'center',
@@ -280,5 +244,10 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: '#ffffff',
     marginVertical: 8,
+  },
+  topBar: {
+    position: 'absolute',
+    left: 16,
+    zIndex: 10,
   },
 });

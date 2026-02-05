@@ -9,11 +9,6 @@ export default function SignupLayout() {
         headerShown: true,
         headerBackTitleVisible: true,
         headerTitle: "",
-        headerRight: () => (
-          <Pressable onPress={() => router.replace("/(tabs)/home")}>
-            <Feather name="home" size={22} color="#fff" />
-          </Pressable>
-        ),
       }}
     />
   );

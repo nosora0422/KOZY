@@ -5,7 +5,7 @@ import { FlatList } from 'react-native';
 import { VideoView, useVideoPlayer } from 'expo-video';
 
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { router, useFocusEffect } from 'expo-router';
+import { router, useFocusEffect, useLocalSearchParams, useNavigation} from 'expo-router';
 import { Feather } from '@expo/vector-icons';
 
 import AppIconButton from '@/components/ui/appIconButton';
@@ -15,73 +15,49 @@ import { DATA } from '@/data/mockListData';
 
 const { height } = Dimensions.get('window');
 
-export default function HomeScreen() {
-  
+export default function SavedList() {
+  const navigation = useNavigation();
   const insets = useSafeAreaInsets();
-  const [activeIndex, setActiveIndex] = useState(0);
+  const { id } = useLocalSearchParams();
+  const item = id ? DATA.find(d => d.id === id) : DATA[0];
 
-  const onViewableItemsChanged = useRef(({ viewableItems }) => {
-    if (viewableItems.length > 0) {
-      setActiveIndex(viewableItems[0].index);
-    }
-  }).current;
+  useFocusEffect(
+    useCallback(() => {
+      const parent = navigation.getParent();
+      parent?.setOptions({
+        tabBarStyle: { display: 'none' },
+      });
 
-  return (
-    <View style={styles.container}>
-      {/* 🔝 Top Bar */}
-      <View style={[styles.topBar, { top: insets.top + 12 }]}>
-        <AppIconButton
-          icon={<Feather name="search" />}
-          type="ghost"
-          size="lg"
-          onPress={() => router.push('/home/search')}
-        />
-      </View>
-      <FlatList
-        data={DATA}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item: reel, index }) => (
-          <ReelItem
-            item={reel}
-            isActive={index === activeIndex}
-            insets={insets}
-          />
-        )}
-        pagingEnabled
-        showsVerticalScrollIndicator={false}
-        onViewableItemsChanged={onViewableItemsChanged}
-        viewabilityConfig={{ itemVisiblePercentThreshold: 80 }}
-        windowSize={3}
-        initialNumToRender={1}
-        maxToRenderPerBatch={1}
-      />
-    </View>
+      return () => {
+        parent?.setOptions({
+          tabBarStyle: undefined,
+        });
+      };
+    }, [])
   );
-}
 
-/* Reel Item*/
-
-function ReelItem({ item, isActive, insets }) {
-  const player = useVideoPlayer(item.videoUrl, (player) => {
+  const player = useVideoPlayer(item?.videoUrl, (player) => {
+    if (!player) return;
     player.loop = true;
     player.muted = true;
   });
-
-  // 🔑 THIS is what actually starts video playback
-  useEffect(() => {
-    if (isActive) {
-      player.play();
-    } else {
-      player.pause();
-    }
-  }, [isActive]);
 
   const toggleMute = () => {
     player.muted = !player.muted;
   };
 
   return (
-    <Pressable style={styles.reel} onPress={toggleMute}>
+    <View style={styles.container}>
+      {/* 🔝 Top Bar */}
+      <View style={[styles.topBar, { top: insets.top + 12 }]}>
+        <AppIconButton
+          icon={<Feather name="arrow-left" size={32} />}
+          type="ghost"
+          size="lg"
+          onPress={() => router.back()}
+        />
+      </View>
+      <Pressable style={styles.reel} onPress={toggleMute}>
       {/* 🎥 Video */}
       <VideoView
         player={player}
@@ -89,17 +65,16 @@ function ReelItem({ item, isActive, insets }) {
         contentFit="cover"
         pointerEvents="none"
       />
-      
 
       {/* Right Actions */}
-      <View style={[styles.rightActions, { bottom: insets.bottom + 100 }]}>
+      <View style={[styles.rightActions, { bottom: insets.bottom + 20 }]}>
         <AppIconButton icon={<Feather name="heart" />} type="bare" />
         <AppIconButton icon={<Feather name="share-2" />} type="bare" />
         <AppIconButton icon={<Feather name="repeat" />} type="bare" />
       </View>
 
       {/* Bottom Left */}
-      <View style={[styles.bottomLeft, { bottom: insets.bottom + 100 }]}>
+      <View style={[styles.bottomLeft, { bottom: insets.bottom + 20 }]}>
         <Text style={styles.username}>${item.price} / month</Text>
         <Text style={styles.question} numberOfLines={2}>
           {item.city}, {item.province}
@@ -109,13 +84,15 @@ function ReelItem({ item, isActive, insets }) {
             text="Detail"
             size="sm"
             type='primary'
-            onPress={() => router.push(`/home/${item.id}`)}
+            onPress={() => router.push(`/(tabs)/account/savedList/detail/${item.id}`)}
           />
         </View>
       </View>
     </Pressable>
+    </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {
@@ -128,15 +105,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'black',
   },
   topBar: {
-    position: 'absolute',
+    position: 'absolute', 
     left: 16,
     zIndex: 10,
-  },
-  rightActions: {
-    position: 'absolute',
-    right: 20,
-    gap: 12,
-    alignItems: 'center',
   },
   bottomLeft: {
     position: 'absolute',
@@ -146,6 +117,12 @@ const styles = StyleSheet.create({
   bottomCTA: {
     marginTop: 12,
     width: 67,
+  },
+  rightActions: {
+    position: 'absolute',
+    right: 20,
+    gap: 12,
+    alignItems: 'center',
   },
   username: {
     color: 'white',

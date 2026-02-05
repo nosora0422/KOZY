@@ -180,7 +180,12 @@ export default function PreviewListing() {
         <AppButton 
           text="Confirm & Publish" 
           type="primary" 
-          onPress={() => {}}
+          onPress={() => {
+            router.push({
+              pathname: '/(tabs)/post/confirmPublish',
+              params: { id: item.id }
+            })
+          }}
         />
     </ScrollView>
   );

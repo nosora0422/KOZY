@@ -1,15 +1,17 @@
 import { Platform, StyleSheet, View, FlatList, Pressable, Alert } from 'react-native';
 import { Image } from 'expo-image';
+import { useLayoutEffect } from 'react';
+import { Feather } from '@expo/vector-icons';
 
 import { DATA } from '@/data/mockListData';
 import { colors } from '@/constants/colors';
 import AppButton from '@/components/ui/appButton';
 import AppText from '@/components/ui/appText';
-import { router } from 'expo-router';
+import { router, useNavigation } from 'expo-router';
 import { useState } from 'react';
 import RadioButton from '@/components/ui/input/radioButton';
 
-export default function SavedList() {
+export default function MyListings() {
   const listings = DATA;
   const [isEditMode, setIsEditMode] = useState(null);
   const [selectedItems, setSelectedItems] = useState([]);
@@ -24,8 +26,6 @@ export default function SavedList() {
         }
     });
     };
-
-
 
   if (!listings || listings.length === 0) {
     return (
@@ -102,14 +102,9 @@ export default function SavedList() {
             style={styles.card}
             onPress={() => {
                 if (isEditMode) return;
-                router.push({
-                    pathname: '/home/[id]',
-                    params: {
-                        id: item.id,
-                        from: 'account/savedList',
-                    },
-                    });}}
-        >
+                router.push(`account/myListings/${item.id}`);
+              }}
+         >
             {/* Owner */}
             <View>
                 <Image

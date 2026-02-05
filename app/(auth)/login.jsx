@@ -94,7 +94,7 @@ export default function Login() {
               if (!validate()) return;
 
               // integrate API
-              router.replace(redirect ?? "/(tabs)");
+              router.replace(redirect ?? "/(tabs)/home");
             }}
           />
 

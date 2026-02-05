@@ -24,12 +24,12 @@ export default function Success() {
             text="Boost My Profile"
             onPress={() => {
               // varifyCode(signup.verificationCode)
-              router.push("/(auth)/signUp/password");
+              router.push("/(tabs)/account/editProfile");
             }}
           />
           <AppButton
             text="Later & Back to Home"
-            onPress={() => {}}
+            onPress={() => router.push("/(tabs)/home")}
             type="secondary"
           />
         </View>
