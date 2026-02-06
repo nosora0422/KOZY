@@ -3,6 +3,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { Platform, StyleSheet, View, Dimensions, ScrollView, Alert, FlatList, Pressable } from 'react-native';
 import { Image } from 'expo-image';
 import { useLocalSearchParams, useNavigation, router } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { DATA } from '@/data/mockListData';
 import AppText from '@/components/ui/appText';
@@ -22,19 +23,14 @@ export default function StepFour() {
     const item = DATA[0]
 
     useFocusEffect(
-      useCallback(() => {
-        const parent = navigation.getParent();
-        parent?.setOptions({
-          tabBarStyle: { display: 'none' },
-        });
-
-        return () => {
+        useCallback(() => {
+          const parent = navigation.getParent();
           parent?.setOptions({
-            tabBarStyle: undefined,
+            tabBarStyle: { display: 'none' },
           });
-        };
-      }, [])
-    );
+        }, [navigation])
+      );
+
 
   return (
     <View style={{ flex: 1, overflow: 'visible' }}>
@@ -161,7 +157,7 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: 'black',
     paddingHorizontal: 16,
-    paddingBottom: Platform.OS === 'ios' ? 100 : 16,
+    paddingBottom: Platform.OS === 'ios' ? 50 : 16,
   },
   buttonContainer:{
     width: '100%',

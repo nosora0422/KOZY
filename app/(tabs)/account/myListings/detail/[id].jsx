@@ -1,10 +1,12 @@
 import { View, Text, StyleSheet, Platform, FlatList, Image, Dimensions, ScrollView } from 'react-native';
 import { router, useLocalSearchParams, useFocusEffect, useNavigation } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useCallback } from 'react';
+
 import { DATA } from '@/data/mockListData';
 import DisplayField from '@/components/ui/displayField';
 import AppButton from '@/components/ui/appButton';
-import { useCallback } from 'react';
+
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const ITEM_WIDTH = SCREEN_WIDTH * 0.8;
@@ -191,7 +193,7 @@ const styles = StyleSheet.create({
   container: { 
     backgroundColor: 'black', 
     paddingHorizontal: 16,
-    paddingBottom: Platform.OS === 'ios' ? 100 : 16,
+    paddingBottom: Platform.OS === 'ios' ? 50 : 16,
     overflow: 'hidden'
   },
   specRow: {

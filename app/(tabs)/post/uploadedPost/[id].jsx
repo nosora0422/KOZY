@@ -18,19 +18,32 @@ export default function UploadedPost() {
   const item = id ? DATA.find(d => d.id === id) : DATA[0];
 
   useFocusEffect(
-    useCallback(() => {
-      const parent = navigation.getParent();
-      parent?.setOptions({
-        tabBarStyle: { display: 'none' },
-      });
-
-      return () => {
-        parent?.setOptions({
-          tabBarStyle: undefined,
-        });
-      };
-    }, [])
-  );
+          useCallback(() => {
+            const parent = navigation.getParent();
+            parent?.setOptions({
+              tabBarStyle: { display: 'none' },
+            });
+    
+            return () => {
+              parent?.setOptions({
+                tabBarStyle: { 
+                  display: 'flex',
+                  position: 'absolute',
+                  alignSelf: 'center', 
+                  bottom: insets.bottom + 10,
+                  borderRadius: 16,
+                  borderTopWidth: 0,
+                  height: 56,
+                  backgroundColor: 'rgba(0,0,0,1)',
+                  maxWidth: 400,
+                  paddingTop: 7,
+                  marginHorizontal: 16,
+                },
+              });
+            };
+          }, [navigation, insets])
+        );
+  
 
   const player = useVideoPlayer(item?.videoUrl, (player) => {
     if (!player) return;

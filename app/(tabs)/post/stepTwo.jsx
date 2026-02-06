@@ -19,19 +19,13 @@ export default function StepTwo() {
     const insets = useSafeAreaInsets();
 
     useFocusEffect(
-      useCallback(() => {
-        const parent = navigation.getParent();
-        parent?.setOptions({
-          tabBarStyle: { display: 'none' },
-        });
-
-        return () => {
+        useCallback(() => {
+          const parent = navigation.getParent();
           parent?.setOptions({
-            tabBarStyle: undefined,
+            tabBarStyle: { display: 'none' },
           });
-        };
-      }, [])
-    );
+        }, [navigation])
+      );
 
   return (
     <ScrollView 
@@ -92,7 +86,7 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: 'black',
     paddingHorizontal: 16,
-    paddingBottom: Platform.OS === 'ios' ? 100 : 16,
+    paddingBottom: Platform.OS === 'ios' ? 50 : 16,
   },
   buttonContainer:{
     width: '100%',

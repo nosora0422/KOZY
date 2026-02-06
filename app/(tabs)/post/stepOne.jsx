@@ -34,19 +34,31 @@ export default function StepOne() {
     const insets = useSafeAreaInsets();
 
     useFocusEffect(
-      useCallback(() => {
-        const parent = navigation.getParent();
-        parent?.setOptions({
-          tabBarStyle: { display: 'none' },
-        });
-
-        return () => {
+        useCallback(() => {
+          const parent = navigation.getParent();
           parent?.setOptions({
-            tabBarStyle: undefined,
+            tabBarStyle: { display: 'none' },
           });
-        };
-      }, [])
-    );
+  
+          return () => {
+            parent?.setOptions({
+              tabBarStyle: { 
+                display: 'flex',
+                position: 'absolute',
+                alignSelf: 'center', 
+                bottom: insets.bottom + 10,
+                borderRadius: 16,
+                borderTopWidth: 0,
+                height: 56,
+                backgroundColor: 'rgba(0,0,0,1)',
+                maxWidth: 400,
+                paddingTop: 7,
+                marginHorizontal: 16,
+              },
+            });
+          };
+        }, [navigation, insets])
+      );
 
   return (
     <ScrollView 
@@ -221,7 +233,7 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: 'black',
     paddingHorizontal: 16,
-    paddingBottom: Platform.OS === 'ios' ? 100 : 16,
+    paddingBottom: Platform.OS === 'ios' ? 50 : 16,
   },
   buttonContainer:{
     width: '100%',

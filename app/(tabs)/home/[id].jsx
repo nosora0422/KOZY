@@ -196,7 +196,7 @@ const styles = StyleSheet.create({
   container: { 
     backgroundColor: 'black', 
     paddingHorizontal: 16,
-    paddingBottom: Platform.OS === 'ios' ? 100 : 16,
+    paddingBottom: Platform.OS === 'ios' ? 50 : 16,
     overflow: 'hidden'
   },
   title: {

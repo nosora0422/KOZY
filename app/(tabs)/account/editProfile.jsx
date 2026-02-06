@@ -3,6 +3,7 @@ import { Image } from 'expo-image';
 import { useFocusEffect } from '@react-navigation/native';
 import { Platform, StyleSheet, View, Dimensions, ScrollView, FlatList, } from 'react-native';
 import { useLocalSearchParams, useNavigation } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import PillGroup from '@/components/ui/pill/pillGroup';
 import AppText from '@/components/ui/appText';
@@ -29,6 +30,7 @@ const IMAGE_HEIGHT = 228;
 
 
 export default function EditProfile() {
+    const insets = useSafeAreaInsets();
     const navigation = useNavigation();
     const { id } = useLocalSearchParams();
     const item = DATA[0];
@@ -69,10 +71,22 @@ export default function EditProfile() {
 
         return () => {
           parent?.setOptions({
-            tabBarStyle: undefined,
+            tabBarStyle: { 
+              display: 'flex',
+              position: 'absolute',
+              alignSelf: 'center', 
+              bottom: insets.bottom + 10,
+              borderRadius: 16,
+              borderTopWidth: 0,
+              height: 56,
+              backgroundColor: 'rgba(0,0,0,1)',
+              maxWidth: 400,
+              paddingTop: 7,
+              marginHorizontal: 16,
+            },
           });
         };
-      }, [])
+      }, [navigation, insets])
     );
 
   const addPhoto = async () => {
@@ -144,12 +158,12 @@ export default function EditProfile() {
                 />
               </View>
             </View>
-
+            {/* Help Text */}
             <DisplayField title="My Profile" style={{ marginBottom: 16 }}>
               Keeping your ID, photo, and profile details up to date helps us build trust in the KOZY community.
             </DisplayField>
 
-            
+            {/* Inputs */}
             <DisplayInput
               label="Gender"
               value={gender}
@@ -218,7 +232,7 @@ export default function EditProfile() {
           </View>
         )}
       />
-
+      {/* Drawers */}
       <AppDrawer
             ref={genderDrawerRef}
             title="What’s your gender?"
@@ -396,7 +410,7 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: 'black',
     paddingHorizontal: 16,
-    paddingBottom: Platform.OS === 'ios' ? 100 : 16,
+    paddingBottom: Platform.OS === 'ios' ? 50 : 16,
   },
   mapContainer: {
     marginBottom: 24,

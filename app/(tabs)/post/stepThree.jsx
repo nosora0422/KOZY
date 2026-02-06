@@ -30,7 +30,6 @@ export default function StepThree() {
                 player.loop = true;
             }
             );
-    const insets = useSafeAreaInsets();
 
     const exampleVideo1 = useVideoPlayer(
         'https://www.w3schools.com/html/mov_bbb.mp4',
@@ -73,19 +72,14 @@ export default function StepThree() {
 
 
     useFocusEffect(
-      useCallback(() => {
-        const parent = navigation.getParent();
-        parent?.setOptions({
-          tabBarStyle: { display: 'none' },
-        });
-
-        return () => {
+        useCallback(() => {
+          const parent = navigation.getParent();
           parent?.setOptions({
-            tabBarStyle: undefined,
+            tabBarStyle: { display: 'none' },
           });
-        };
-      }, [])
-    );
+        }, [navigation])
+      );
+
 
   return (
     <View style={{ flex: 1, overflow: 'visible' }}>
@@ -231,7 +225,7 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: 'black',
     paddingHorizontal: 16,
-    paddingBottom: Platform.OS === 'ios' ? 100 : 16,
+    paddingBottom: Platform.OS === 'ios' ? 50 : 16,
   },
   buttonContainer:{
     width: '100%',
