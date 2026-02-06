@@ -33,6 +33,7 @@ export const DATA = [
       aboutMe:
         'Hi! I am Alex, a photographer who loves capturing the vibrant life of New York City. I enjoy meeting new people and sharing experiences. Looking for a friendly roommate to share this amazing apartment with!',
     },
+    publishedDate: '2024-06-15',
   },
   {
     id: '2',
@@ -68,6 +69,7 @@ export const DATA = [
       aboutMe:
         'Hi! I am Samantha, a photographer who loves capturing the vibrant life of New York City. I enjoy meeting new people and sharing experiences. Looking for a friendly roommate to share this amazing apartment with!',
     },
+    publishedDate: '2024-06-15',
   },
   {
     id: '3',
@@ -103,5 +105,42 @@ export const DATA = [
       aboutMe:
         'Hi! I am Daniel, a photographer who loves capturing the vibrant life of New York City. I enjoy meeting new people and sharing experiences. Looking for a friendly roommate to share this amazing apartment with!',
     },
+    publishedDate: '2024-06-15',
+  },
+  {
+    id: '4',
+    videoUrl: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
+    price: 3200,
+    street: '123 Broadway Ave',
+    city: 'Downtown',
+    province: 'San Francisco',
+    title: 'Luxury 1BR Downtown SF',
+    availableFrom: '2024-07-01',
+    leaseType: 'Fixed-term',
+    roomType: 'Shared Room',
+    bathroomType: 'Private',
+    description:
+      'Luxury one-bedroom apartment in downtown San Francisco with premium finishes, floor-to-ceiling windows, and access to rooftop amenities.',
+    bedrooms: 1,
+    bathrooms: 1,
+    sizeSqft: 680,
+    furnished: true,
+    amenities: ['Rooftop', 'Concierge', 'Gym', 'Parking'],
+    images: [
+      'https://picsum.photos/800/1200?random=5',
+      'https://picsum.photos/800/1200?random=6',
+    ],
+    owner: {
+      name: 'Daniel Kim',
+      avatar: ['https://i.pravatar.cc/150?img=8', 'https://i.pravatar.cc/150?img=9'],
+      gender: 'Male',
+      ageGroup: '20s',
+      occupation: 'Photographer',
+      personality: 'Creative and outgoing',
+      lifestyle: 'Enjoys exploring the city and attending art events',
+      aboutMe:
+        'Hi! I am Daniel, a photographer who loves capturing the vibrant life of New York City. I enjoy meeting new people and sharing experiences. Looking for a friendly roommate to share this amazing apartment with!',
+    },
+    publishedDate: '2024-06-15',
   },
 ];

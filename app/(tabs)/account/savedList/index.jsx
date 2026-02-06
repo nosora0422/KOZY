@@ -1,18 +1,33 @@
 import { Platform, StyleSheet, View, FlatList, Pressable, Alert } from 'react-native';
 import { Image } from 'expo-image';
 
-import { DATA } from '@/data/mockListData';
-import { colors } from '@/constants/colors';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import AppButton from '@/components/ui/appButton';
 import AppText from '@/components/ui/appText';
-import { router } from 'expo-router';
-import { useState } from 'react';
+import { router, useFocusEffect } from 'expo-router';
+import { useState, useCallback } from 'react';
 import RadioButton from '@/components/ui/input/radioButton';
 
 export default function SavedList() {
-  const listings = DATA;
+  const [listings, setListings] = useState([]);
   const [isEditMode, setIsEditMode] = useState(null);
   const [selectedItems, setSelectedItems] = useState([]);
+
+  const loadSavedListings = useCallback(async () => {
+    try {
+      const stored = await AsyncStorage.getItem('savedListings');
+      const parsed = stored ? JSON.parse(stored) : [];
+      setListings(parsed);
+    } catch (error) {
+      setListings([]);
+    }
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      loadSavedListings();
+    }, [loadSavedListings])
+  );
 
   const toogleEdit = () => {setIsEditMode(prev => !prev)};
   const toggleSelectItem = (id) => {

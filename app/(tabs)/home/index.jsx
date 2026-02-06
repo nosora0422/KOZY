@@ -1,12 +1,13 @@
 import React, { useRef, useState, useCallback, useEffect } from 'react';
-import { View, StyleSheet, Dimensions, Text, AppState, Pressable } from 'react-native';
+import { View, StyleSheet, Dimensions, Text, Share, Pressable } from 'react-native';
 
 import { FlatList } from 'react-native'; 
 import { VideoView, useVideoPlayer } from 'expo-video';
 
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router, useFocusEffect } from 'expo-router';
-import { Feather } from '@expo/vector-icons';
+import { Feather, MaterialIcons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import AppIconButton from '@/components/ui/appIconButton';
 import AppButton from '@/components/ui/appButton';
@@ -14,17 +15,62 @@ import AppButton from '@/components/ui/appButton';
 import { DATA } from '@/data/mockListData';
 
 const { height } = Dimensions.get('window');
+const SAVED_LISTINGS_KEY = 'savedListings';
 
 export default function HomeScreen() {
   
   const insets = useSafeAreaInsets();
   const [activeIndex, setActiveIndex] = useState(0);
+  const [savedListings, setSavedListings] = useState([]);
+  const [savedIds, setSavedIds] = useState(new Set());
+
+  const loadSavedListings = useCallback(async () => {
+    try {
+      const stored = await AsyncStorage.getItem(SAVED_LISTINGS_KEY);
+      const parsed = stored ? JSON.parse(stored) : [];
+      setSavedListings(parsed);
+      setSavedIds(new Set(parsed.map((item) => item.id)));
+    } catch (error) {
+      // noop
+    }
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      loadSavedListings();
+    }, [loadSavedListings])
+  );
+
+  const handleToggleSave = useCallback((item) => {
+    setSavedListings((prev) => {
+      const exists = prev.some((saved) => saved.id === item.id);
+      const next = exists
+        ? prev.filter((saved) => saved.id !== item.id)
+        : [item, ...prev];
+
+      setSavedIds(new Set(next.map((saved) => saved.id)));
+      AsyncStorage.setItem(SAVED_LISTINGS_KEY, JSON.stringify(next)).catch(() => {});
+      return next;
+    });
+  }, []);
 
   const onViewableItemsChanged = useRef(({ viewableItems }) => {
     if (viewableItems.length > 0) {
       setActiveIndex(viewableItems[0].index);
     }
   }).current;
+
+  const onShare = async () => {
+    try {
+      await Share.share({
+        message: "Check this out! 👀",
+        url: "https://example.com", // iOS uses this
+        title: "Share link",        // Android uses this
+      });
+    } catch (error) {
+      console.error("Share error:", error);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -45,6 +91,9 @@ export default function HomeScreen() {
             item={reel}
             isActive={index === activeIndex}
             insets={insets}
+            isSaved={savedIds.has(reel.id)}
+            onToggleSave={handleToggleSave}
+            onShare={onShare}
           />
         )}
         pagingEnabled
@@ -60,8 +109,7 @@ export default function HomeScreen() {
 }
 
 /* Reel Item*/
-
-function ReelItem({ item, isActive, insets }) {
+function ReelItem({ item, isActive, insets, isSaved, onToggleSave, onShare }) {
   const player = useVideoPlayer(item.videoUrl, (player) => {
     player.loop = true;
     player.muted = true;
@@ -90,11 +138,14 @@ function ReelItem({ item, isActive, insets }) {
         pointerEvents="none"
       />
       
-
       {/* Right Actions */}
       <View style={[styles.rightActions, { bottom: insets.bottom + 100 }]}>
-        <AppIconButton icon={<Feather name="heart" />} type="bare" />
-        <AppIconButton icon={<Feather name="share-2" />} type="bare" />
+        <AppIconButton
+          icon={<MaterialIcons name={isSaved ? "favorite" : "favorite-border"} />}
+          type='bare'
+          onPress={() => onToggleSave(item)}
+        />
+        <AppIconButton icon={<Feather name="share-2" />} type="bare" onPress={() => onShare(item)} />
         <AppIconButton icon={<Feather name="repeat" />} type="bare" />
       </View>
 

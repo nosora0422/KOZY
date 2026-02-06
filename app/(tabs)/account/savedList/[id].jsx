@@ -1,5 +1,5 @@
 import React, { useRef, useState, useCallback, useEffect } from 'react';
-import { View, StyleSheet, Dimensions, Text, AppState, Pressable } from 'react-native';
+import { View, StyleSheet, Dimensions, Text, Share, Pressable } from 'react-native';
 
 import { FlatList } from 'react-native'; 
 import { VideoView, useVideoPlayer } from 'expo-video';
@@ -7,6 +7,8 @@ import { VideoView, useVideoPlayer } from 'expo-video';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router, useFocusEffect, useLocalSearchParams, useNavigation} from 'expo-router';
 import { Feather } from '@expo/vector-icons';
+import { MaterialIcons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import AppIconButton from '@/components/ui/appIconButton';
 import AppButton from '@/components/ui/appButton';
@@ -20,6 +22,40 @@ export default function SavedList() {
   const insets = useSafeAreaInsets();
   const { id } = useLocalSearchParams();
   const item = id ? DATA.find(d => d.id === id) : DATA[0];
+  const [isSaved, setIsSaved] = useState(false);
+
+  const loadSavedState = useCallback(async () => {
+    try {
+      const stored = await AsyncStorage.getItem('savedListings');
+      const parsed = stored ? JSON.parse(stored) : [];
+      setIsSaved(parsed.some((saved) => saved.id === item?.id));
+    } catch (error) {
+      setIsSaved(false);
+    }
+  }, [item?.id]);
+
+  useFocusEffect(
+    useCallback(() => {
+      loadSavedState();
+    }, [loadSavedState])
+  );
+
+  const handleToggleSave = useCallback(async () => {
+    try {
+      const stored = await AsyncStorage.getItem('savedListings');
+      const parsed = stored ? JSON.parse(stored) : [];
+      const exists = parsed.some((saved) => saved.id === item?.id);
+      const next = exists
+        ? parsed.filter((saved) => saved.id !== item?.id)
+        : [item, ...parsed];
+
+      await AsyncStorage.setItem('savedListings', JSON.stringify(next));
+      setIsSaved(!exists);
+      router.back();
+    } catch (error) {
+      // noop
+    }
+  }, [item]);
 
   useFocusEffect(
     useCallback(() => {
@@ -35,6 +71,18 @@ export default function SavedList() {
       };
     }, [])
   );
+
+  const onShare = async () => {
+      try {
+        await Share.share({
+          message: "Check this out! 👀",
+          url: "https://example.com", // iOS uses this
+          title: "Share link",        // Android uses this
+        });
+      } catch (error) {
+        console.error("Share error:", error);
+      }
+    };
 
   const player = useVideoPlayer(item?.videoUrl, (player) => {
     if (!player) return;
@@ -68,8 +116,12 @@ export default function SavedList() {
 
       {/* Right Actions */}
       <View style={[styles.rightActions, { bottom: insets.bottom + 20 }]}>
-        <AppIconButton icon={<Feather name="heart" />} type="bare" />
-        <AppIconButton icon={<Feather name="share-2" />} type="bare" />
+      <AppIconButton
+          icon={<MaterialIcons name="favorite" />}
+          type='bare'
+          onPress={handleToggleSave}
+        />
+        <AppIconButton icon={<Feather name="share-2" />} type="bare" onPress={onShare} />
         <AppIconButton icon={<Feather name="repeat" />} type="bare" />
       </View>
 
