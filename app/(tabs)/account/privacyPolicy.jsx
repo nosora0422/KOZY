@@ -1,6 +1,4 @@
-import { useState } from 'react';
 import { Platform, StyleSheet, ScrollView, View, Text } from 'react-native';
-import { router } from 'expo-router';
 import { colors } from '@/constants/colors';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 

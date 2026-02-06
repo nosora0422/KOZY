@@ -1,6 +1,6 @@
 import { useSignup } from "@/context/SignupContext";
 import { router } from "expo-router";
-import { StyleSheet, View, Pressable, Text } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import TextField from "@/components/ui/input/textField";
 import AppButton from "@/components/ui/appButton";

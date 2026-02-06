@@ -1,12 +1,11 @@
 import { View, Text, StyleSheet, Platform, FlatList, Image, Dimensions, ScrollView } from 'react-native';
 import { router, useLocalSearchParams, useFocusEffect, useNavigation } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Feather } from '@expo/vector-icons';
+import { useCallback } from 'react';
+
 import { DATA } from '@/data/mockListData';
 import DisplayField from '@/components/ui/displayField';
 import AppButton from '@/components/ui/appButton';
-import AppIconButton from '@/components/ui/appIconButton';
-import { useCallback } from 'react';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const ITEM_WIDTH = SCREEN_WIDTH * 0.8;

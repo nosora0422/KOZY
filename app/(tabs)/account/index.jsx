@@ -1,9 +1,10 @@
 import { router, usePathname } from "expo-router";
 import { Pressable, StyleSheet, View} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Feather } from "@expo/vector-icons";
+
 import AppText from '@/components/ui/appText';
 import Badge from "@/components/ui/badge";
-import { Feather } from "@expo/vector-icons";
 
 
 export default function AccountScreen() {

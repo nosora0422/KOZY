@@ -17,7 +17,6 @@ import Dropdown from '@/components/ui/input/dropdown';
 import TextField from '@/components/ui/input/textField';
 import TextArea from '@/components/ui/input/textArea';
 import AppButton from '@/components/ui/appButton';
-import { Feather } from '@expo/vector-icons';
 import MediaInput from '@/components/ui/input/mediaInput';
 import mockPickImage from '@/services/mockMediaUpload';
 import validateImage from '@/utils/mediaValidation';

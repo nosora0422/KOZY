@@ -1,11 +1,11 @@
 import { router, usePathname, useLocalSearchParams } from "expo-router";
 import { Platform, StyleSheet, View} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Feather } from "@expo/vector-icons";
+
+import { DATA } from "@/data/mockListData";
 import AppText from '@/components/ui/appText';
 import AppButton from '@/components/ui/appButton';
-import { Feather } from "@expo/vector-icons";
-import { DATA } from "@/data/mockListData";
-
 
 export default function ConfrimPublish() {
   const insets = useSafeAreaInsets();

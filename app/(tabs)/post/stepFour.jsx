@@ -3,20 +3,12 @@ import { useFocusEffect } from '@react-navigation/native';
 import { Platform, StyleSheet, View, Dimensions, ScrollView, Alert, FlatList, Pressable } from 'react-native';
 import { Image } from 'expo-image';
 import { useLocalSearchParams, useNavigation, router } from 'expo-router';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { VideoView, useVideoPlayer } from 'expo-video';
-import * as ImagePicker from 'expo-image-picker';
 
 import { DATA } from '@/data/mockListData';
-
 import AppText from '@/components/ui/appText';
 import AppButton from '@/components/ui/appButton';
 import DisplayField from '@/components/ui/displayField';
-import AppDrawer from '@/components/ui/drawer/AppDrawer';
-import { colors } from '@/constants/colors';
 import Badge from '@/components/ui/badge';
-import AppIconButton from '@/components/ui/appIconButton';
-import { Feather } from '@expo/vector-icons';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const ITEM_WIDTH = SCREEN_WIDTH * 0.8;

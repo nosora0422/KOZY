@@ -5,17 +5,12 @@ import {
   DefaultTheme,
 } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
-
 import { ThemeProvider as RNEThemeProvider, } from 'react-native-elements';
-
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-
-
 import { Slot } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+
 import { useColorScheme } from '@/hooks/use-color-scheme';
-
-
 import { appTheme } from '@/constants/index';
 
 const AppDarkTheme = {

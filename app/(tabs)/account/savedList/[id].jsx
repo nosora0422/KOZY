@@ -1,9 +1,6 @@
 import React, { useRef, useState, useCallback, useEffect } from 'react';
 import { View, StyleSheet, Dimensions, Text, Share, Pressable } from 'react-native';
-
-import { FlatList } from 'react-native'; 
 import { VideoView, useVideoPlayer } from 'expo-video';
-
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router, useFocusEffect, useLocalSearchParams, useNavigation} from 'expo-router';
 import { Feather } from '@expo/vector-icons';
@@ -12,7 +9,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import AppIconButton from '@/components/ui/appIconButton';
 import AppButton from '@/components/ui/appButton';
-
 import { DATA } from '@/data/mockListData';
 
 const { height } = Dimensions.get('window');

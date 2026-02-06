@@ -1,6 +1,4 @@
-import { Stack, router } from 'expo-router';
-import { Feather } from '@expo/vector-icons';
-import { Pressable } from "react-native";
+import { Stack } from 'expo-router';
 
 export default function SignupLayout() {
   return (

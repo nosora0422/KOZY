@@ -4,7 +4,6 @@ import { router } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import AppText from '@/components/ui/appText';
-
 import DisplayField from '@/components/ui/displayField';
 import RadioButton  from '@/components/ui/input/radioButton';
 import AppButton from '@/components/ui/appButton';

@@ -1,10 +1,12 @@
 import { router, usePathname, Stack } from "expo-router";
 import { Platform, StyleSheet, View} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { ScrollView } from "react-native-gesture-handler";
+
 import AppText from '@/components/ui/appText';
 import AppButton from '@/components/ui/appButton';
 import { colors } from '@/constants/colors';
-import { ScrollView } from "react-native-gesture-handler";
+
 
 
 export default function TrustLevelInfo() {
