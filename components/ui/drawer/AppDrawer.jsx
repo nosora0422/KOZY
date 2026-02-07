@@ -25,13 +25,11 @@ const AppDrawer = forwardRef(
     ref
   ) => {
 
-    
-
     return (
       <BottomSheet
         ref={ref}
         index={-1}
-        snapPoints={snapPoints ?? ['60%', '80%']}
+        snapPoints={snapPoints ?? ['70%', '80%']}
         enablePanDownToClose
         backgroundStyle={{
             backgroundColor: colors.semantic.bottomSheet.background,
@@ -67,28 +65,29 @@ const AppDrawer = forwardRef(
             <View style={styles.content}>
                 {children}
             </View>
-
-            {/* Footer */}
-            {primaryAction && (
-                <View style={[styles.footer, { marginBottom: 12 }]}>
-                    <AppButton 
-                      text={primaryActionText || "Save"} 
-                      onPress={primaryAction} 
-                      type="primary" 
-                      state={primaryDisabled ? "disabled" : "normal"} 
-                    />
-                </View>
-            )}
-            {secondaryAction && (
-                <View style={styles.footer}>
-                    <AppButton 
-                      text={secondaryActionText || "Save"} 
-                      onPress={secondaryAction} 
-                      type="secondary" 
-                      state={secondaryDisabled ? "disabled" : "normal"}
-                    />
-                </View>
-            )}
+            <View style={{ marginBottom: 60 }}> 
+              {/* Footer */}
+              {primaryAction && (
+                  <View style={[styles.footer, { marginBottom: 12 }]}>
+                      <AppButton 
+                        text={primaryActionText || "Save"} 
+                        onPress={primaryAction} 
+                        type="primary" 
+                        state={primaryDisabled ? "disabled" : "normal"} 
+                      />
+                  </View>
+              )}
+              {secondaryAction && (
+                  <View style={styles.footer}>
+                      <AppButton 
+                        text={secondaryActionText || "Save"} 
+                        onPress={secondaryAction} 
+                        type="secondary" 
+                        state={secondaryDisabled ? "disabled" : "normal"}
+                      />
+                  </View>
+              )}
+            </View>
         </BottomSheetScrollView>
       </BottomSheet>
     );
@@ -100,14 +99,12 @@ export default AppDrawer;
 const styles = StyleSheet.create({
   sheetContainer: {
     paddingTop: 12,
-    paddingBottom: 100,
     paddingHorizontal: 46,
   },
   sheetContainerCenter: {
     display: 'flex',
     justifyContent: 'center',
     paddingTop: 12,
-    paddingBottom: 100,
     paddingHorizontal: 46,
   },
   content: {

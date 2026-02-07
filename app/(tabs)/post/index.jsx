@@ -1,4 +1,4 @@
-import { router, usePathname } from "expo-router";
+import { router, usePathname, useFocusEffect, useNavigation } from "expo-router";
 import { Platform, StyleSheet, View} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AppText from '@/components/ui/appText';
@@ -6,9 +6,34 @@ import AppButton from '@/components/ui/appButton';
 
 
 export default function PostScreen() {
+  const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const pathname = usePathname();
   const isLogedIn = true;
+
+  useFocusEffect(
+          useCallback(() => {
+            const parent = navigation.getParent();
+    
+            return () => {
+              parent?.setOptions({
+                tabBarStyle: { 
+                  display: 'flex',
+                  position: 'absolute',
+                  alignSelf: 'center', 
+                  bottom: insets.bottom + 10,
+                  borderRadius: 16,
+                  borderTopWidth: 0,
+                  height: 56,
+                  backgroundColor: 'rgba(0,0,0,1)',
+                  maxWidth: 400,
+                  paddingTop: 7,
+                  marginHorizontal: 16,
+                },
+              });
+            };
+          }, [navigation, insets])
+        );
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>

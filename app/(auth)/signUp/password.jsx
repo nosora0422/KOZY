@@ -8,11 +8,14 @@ import AppButton from "@/components/ui/appButton";
 import AppText from "@/components/ui/appText";
 import { colors } from '@/constants/colors';
 import FormField from "@/components/ui/form/formField";
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
 export default function Password() {
   const { signup, setPassword } = useSignup();
 
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errors, setErrors] = useState({
     password: null,
     confirmPassword: null,
@@ -61,6 +64,16 @@ export default function Password() {
                 }}
                 placeholder="Password"
                 type="auth"
+                secureTextEntry={!showPassword}
+                rightIcon={
+                  <MaterialIcons
+                    name={showPassword ? "visibility-off" : "visibility"}
+                    size={20}
+                    color={colors.semantic.text.primary}
+                  />
+                }
+                onRightIconPress={() => setShowPassword((value) => !value)}
+                rightIconAccessibilityLabel={showPassword ? "Hide password" : "Show password"}
                 error={!!errors.password}
               />
             </FormField>
@@ -73,7 +86,16 @@ export default function Password() {
                 }}
                 placeholder="Confirm Password"
                 type="auth"
-                secureTextEntry
+                secureTextEntry={!showConfirmPassword}
+                rightIcon={
+                  <MaterialIcons
+                    name={showConfirmPassword ? "visibility-off" : "visibility"}
+                    size={20}
+                    color={colors.semantic.text.primary}
+                  />
+                }
+                onRightIconPress={() => setShowConfirmPassword((value) => !value)}
+                rightIconAccessibilityLabel={showConfirmPassword ? "Hide password" : "Show password"}
                 error={!!errors.confirmPassword}
               />
             </FormField>

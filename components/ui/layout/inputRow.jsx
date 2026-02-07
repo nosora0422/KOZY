@@ -20,6 +20,7 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: "row",
     gap: 4,
+    marginBottom: 12,
   },
   
 });

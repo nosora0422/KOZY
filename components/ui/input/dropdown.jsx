@@ -2,9 +2,9 @@ import { View, StyleSheet } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { colors } from "@/constants/colors";
 
-export default function Dropdown({ value, options, onChange }) {
+export default function Dropdown({ value, options, onChange, style }) {
   return (
-    <View style={styles.wrapper}>
+    <View style={[styles.wrapper, style]}>
       <Picker
         selectedValue={value}
         onValueChange={onChange}

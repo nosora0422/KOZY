@@ -19,9 +19,9 @@ export default function DisplayInput({
   return (
     <Pressable onPress={onPress} style={style}>
       <View style={{ paddingVertical: 12 }}>
-        <AppText variant="body-sm-strong">
+        {label && <AppText variant="body-md-strong">
           {label}
-        </AppText>
+        </AppText>}
 
         <View
           style={{
