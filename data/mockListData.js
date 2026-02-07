@@ -26,6 +26,7 @@ export const DATA = [
     ],
     owner: {
       name: 'Alex Johnson',
+      email: 'alex@gmail.com',
       avatar: ['https://i.pravatar.cc/150?img=3', 'https://i.pravatar.cc/150?img=4'],
       gender: 'Male',
       ageGroup: '20s',
@@ -65,6 +66,7 @@ export const DATA = [
     ],
     owner: {
       name: 'Samantha Lee',
+      email: 'samantha@gmail.com',
       avatar: ['https://i.pravatar.cc/150?img=5', 'https://i.pravatar.cc/150?img=6'],
       gender: 'Female',
       ageGroup: '20s',
@@ -103,6 +105,7 @@ export const DATA = [
     ],
     owner: {
       name: 'Daniel Kim',
+      email: 'daniel@gmail.com',
       avatar: ['https://i.pravatar.cc/150?img=8', 'https://i.pravatar.cc/150?img=9'],
       gender: 'Male',
       ageGroup: '20s',
@@ -140,6 +143,7 @@ export const DATA = [
     ],
     owner: {
       name: 'Daniel Kim',
+      email:'Kim@gamil.com',
       avatar: ['https://i.pravatar.cc/150?img=8', 'https://i.pravatar.cc/150?img=9'],
       gender: 'Male',
       ageGroup: '20s',
