@@ -17,6 +17,7 @@ export default function SavedListDetail() {
   const insets = useSafeAreaInsets();
   const { id } = useLocalSearchParams();
   const item = DATA.find(d => d.id === id);
+  const userVerified = true; // TODO: replace with real verification logic
 
   useFocusEffect(
     useCallback(() => {
@@ -27,11 +28,60 @@ export default function SavedListDetail() {
 
       return () => {
         parent?.setOptions({
-          tabBarStyle: undefined,
+          position: 'absolute',
+          alignSelf: 'center', 
+          bottom: insets.bottom + 10,
+          borderRadius: 16,
+          borderTopWidth: 0,
+          height: 56,
+          backgroundColor: 'rgba(0,0,0,1)',
+          maxWidth: 400,
+          paddingTop: 7,
+          marginHorizontal: 16,
         });
       };
     }, [navigation])
   );
+
+  const sendChatRequest = () => {
+    if(userVerified) {
+      Alert.alert(
+        'Chat Request Sent', 
+        `Your request has been sent to the room provider. You’ll be notified once it’s accepted.\n\n🔔 Want to get notified? Turn on chat alerts in your notification settings.`,
+        [
+          { 
+            text: 'Go to Settings', 
+            style: 'cancel',
+            onPress: () => {
+              router.push('/(tabs)/account/notification');
+          }, 
+          },
+          { 
+            text: 'Close', 
+            style: 'cancel' 
+          },
+        ]
+      );
+    } else {
+      Alert.alert(
+        '',
+        'To send a chat request, please upload a photo and set your preferences. This helps build trust and improves your match quality.',
+        [
+          {
+            text: 'Close',
+            style: 'cancel',
+        },
+        {
+          text: 'Complete Profile',
+          onPress: () => {
+              router.push('/(tabs)/account/editProfile');
+          },
+        },
+      ]
+      );
+    }
+  };
+  
 
   if (!item) {
     return (
@@ -182,22 +232,7 @@ export default function SavedListDetail() {
         <AppButton 
             text="Send Chat Request" 
             type="primary" 
-            onPress={() => {
-            Alert.alert(
-                'Request Sent',
-                'To send a chat request, please upload a photo and set your preferences. This helps build trust and improves your match quality.',
-                [{
-                text: 'Close',
-                style: 'cancel',
-                },
-                {
-                text: 'Complete Profile',
-                onPress: () => {
-                    router.push('/(tabs)/account/editProfile');
-                },
-                },]
-            );
-            }}
+            onPress={sendChatRequest}
         />
       </ScrollView>
   );

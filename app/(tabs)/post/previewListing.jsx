@@ -176,7 +176,10 @@ export default function PreviewListing() {
           text="Edit Listing" 
           type="secondary" 
           style={{ marginBottom: 10 }}
-          onPress={() => {}}
+          onPress={() => {router.push({
+            pathname: '/(tabs)/post/stepOne',
+            params: { id: item.id }
+          })}}
         />
         <AppButton 
           text="Confirm & Publish" 

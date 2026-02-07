@@ -201,6 +201,7 @@ export default function StepThree() {
                             onPress={() => {
                                 setSelectedVideo(null)
                                 drawerRef.current?.close();
+                                router.push('/(tabs)/post');
                             }}
                         />
                     </View>

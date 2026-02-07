@@ -131,7 +131,7 @@ export default function StepFour() {
                                                 text: 'Exit without saving',
                                                 style: 'destructive',
                                                 onPress: () => {
-                                                    router.back();
+                                                    router.push('/(tabs)/post');
                                                 },
                                             },]
                                         );  

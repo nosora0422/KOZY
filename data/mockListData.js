@@ -34,6 +34,7 @@ export const DATA = [
       lifestyle: 'Enjoys exploring the city and attending art events',
       aboutMe:
         'Hi! I am Alex, a photographer who loves capturing the vibrant life of New York City. I enjoy meeting new people and sharing experiences. Looking for a friendly roommate to share this amazing apartment with!',
+      verified: false,
     },
     publishedDate: '06-15-2026',
   },
@@ -110,6 +111,7 @@ export const DATA = [
       lifestyle: 'Enjoys exploring the city and attending art events',
       aboutMe:
         'Hi! I am Daniel, a photographer who loves capturing the vibrant life of New York City. I enjoy meeting new people and sharing experiences. Looking for a friendly roommate to share this amazing apartment with!',
+      verified: false,
     },
     publishedDate: '06-15-2026',
   },
@@ -146,6 +148,7 @@ export const DATA = [
       lifestyle: 'Enjoys exploring the city and attending art events',
       aboutMe:
         'Hi! I am Daniel, a photographer who loves capturing the vibrant life of New York City. I enjoy meeting new people and sharing experiences. Looking for a friendly roommate to share this amazing apartment with!',
+      verified: false,
     },
     publishedDate: '06-15-2026',
   },

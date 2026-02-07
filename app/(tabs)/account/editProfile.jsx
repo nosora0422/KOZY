@@ -1,7 +1,7 @@
 import { useRef, useState, useCallback } from 'react';
 import { Image } from 'expo-image';
 import { useFocusEffect } from '@react-navigation/native';
-import { Platform, StyleSheet, View, Dimensions, ScrollView, FlatList, } from 'react-native';
+import { Platform, StyleSheet, View, Dimensions, ScrollView, FlatList, Alert } from 'react-native';
 import { useLocalSearchParams, useNavigation } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -52,6 +52,7 @@ export default function EditProfile() {
     const [aboutMe, setAboutMe] = useState('');
     const [error, setError] = useState(null);
     const [myEmail, setMyEmail] = useState(null);
+    const [verified, setVerified] = useState(false);
     // const [photos, setPhotos] = useState(
     //       (item.owner.avatar ?? []).slice(0, 2).map(uri => ({
     //         uri,
@@ -88,6 +89,31 @@ export default function EditProfile() {
         };
       }, [navigation, insets])
     );
+
+  const checkCompleteProfile = () => {
+    if(personality.length === 0 || lifestylePreferences.length === 0 || photos.length === 0 || !gender || !job || !aboutMe || !myEmail || !verified) {
+      Alert.alert(
+        'Profile Updated', 
+        'Your profile has been updated.', 
+        [
+          { 
+            text: 'Confirm', 
+            style: 'cancel' 
+          },
+        ]);
+      return false;
+    } else {
+      Alert.alert(
+        'Profile Updated', 
+        'Your profile has been updated. You can now start chatting and upload listings.', 
+        [
+          { 
+            text: 'Close', 
+            style: 'cancel' 
+          },
+        ]);
+    }
+  }
 
   const addPhoto = async () => {
     if (photos.length >= 2) {
@@ -236,7 +262,10 @@ export default function EditProfile() {
       <AppDrawer
             ref={genderDrawerRef}
             title="What’s your gender?"
-            primaryAction={() => genderDrawerRef.current?.close()}
+            primaryAction={() => {
+              genderDrawerRef.current?.close();
+              checkCompleteProfile();
+            }}
           >
             <Dropdown
               value={gender}
@@ -252,7 +281,10 @@ export default function EditProfile() {
             ref={jobDrawerRef}
             title="What’s your job or profession?"
             description="Tell us what your profession is."
-            primaryAction={() => jobDrawerRef.current?.close()}
+            primaryAction={() => {
+              jobDrawerRef.current?.close(); 
+              checkCompleteProfile();
+            }}
           >
             <FormField label="" error={error}>
               <InputRow>
@@ -264,7 +296,10 @@ export default function EditProfile() {
             ref={personalityDrawerRef}
             title="What’s your personality?"
             description="Let others know your vibe. Select words that reflect your personality."
-            primaryAction={() => personalityDrawerRef.current?.close()}
+            primaryAction={() => {
+              personalityDrawerRef.current?.close();
+              checkCompleteProfile();
+            }} 
           >
             <PillGroup
               items={[
@@ -283,7 +318,10 @@ export default function EditProfile() {
             ref={lifestyleDrawerRef}
             title="What’s your lifestyle?"
             description="Your daily habits matter in shared spaces. Choose your lifestyle preferences."
-            primaryAction={() => lifestyleDrawerRef.current?.close()}
+            primaryAction={() => {
+              lifestyleDrawerRef.current?.close(); 
+              checkCompleteProfile();
+            }}
           >
             <PillGroup
               items={[
@@ -306,10 +344,13 @@ export default function EditProfile() {
             ref={aboutMeDrawerRef}
             title="What your story?"
             description="Tell us what your short story."
-            primaryAction={() => aboutMeDrawerRef.current?.close()}
+            primaryAction={() => {
+              aboutMeDrawerRef.current?.close();
+              checkCompleteProfile();
+            }}
           >
             <FormField label="" error={error}>
-                <TextArea placeholder="ex: Software Engineer" error={!!error}/>
+                <TextArea placeholder="Tell us your story." error={!!error}/>
             </FormField>
       </AppDrawer>
       <AppDrawer

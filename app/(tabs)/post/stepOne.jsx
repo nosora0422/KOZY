@@ -251,7 +251,7 @@ export default function StepOne() {
                                                 text: 'Exit without saving',
                                                 style: 'destructive',
                                                 onPress: () => {
-                                                    router.back();
+                                                    router.push('/(tabs)/post');
                                                 },
                                             },]
                                         );  
