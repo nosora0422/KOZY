@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { View, Text, StyleSheet, Platform, FlatList, Image, Dimensions, ScrollView, Alert } from 'react-native';
 import { router, useFocusEffect, useLocalSearchParams, useNavigation} from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -121,7 +121,6 @@ export default function DetailScreen() {
                     router.push(`(tabs)/home/${item.id}`);
                   }}
                 />
-              
             </MapView>
           </View>
           <DisplayField title="Price">

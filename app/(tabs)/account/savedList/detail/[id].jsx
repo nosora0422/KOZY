@@ -1,7 +1,8 @@
 import { View, Text, StyleSheet, Platform, FlatList, Image, Dimensions, ScrollView, Alert } from 'react-native';
 import { router, useLocalSearchParams, useFocusEffect, useNavigation } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
+import MapView, { Marker } from 'react-native-maps';
 
 import { DATA } from '@/data/mockListData';
 import DisplayField from '@/components/ui/displayField';
@@ -42,6 +43,17 @@ export default function SavedListDetail() {
       };
     }, [navigation])
   );
+
+  const defaultRegion = useMemo(() => {
+    const initialLatitude = Number(item?.latitude);
+    const initialLongitude = Number(item?.longitude);
+    return {
+      latitude: Number.isFinite(initialLatitude) ? initialLatitude : 49.2827,
+      longitude: Number.isFinite(initialLongitude) ? initialLongitude : -123.1207,
+      latitudeDelta: 0.08,
+      longitudeDelta: 0.08,
+    };
+  }, [item]);
 
   const sendChatRequest = () => {
     if(userVerified) {
@@ -123,11 +135,26 @@ export default function SavedListDetail() {
           <DisplayField title="Location">
             {`${item.street}, ${item.city}, ${item.province}`}
           </DisplayField>
-          <Image 
-            source={require('@/assets/images/map-placeholder.png')}
-            style={styles.mapImage}
-            resizeMode="cover"
-          />
+          <View style={styles.mapContainer}>
+            <MapView 
+              style={StyleSheet.absoluteFill} 
+              initialRegion={defaultRegion}
+            >
+              
+                <Marker
+                  key={item.id}
+                  coordinate={{
+                    latitude: Number(item.latitude),
+                    longitude: Number(item.longitude),
+                  }}
+                  title={item.title}
+                  description={`$${item.price}`}
+                  onPress={() => {
+                    router.push(`(tabs)/home/${item.id}`);
+                  }}
+                />
+            </MapView>
+          </View>
           <DisplayField title="Price">
             ${item.price} / month
           </DisplayField>
@@ -243,6 +270,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingBottom: Platform.OS === 'ios' ? 50 : 16,
     overflow: 'hidden'
+  },
+  mapContainer: {
+    height: 80,
+    borderRadius: 4,
+    overflow: 'hidden',
   },
   specRow: {
     flexDirection: 'row',

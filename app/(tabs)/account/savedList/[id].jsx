@@ -62,7 +62,16 @@ export default function SavedList() {
 
       return () => {
         parent?.setOptions({
-          tabBarStyle: undefined,
+          position: 'absolute',
+          alignSelf: 'center', 
+          bottom: insets.bottom + 10,
+          borderRadius: 16,
+          borderTopWidth: 0,
+          height: 56,
+          backgroundColor: 'rgba(0,0,0,1)',
+          maxWidth: 400,
+          paddingTop: 7,
+          marginHorizontal: 16,
         });
       };
     }, [])
