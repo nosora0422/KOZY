@@ -62,7 +62,7 @@ const AppDrawer = forwardRef(
             </View>}
 
             {/* Scrollable Content */}
-            <View style={styles.content}>
+            <View style={[styles.content, {marginVertical: title ? 50 : 0}]}>
                 {children}
             </View>
             <View style={{ marginBottom: 60 }}> 
@@ -106,9 +106,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingTop: 12,
     paddingHorizontal: 46,
-  },
-  content: {
-    paddingVertical: 50,
   },
   description: {
     marginTop: 12,

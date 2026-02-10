@@ -217,13 +217,13 @@ export default function StepOne() {
                                 value={amenities}
                                 onChange={setAmenities}
                             />
-                            <TextField
+                            {/* <TextField
                                 value={additionalAmenities}
                                 placeholder="Add more amenities"
                                 placeholderTextColor={colors.semantic.text.placeholder}
                                 onChangeText={setAdditionalAmenities}
                                 style={{ marginTop: 10 }}
-                            />
+                            /> */}
                         </FormField>
                         <FormField label="Description" error={error}>
                             <TextArea
@@ -267,7 +267,6 @@ export default function StepOne() {
         />
         <AppDrawer
             ref={availableMonthDrawerRef}
-            title="Choose Available Month"
             snapPoints={['70%']}
             primaryAction={() => availableMonthDrawerRef.current?.close()}
         >
@@ -295,7 +294,6 @@ export default function StepOne() {
         </AppDrawer>
         <AppDrawer
             ref={availableDayDrawerRef}
-            title="Choose Available Day"
             snapPoints={['80%']}
             primaryAction={() => availableDayDrawerRef.current?.close()}
         >
@@ -340,7 +338,6 @@ export default function StepOne() {
         </AppDrawer>
         <AppDrawer
             ref={availableYearDrawerRef}
-            title="Choose Available Year"
             snapPoints={['80%']}
             primaryAction={() => availableYearDrawerRef.current?.close()}
         >
