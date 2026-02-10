@@ -50,8 +50,7 @@ export default function SavedListDetail() {
         `Your request has been sent to the room provider. You’ll be notified once it’s accepted.\n\n🔔 Want to get notified? Turn on chat alerts in your notification settings.`,
         [
           { 
-            text: 'Go to Settings', 
-            style: 'cancel',
+            text: 'Go to Settings',
             onPress: () => {
               router.push('/(tabs)/account/notification');
           }, 

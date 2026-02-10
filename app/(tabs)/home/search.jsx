@@ -1,20 +1,77 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Image } from 'expo-image';
 import { Platform, StyleSheet, View, TextInput, ScrollView } from 'react-native';
 import { colors } from '@/constants/colors';
 import { Feather } from '@expo/vector-icons';
+import MapView, { Marker } from 'react-native-maps';
 
 import InputRow from "@/components/ui/layout/inputRow";
 import TextField from "@/components/ui/input/textField";
 import FormField from '@/components/ui/form/formField';
 import PillGroup from '@/components/ui/pill/pillGroup';
+import { DATA } from '@/data/mockListData';
+import { router } from 'expo-router';
 
 export default function SearchScreen() {
-  const [budget, setBudget] = useState("");
-  const [lifestyle, setLifestyle] = useState("");
+  // default to 0 in budget fields to avoid NaN issues in filtering logic, but treat empty string as no input
+  const [budgetFrom, setBudgetFrom] = useState("");
+  const [budgetTo, setBudgetTo] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [error, setError] = useState(null);
   const [selected, setSelected] = useState([]);
+  const [listings, setListings] = useState(Array.isArray(DATA) ? DATA : []);
+
+  // Filter listings based on search term, budget, and lifestyle preferences
+  const filteredListings = useMemo(() => {
+    const selectedValues = selected.map((value) => String(value).toLowerCase());
+    const term = searchTerm.trim().toLowerCase();
+
+    return listings.filter((item) => {
+      const price = Number(item?.price);
+      const min = Number(budgetFrom);
+      const max = Number(budgetTo);
+
+      const hasMin = budgetFrom.trim().length > 0 && Number.isFinite(min);
+      const hasMax = budgetTo.trim().length > 0 && Number.isFinite(max);
+
+      const matchesBudget =
+        (!hasMin || price >= min) && (!hasMax || price <= max);
+
+      const lifestyleText = `${item?.owner?.lifestyle ?? ""} ${item?.owner?.personality ?? ""}`
+        .toLowerCase()
+        .trim();
+      const matchesLifestyle =
+        selectedValues.length === 0 ||
+        selectedValues.some((value) => lifestyleText.includes(value));
+
+      const locationText = `${item?.city ?? ""} ${item?.province ?? ""} ${item?.postalCode ?? ""} ${item?.street ?? ""}`
+        .toLowerCase()
+        .trim();
+      const matchesLocation = term.length === 0 || locationText.includes(term);
+
+      return matchesBudget && matchesLifestyle && matchesLocation;
+    });
+  }, [listings, budgetFrom, budgetTo, selected, searchTerm]);
+
+  //list on the map
+  const mapListings = useMemo(() => {
+    return filteredListings.filter((item) => {
+      const latitude = Number(item?.latitude);
+      const longitude = Number(item?.longitude);
+      return Number.isFinite(latitude) && Number.isFinite(longitude);
+    });
+  }, [filteredListings]);
+
+  const defaultRegion = useMemo(() => {
+    const initialLatitude = Number(mapListings[0]?.latitude);
+    const initialLongitude = Number(mapListings[0]?.longitude);
+    return {
+      latitude: Number.isFinite(initialLatitude) ? initialLatitude : 49.2827,
+      longitude: Number.isFinite(initialLongitude) ? initialLongitude : -123.1207,
+      latitudeDelta: 0.08,
+      longitudeDelta: 0.08,
+    };
+  }, [mapListings]);
 
   return (
     <ScrollView 
@@ -34,15 +91,41 @@ export default function SearchScreen() {
         </View>
       </FormField>
       <View style={styles.mapContainer}>
-        <Image
-          source={require('@/assets/images/map-placeholder.png')}
-          style={{ width: '100%', borderRadius: 16, marginBottom: 16, aspectRatio: 1/1 }}
-        />
+        <MapView 
+          style={StyleSheet.absoluteFill} 
+          initialRegion={defaultRegion}
+        >
+          {mapListings.map((item) => (
+            <Marker
+              key={item.id}
+              coordinate={{
+                latitude: Number(item.latitude),
+                longitude: Number(item.longitude),
+              }}
+              title={item.title}
+              description={`$${item.price}`}
+              onPress={() => {
+                router.push(`(tabs)/home/${item.id}`);
+              }}
+            />
+          ))}
+        </MapView>
       </View>
       <FormField label="Rent Budget" error={error}>
         <InputRow>
-          <TextField placeholder="From" error={!!error}/>
-          <TextField placeholder="To" />
+          <TextField
+            placeholder="From"
+            error={!!error}
+            value={budgetFrom}
+            onChangeText={setBudgetFrom}
+            keyboardType="numeric"
+          />
+          <TextField
+            placeholder="To"
+            value={budgetTo}
+            onChangeText={setBudgetTo}
+            keyboardType="numeric"
+          />
         </InputRow>
       </FormField>
       <FormField label="Lifestyle Preferences">
@@ -74,6 +157,9 @@ const styles = StyleSheet.create({
   },
   mapContainer: {
     marginBottom: 24,
+    height: 240,
+    borderRadius: 16,
+    overflow: 'hidden',
   },
   text:{
     color: 'white',

@@ -1,5 +1,8 @@
+import React, { useCallback } from 'react';
 import { View, Text, StyleSheet, Platform, FlatList, Image, Dimensions, ScrollView, Alert } from 'react-native';
-import { router, useLocalSearchParams } from 'expo-router';
+import { router, useFocusEffect, useLocalSearchParams, useNavigation} from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import MapView, { Marker } from 'react-native-maps';
 
 import { DATA } from '@/data/mockListData';
 import DisplayField from '@/components/ui/displayField';
@@ -11,8 +14,53 @@ const ITEM_SPACING = 12;
 const IMAGE_HEIGHT = 228;
 
 export default function DetailScreen() {
+  const navigation = useNavigation();
   const { id } = useLocalSearchParams();
+  const insets = useSafeAreaInsets();
   const item = DATA.find(d => d.id === id);
+
+  // Helper to format personality and lifestyle arrays into a readable string
+  const formatList = (value) => {
+    if (Array.isArray(value)) {
+      return value.filter(Boolean).join(' · ');
+    }
+    return value ?? '';
+  };
+
+  // useFocusEffect(
+  //     useCallback(() => {
+  //       const parent = navigation.getParent();
+  //       parent?.setOptions({
+  //         tabBarStyle: { display: 'none' },
+  //       });
+  
+  //       return () => {
+  //         parent?.setOptions({
+  //           position: 'absolute',
+  //           alignSelf: 'center', 
+  //           bottom: insets.bottom + 10,
+  //           borderRadius: 16,
+  //           borderTopWidth: 0,
+  //           height: 56,
+  //           backgroundColor: 'rgba(0,0,0,1)',
+  //           maxWidth: 400,
+  //           paddingTop: 7,
+  //           marginHorizontal: 16,
+  //         });
+  //       };
+  //     }, [])
+  //   );
+
+  const defaultRegion = useMemo(() => {
+      const initialLatitude = Number(item?.latitude);
+      const initialLongitude = Number(item?.longitude);
+      return {
+        latitude: Number.isFinite(initialLatitude) ? initialLatitude : 49.2827,
+        longitude: Number.isFinite(initialLongitude) ? initialLongitude : -123.1207,
+        latitudeDelta: 0.08,
+        longitudeDelta: 0.08,
+      };
+    }, [item]);
 
   if (!item) {
     return (
@@ -55,11 +103,27 @@ export default function DetailScreen() {
           <DisplayField title="Location">
             {`${item.street}, ${item.city}, ${item.province}`}
           </DisplayField>
-          <Image 
-            source={require('@/assets/images/map-placeholder.png')}
-            style={styles.mapImage}
-            resizeMode="cover"
-            />
+          <View style={styles.mapContainer}>
+            <MapView 
+              style={StyleSheet.absoluteFill} 
+              initialRegion={defaultRegion}
+            >
+              
+                <Marker
+                  key={item.id}
+                  coordinate={{
+                    latitude: Number(item.latitude),
+                    longitude: Number(item.longitude),
+                  }}
+                  title={item.title}
+                  description={`$${item.price}`}
+                  onPress={() => {
+                    router.push(`(tabs)/home/${item.id}`);
+                  }}
+                />
+              
+            </MapView>
+          </View>
           <DisplayField title="Price">
             ${item.price} / month
           </DisplayField>
@@ -148,11 +212,11 @@ export default function DetailScreen() {
             </DisplayField>
 
             <DisplayField title="Personality">
-              {item.owner.personality}
+              {formatList(item.owner.personality)}
             </DisplayField>
 
             <DisplayField title="Lifestyle">
-              {item.owner.lifestyle}
+              {formatList(item.owner.lifestyle)}
             </DisplayField>
 
             <DisplayField title="About Me">
@@ -173,7 +237,7 @@ export default function DetailScreen() {
           type="primary" 
           onPress={() => {
             Alert.alert(
-              'Request Sent',
+              '',
               'To send a chat request, please upload a photo and set your preferences. This helps build trust and improves your match quality.',
               [{
                 text: 'Close',
@@ -196,7 +260,7 @@ const styles = StyleSheet.create({
   container: { 
     backgroundColor: 'black', 
     paddingHorizontal: 16,
-    paddingBottom: Platform.OS === 'ios' ? 50 : 16,
+    paddingBottom: Platform.OS === 'ios' ? 100 : 16,
     overflow: 'hidden'
   },
   title: {
@@ -213,6 +277,11 @@ const styles = StyleSheet.create({
   location: {
     color: '#bbb',
     marginBottom: 12,
+  },
+  mapContainer: {
+    height: 80,
+    borderRadius: 4,
+    overflow: 'hidden',
   },
   description: {
     color: 'white',
