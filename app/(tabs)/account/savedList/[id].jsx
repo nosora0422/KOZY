@@ -54,28 +54,30 @@ export default function SavedList() {
   }, [item]);
 
   useFocusEffect(
-    useCallback(() => {
-      const parent = navigation.getParent();
-      parent?.setOptions({
-        tabBarStyle: { display: 'none' },
-      });
-
-      return () => {
+      useCallback(() => {
+        const parent = navigation.getParent();
         parent?.setOptions({
-          position: 'absolute',
-          alignSelf: 'center', 
-          bottom: insets.bottom + 10,
-          borderRadius: 16,
-          borderTopWidth: 0,
-          height: 56,
-          backgroundColor: 'rgba(0,0,0,1)',
-          maxWidth: 400,
-          paddingTop: 7,
-          marginHorizontal: 16,
+          tabBarStyle: { display: 'none' },
         });
-      };
-    }, [])
-  );
+  
+        return () => {
+          parent?.setOptions({
+            tabBarStyle: {
+              position: 'absolute',
+              alignSelf: 'center', 
+              bottom: insets.bottom + 10,
+              borderRadius: 16,
+              borderTopWidth: 0,
+              height: 56,
+              backgroundColor: 'rgba(0,0,0,1)',
+              maxWidth: 400,
+              paddingTop: 7,
+              marginHorizontal: 16,
+            },
+          });
+        };
+      }, [navigation, insets.bottom])
+    );
 
   const onShare = async () => {
       try {

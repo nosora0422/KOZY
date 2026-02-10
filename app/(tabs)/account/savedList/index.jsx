@@ -6,7 +6,7 @@ import { useState, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import AppButton from '@/components/ui/appButton';
 import AppText from '@/components/ui/appText';
-import RadioButton from '@/components/ui/input/radioButton';
+import CheckBox from '@/components/ui/input/checkbox';
 
 export default function SavedList() {
   const [listings, setListings] = useState([]);
@@ -54,7 +54,7 @@ export default function SavedList() {
 
   return (
     <View style={styles.container}>
-        {/* Bottons */}
+        {/* Buttons */}
         <View style={styles.buttonContainer}>
             {!isEditMode && (
                 <AppButton 
@@ -157,7 +157,7 @@ export default function SavedList() {
                 </AppText>
             </View>
             {isEditMode &&
-                <RadioButton
+                <CheckBox
                     selected={selectedItems.includes(item.id)}
                     onPress={() => toggleSelectItem(item.id)}
                 />

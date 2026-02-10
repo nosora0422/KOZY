@@ -27,6 +27,8 @@ export default function StepTwo() {
         }, [navigation])
       );
 
+
+
   return (
     <ScrollView 
         contentContainerStyle={[styles.container, { paddingTop: insets.top }]}

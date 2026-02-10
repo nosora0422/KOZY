@@ -1,6 +1,5 @@
 import { View, StyleSheet } from 'react-native';
 import AppText from '@/components/ui/appText';
-import { colors } from '@/constants/colors';
 
 export default function InfoList({ title, items }) {
   return (
