@@ -1,9 +1,9 @@
 import { useMemo, useState } from 'react';
 import { Image } from 'expo-image';
-import { Platform, StyleSheet, View, TextInput, ScrollView } from 'react-native';
+import { Platform, StyleSheet, View, TextInput, ScrollView, Text } from 'react-native';
 import { colors } from '@/constants/colors';
 import { Feather } from '@expo/vector-icons';
-import MapView, { Marker } from 'react-native-maps';
+import MapView, { Marker, Callout } from 'react-native-maps';
 
 import InputRow from "@/components/ui/layout/inputRow";
 import TextField from "@/components/ui/input/textField";
@@ -91,25 +91,31 @@ export default function SearchScreen() {
         </View>
       </FormField>
       <View style={styles.mapContainer}>
-        <MapView 
-          style={StyleSheet.absoluteFill} 
-          initialRegion={defaultRegion}
-        >
-          {mapListings.map((item) => (
-            <Marker
-              key={item.id}
-              coordinate={{
-                latitude: Number(item.latitude),
-                longitude: Number(item.longitude),
-              }}
-              title={item.title}
-              description={`$${item.price}`}
+      <MapView
+        style={StyleSheet.absoluteFill}
+        initialRegion={defaultRegion}
+      >
+        {mapListings.map((item) => (
+          <Marker
+            key={item.id}
+            coordinate={{
+              latitude: Number(item.latitude),
+              longitude: Number(item.longitude),
+            }}
+          >
+            <Callout
               onPress={() => {
                 router.push(`(tabs)/home/${item.id}`);
               }}
-            />
-          ))}
-        </MapView>
+            >
+              <>
+                <Text>{item.title}</Text>
+                <Text>${item.price}</Text>
+              </>
+            </Callout>
+          </Marker>
+        ))}
+      </MapView>
       </View>
       <FormField label="Rent Budget" error={error}>
         <InputRow>

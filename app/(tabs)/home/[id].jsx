@@ -108,19 +108,14 @@ export default function DetailScreen() {
               style={StyleSheet.absoluteFill} 
               initialRegion={defaultRegion}
             >
-              
-                <Marker
-                  key={item.id}
-                  coordinate={{
-                    latitude: Number(item.latitude),
-                    longitude: Number(item.longitude),
-                  }}
-                  title={item.title}
-                  description={`$${item.price}`}
-                  onPress={() => {
-                    router.push(`(tabs)/home/${item.id}`);
-                  }}
-                />
+              <Marker
+                key={item.id}
+                coordinate={{
+                  latitude: Number(item.latitude),
+                  longitude: Number(item.longitude),
+                }}
+              >
+              </Marker>
             </MapView>
           </View>
           <DisplayField title="Price">

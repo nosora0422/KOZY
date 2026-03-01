@@ -350,7 +350,13 @@ export default function EditProfile() {
             }}
           >
             <FormField label="" error={error}>
-                <TextArea placeholder="Tell us your story." error={!!error}/>
+                <TextArea 
+                  placeholder="Tell us your story." 
+                  error={!!error} 
+                  maxLength={750}
+                  onChangeText={setAboutMe}
+                  value={aboutMe}
+                />
             </FormField>
       </AppDrawer>
       <AppDrawer

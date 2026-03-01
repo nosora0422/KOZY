@@ -9,7 +9,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import AppIconButton from '@/components/ui/appIconButton';
 import AppButton from '@/components/ui/appButton';
+import AppText from '@/components/ui/appText';
 import { DATA } from '@/data/mockListData';
+import { colors } from '@/constants/colors';
 
 const { height } = Dimensions.get('window');
 const SAVED_LISTINGS_KEY = 'savedListings';
@@ -106,11 +108,15 @@ export default function HomeScreen() {
 }
 
 /* Reel Item*/
-function ReelItem({ item, isActive, insets, isSaved, onToggleSave, onShare }) {
+function ReelItem({ item, isActive, insets, isSaved, onToggleSave, onShare, onMorePress }) {
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const player = useVideoPlayer(item.videoUrl, (player) => {
     player.loop = true;
     player.muted = true;
   });
+  const toggleDropdown = () => {
+    setIsDropdownOpen((prev) => !prev);
+  }
 
   // 🔑 THIS is what actually starts video playback
   useEffect(() => {
@@ -136,18 +142,27 @@ function ReelItem({ item, isActive, insets, isSaved, onToggleSave, onShare }) {
       />
       
       {/* Right Actions */}
-      <View style={[styles.rightActions, { bottom: insets.bottom + 100 }]}>
+      <View style={[styles.rightActions, { bottom: insets.bottom + 76 }]}>
         <AppIconButton
           icon={<MaterialIcons name={isSaved ? "favorite" : "favorite-border"} />}
           type='bare'
           onPress={() => onToggleSave(item)}
         />
         <AppIconButton icon={<Feather name="share-2" />} type="bare" onPress={() => onShare(item)} />
-        <AppIconButton icon={<Feather name="repeat" />} type="bare" />
+         <AppIconButton icon={<Feather name="more-horizontal" />} type="bare" onPress={toggleDropdown} />
+         {isDropdownOpen && (
+          <Pressable 
+            style={styles.rightActionsdDropdown} 
+            onPress={() => router.push(`/(tabs)/account/contactUs`)}
+          >
+            <AppText varient="caption" color="error">Report</AppText>
+          </Pressable>
+         )}
+         
       </View>
 
       {/* Bottom Left */}
-      <View style={[styles.bottomLeft, { bottom: insets.bottom + 100 }]}>
+      <View style={[styles.bottomLeft, { bottom: insets.bottom + 76 }]}>
         <Text style={styles.username}>${item.price} / month</Text>
         <Text style={styles.question} numberOfLines={2}>
           {item.city}, {item.province}
@@ -204,5 +219,15 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 14,
     lineHeight: 20,
+  },
+  rightActionsdDropdown: {
+    width: 200,
+    position: 'absolute',
+    top: 10,
+    right: 0,
+    backgroundColor: colors.base.gray700,
+    padding: 12,
+    borderRadius: 10,
+    zIndex: 200,
   },
 });

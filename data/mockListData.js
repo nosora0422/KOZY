@@ -1,7 +1,7 @@
 export const DATA = [
   {
     id: '1',
-    videoUrl: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
+    videoUrl: require('../assets/videos/sample-room1.mp4'),
     price: 1800,
     street: '123 Broadway Ave',
     additionalAddress: 'Apt 4B',
@@ -43,7 +43,7 @@ export const DATA = [
   },
   {
     id: '2',
-    videoUrl: 'https://www.w3schools.com/html/movie.mp4',
+    videoUrl: require('../assets/videos/sample-room2.mp4'),
     price: 2300,
     street: '123 Broadway Ave',
     additionalAddress: 'Apt 4B',
@@ -84,7 +84,7 @@ export const DATA = [
   },
   {
     id: '3',
-    videoUrl: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
+    videoUrl: require('../assets/videos/sample-room1.mp4'),
     price: 3200,
     street: '123 Broadway Ave',
     additionalAddress: 'Apt 4B',
@@ -126,7 +126,7 @@ export const DATA = [
   },
   {
     id: '4',
-    videoUrl: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
+    videoUrl: require('../assets/videos/sample-room2.mp4'),
     price: 3200,
     street: '123 Broadway Ave',
     city: 'Downtown',
