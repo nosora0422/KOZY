@@ -153,7 +153,12 @@ function ReelItem({ item, isActive, insets, isSaved, onToggleSave, onShare, onMo
          {isDropdownOpen && (
           <Pressable 
             style={styles.rightActionsdDropdown} 
-            onPress={() => router.push(`/(tabs)/account/contactUs`)}
+              onPress={() =>
+                router.push({
+                  pathname: '/(tabs)/account/contactUs',
+                  params: { backTo: '/(tabs)/home' },
+                })
+              }
           >
             <AppText varient="caption" color="error">Report</AppText>
           </Pressable>

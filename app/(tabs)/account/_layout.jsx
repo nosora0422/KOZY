@@ -1,4 +1,6 @@
-import { Stack } from 'expo-router';
+import { Stack, router } from 'expo-router';
+import { Pressable } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function AccountStack() {
   return (
@@ -33,12 +35,40 @@ export default function AccountStack() {
           headerBackTitleVisible: false
       }} />
       <Stack.Screen name="contactUs" 
-        options={{ 
+        options={({ route }) => ({ 
           title: '',
           headerShown: true,
-          headerBackVisible: true,
-          headerBackTitleVisible: false
-      }} />
+          headerBackVisible: false,
+          headerBackTitleVisible: false,
+          headerLeft: () => (
+            <Pressable
+              onPress={() => {
+                const backTo = route?.params?.backTo;
+
+                if (typeof backTo === 'string' && backTo.length > 0) {
+                  router.replace(backTo);
+                  return;
+                }
+
+                if (router.canGoBack()) {
+                  router.back();
+                  return;
+                }
+
+                router.replace('/(tabs)/account');
+              }}
+              hitSlop={10}
+              style={{
+                width: 32,
+                height: 32,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+            >
+              <Ionicons name="chevron-back" size={24} color={'#ffffff'} />
+            </Pressable>
+          )
+      })} />
       <Stack.Screen name="savedList/index" 
         options={{ 
           title: 'Saved Listings',
