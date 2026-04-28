@@ -3,7 +3,7 @@ import { baseColors } from './base';
 export const semanticColors = {
   text: {
     primary: baseColors.bodyInverted,
-    secondary: baseColors.gray700,
+    secondary: baseColors.gray800,
     disabled: baseColors.gray400,
     placeholder: baseColors.gray400,
     error: baseColors.warning,
@@ -44,29 +44,29 @@ export const semanticColors = {
     primary: {
       normal: {
         bg: baseColors.primary,
-        text: baseColors.body,
+        text: baseColors.accent,
         border: 'transparent',
       },
       pressed: {
-        bg: baseColors.primary,
-        text: baseColors.body,
+        bg: baseColors.gray500,
+        text: baseColors.black,
         border: 'transparent',
       },
       disabled: {
-        bg: '#3f3f3fff',
-        text: baseColors.body,
+        bg: baseColors.gray500Alpha,
+        text: baseColors.black,
         border: '#3f3f3fff',
       },
     },
 
     secondary: {
       normal: {
-        bg: 'transparent',
+        bg: baseColors.gray800Alpha,
         text: baseColors.bodyInverted,
         border: baseColors.bodyInverted,
       },
       pressed: {
-        bg: 'transparent',
+        bg: baseColors.white200Alpha,
         text: baseColors.bodyInverted,
         border: baseColors.bodyInverted,
       },
@@ -84,7 +84,7 @@ export const semanticColors = {
         border: 'transparent',
       },
       pressed: {
-        bg: baseColors.gray400,
+        bg: baseColors.gray500,
         text: baseColors.bodyInverted,
         border: 'transparent',
       },

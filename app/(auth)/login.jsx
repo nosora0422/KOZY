@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { router, useLocalSearchParams } from "expo-router";
-import { StyleSheet, View, Text, Pressable } from "react-native";
+import { StyleSheet, View, Text, Pressable, Image } from "react-native";
 import { Feather } from "@expo/vector-icons";
 
 import TextField from "@/components/ui/input/textField";
@@ -41,49 +41,58 @@ export default function Login() {
 
   return (
     <View style={styles.container}>
+      {/* Background shapes */}
+      <View style={styles.topShape} />
+      <View style={styles.bottomShape} />
       <View style={styles.content}>
         <View style={styles.topContent}>
-          <AppText variant="headline-md" style={{ marginBottom: 12 }}>
-            Log In to Continue
-          </AppText>
+          <Image
+            source={require('@/assets/images/Horizontal-logo.png')}
+            style={{ width: 200, height: 100, marginBottom: 24 }}
+            resizeMode="contain"
+          />
+          <View style={styles.inputContainer}>
+            <AppText variant="headline-md" style={{ marginBottom: 12 }} textColor={colors.base.gray800}>
+              Log In to Continue
+            </AppText>
 
-          <AppText variant="body-sm" style={{ marginBottom: 54 }}>
-            Match with the Right Room, Right Roommate
-          </AppText>
+            <AppText variant="body-sm" style={{ marginBottom: 32, textAlign: 'center' }} textColor={colors.base.gray800}>
+              Match with the Right Room, Right Roommate
+            </AppText>
 
-          <View style={styles.inputGroup}>
-            <FormField error={errors.email}>
-              <TextField
-                value={email}
-                onChangeText={(text) => {
-                  setEmail(text);
-                  setErrors((e) => ({ ...e, email: null }));
-                }}
-                placeholder="Email"
-                type="auth"
-                autoCapitalize="none"
-                keyboardType="email-address"
-                error={!!errors.email}
-              />
-            </FormField>
+            <View style={styles.inputGroup}>
+              <FormField error={errors.email}>
+                <TextField
+                  value={email}
+                  onChangeText={(text) => {
+                    setEmail(text);
+                    setErrors((e) => ({ ...e, email: null }));
+                  }}
+                  placeholder="Email"
+                  type="auth"
+                  autoCapitalize="none"
+                  keyboardType="email-address"
+                  error={!!errors.email}
+                />
+              </FormField>
 
-            <FormField error={errors.password}>
-              <TextField
-                value={password}
-                onChangeText={(text) => {
-                  setPassword(text);
-                  setErrors((e) => ({ ...e, password: null }));
-                }}
-                placeholder="Password"
-                type="auth"
-                secureTextEntry
-                autoCapitalize="none"
-                error={!!errors.password}
-              />
-            </FormField>
+              <FormField error={errors.password}>
+                <TextField
+                  value={password}
+                  onChangeText={(text) => {
+                    setPassword(text);
+                    setErrors((e) => ({ ...e, password: null }));
+                  }}
+                  placeholder="Password"
+                  type="auth"
+                  secureTextEntry
+                  autoCapitalize="none"
+                  error={!!errors.password}
+                />
+              </FormField>
+            </View>
           </View>
         </View>
-
         <View style={styles.bottomContent}>
           <Pressable onPress={() => router.replace("/(tabs)/home")}>
             <Feather name="home" size={22} color="#fff" />
@@ -119,6 +128,44 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 16,
     justifyContent: "center",
+    backgroundColor: colors.base.white,
+  },
+  topShape: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: '40%',
+    backgroundColor: colors.base.accent,
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+  },
+  
+  bottomShape: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: '40%',
+    backgroundColor: colors.base.accent,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+  },
+  inputContainer:{
+    width: '100%',
+    marginHorizontal: 20,
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: 12,
+    backgroundColor: colors.base.white,
+    padding: 34,
+    borderRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 2, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    elevation: 5,
   },
   content: {
     flex: 1,

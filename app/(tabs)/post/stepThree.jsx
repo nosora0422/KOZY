@@ -152,7 +152,6 @@ export default function StepThree() {
             title='Preview Tour Video'
         >
             <View style={styles.sheetContent}>
-
                 {selectedVideo && (
                 <View style={styles.previewWrapper}>
                     <VideoView
@@ -260,6 +259,7 @@ const styles = StyleSheet.create({
         borderRadius: 8,
     },
     sheetContent: {
+        marginTop: -20,
         gap: 20,
     },
 

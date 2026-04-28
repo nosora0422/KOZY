@@ -3,6 +3,7 @@ export const DATA = [
     id: '1',
     videoUrl: require('../assets/videos/sample-room1.mp4'),
     price: 1800,
+    deposit: 900,
     street: '123 Broadway Ave',
     additionalAddress: 'Apt 4B',
     city: 'Soho',
@@ -21,6 +22,7 @@ export const DATA = [
     bathroomType: 'Shared',
     sizeSqft: 520,
     furnished: true,
+    utilityIncluded: true,
     amenities: ['WiFi', 'Air Conditioning', 'Washer/Dryer', 'Elevator'],
     images: [
       'https://picsum.photos/800/1200?random=1',
@@ -35,6 +37,7 @@ export const DATA = [
       occupation: 'Photographer',
       personality: [ 'Calm', 'Friendly'],
       lifestyle: ['Early Bird', 'Clean & Tidy'],
+      lookingFor: ['Non-smoker', 'Student', 'Young Professional'],
       aboutMe:
         'Hi! I am Alex, a photographer who loves capturing the vibrant life of New York City. I enjoy meeting new people and sharing experiences. Looking for a friendly roommate to share this amazing apartment with!',
       verified: false,
@@ -45,6 +48,7 @@ export const DATA = [
     id: '2',
     videoUrl: require('../assets/videos/sample-room2.mp4'),
     price: 2300,
+    deposit: 1050,
     street: '123 Broadway Ave',
     additionalAddress: 'Apt 4B',
     city: 'Williamsburg',
@@ -63,6 +67,7 @@ export const DATA = [
     bathrooms: 1,
     sizeSqft: 740,
     furnished: false,
+    utilityIncluded: true,
     amenities: ['Balcony', 'Gym', 'Doorman', 'Pet Friendly'],
     images: [
       'https://picsum.photos/800/1200?random=3',
@@ -77,6 +82,7 @@ export const DATA = [
       occupation: 'Photographer',
       personality: [ 'Independent', 'Friendly'],
       lifestyle: ['Smoker', 'Go to Office'],
+      lookingFor: ['Non-smoker', 'Student', 'Young Professional'],
       aboutMe:
         'Hi! I am Samantha, a photographer who loves capturing the vibrant life of New York City. I enjoy meeting new people and sharing experiences. Looking for a friendly roommate to share this amazing apartment with!',
     },
@@ -86,6 +92,7 @@ export const DATA = [
     id: '3',
     videoUrl: require('../assets/videos/sample-room1.mp4'),
     price: 3200,
+    deposit: 1600,
     street: '123 Broadway Ave',
     additionalAddress: 'Apt 4B',
     city: 'Downtown',
@@ -105,6 +112,7 @@ export const DATA = [
     sizeSqft: 680,
     furnished: true,
     amenities: ['Rooftop', 'Concierge', 'Gym', 'Parking'],
+    utilityIncluded: true,
     images: [
       'https://picsum.photos/800/1200?random=5',
       'https://picsum.photos/800/1200?random=6',
@@ -118,6 +126,7 @@ export const DATA = [
       occupation: 'Photographer',
       personality: [ 'Talkative', 'Outgoing'],
       lifestyle: ['Easygoing', 'Work from Home'],
+      lookingFor: ['Non-smoker', 'Student', 'Young Professional'],
       aboutMe:
         'Hi! I am Daniel, a photographer who loves capturing the vibrant life of New York City. I enjoy meeting new people and sharing experiences. Looking for a friendly roommate to share this amazing apartment with!',
       verified: false,
@@ -139,6 +148,7 @@ export const DATA = [
     leaseType: 'Fixed-term',
     roomType: 'Shared Room',
     bathroomType: 'Private',
+    utilityIncluded: true,
     description:
       'Luxury one-bedroom apartment in downtown San Francisco with premium finishes, floor-to-ceiling windows, and access to rooftop amenities.',
     bedrooms: 1,
@@ -159,6 +169,7 @@ export const DATA = [
       occupation: 'Photographer',
       personality: [ 'Creative', 'Outgoing'],
       lifestyle: ['Introverted'],
+      lookingFor: ['Non-smoker', 'Student', 'Young Professional'],
       aboutMe:
         'Hi! I am Daniel, a photographer who loves capturing the vibrant life of New York City. I enjoy meeting new people and sharing experiences. Looking for a friendly roommate to share this amazing apartment with!',
       verified: false,

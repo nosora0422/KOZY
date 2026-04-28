@@ -30,12 +30,16 @@ export default function TextField({
     return colors.semantic.input.border.normal;
   };
 
-  const border = borderStyle();
+  // If type is 'auth', override border and text color to gray800
+  const isAuth = type === 'auth';
+  const border = isAuth
+    ? { color: colors.base.gray800, width: 1 }
+    : borderStyle();
 
   return (
     <View style={[styles.wrapper, containerStyle]}>
       <TextInput
-        {...props} 
+        {...props}
         secureTextEntry={props.secureTextEntry}
         value={value}
         editable={!disabled}
@@ -57,6 +61,7 @@ export default function TextField({
           {
             borderColor: border.color,
             borderWidth: border.width,
+            color: isAuth ? colors.base.gray800 : undefined,
           },
           rightIcon && styles.inputWithIcon,
           style,

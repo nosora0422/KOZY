@@ -5,9 +5,11 @@ import { useState } from 'react';
 import SwipeToDeleteRow from '@/components/ui/layout/swipeRow';
 import AppButton from '@/components/ui/appButton';
 import { DATA } from '@/data/mockListData';
+import { colors } from '@/constants/colors';
+import AppText from '@/components/ui/appText';
 
 export default function MyListings() {
-  const [listings, setListings] = useState(DATA);
+  const [listings, setListings] = useState(null);
 
   const handleDeleteListing = (id) => {
     Alert.alert(
@@ -34,9 +36,21 @@ export default function MyListings() {
     return (
       <View style={styles.container}>
         <View style={styles.noItemContainer}>
+            <View style={{ width: 300, height: 150, backgroundColor: 'gray'}}></View>
+            <View>
+              <AppText 
+                  variant="headline-md"
+                  color="primary"
+              >Have a room to share?</AppText>
+              <AppText 
+                  variant="body-sm"
+                  color="primary"
+              >List it and connect with verified seekers.</AppText>
+            </View>
             <AppButton 
-                text="Upload a Room Listing"
-                onPress={() => router.push("(tabs)/post")} />
+                text="Share a room"
+                onPress={() => router.push("(tabs)/post")} 
+            />
         </View>
       </View>
     );
@@ -62,6 +76,12 @@ export default function MyListings() {
 
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 16,
+  },
   flatList: {
     flex: 1,
     backgroundColor: 'black',
@@ -69,8 +89,9 @@ const styles = StyleSheet.create({
     paddingBottom: Platform.OS === 'ios' ? 100 : 16,
   },
   noItemContainer:{
-    flex:1, 
+    width: '100%',
     alignItems: "center", 
-    justifyContent: "center"
+    justifyContent: "center",
+    gap: 64,
   }
 });

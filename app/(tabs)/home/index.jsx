@@ -1,5 +1,5 @@
 import React, { useRef, useState, useCallback, useEffect } from 'react';
-import { View, StyleSheet, Dimensions, Text, Share, Pressable } from 'react-native';
+import { View, StyleSheet, Dimensions, Text, Share, Pressable, Image } from 'react-native';
 import { FlatList } from 'react-native'; 
 import { VideoView, useVideoPlayer } from 'expo-video';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -12,6 +12,7 @@ import AppButton from '@/components/ui/appButton';
 import AppText from '@/components/ui/appText';
 import { DATA } from '@/data/mockListData';
 import { colors } from '@/constants/colors';
+import { Avatar } from 'react-native-elements';
 
 const { height } = Dimensions.get('window');
 const SAVED_LISTINGS_KEY = 'savedListings';
@@ -168,18 +169,29 @@ function ReelItem({ item, isActive, insets, isSaved, onToggleSave, onShare, onMo
 
       {/* Bottom Left */}
       <View style={[styles.bottomLeft, { bottom: insets.bottom + 76 }]}>
-        <Text style={styles.username}>${item.price} / month</Text>
-        <Text style={styles.question} numberOfLines={2}>
-          {item.city}, {item.province}
-        </Text>
-        <View style={styles.bottomCTA}> 
-          <AppButton 
-            text="Detail"
-            size="sm"
-            type='primary'
-            onPress={() => router.push(`/home/${item.id}`)}
+        <View style={styles.bottomRoomInfo}>
+          <Avatar
+            source={{ uri: item.owner.avatar[0] }}
+            size={44}
+            rounded
+            containerStyle={{ backgroundColor: 'gray' }}
           />
+          <View style={styles.bottomInfo}>
+            <AppText variant='body-md-strong'>{item.title}</AppText>
+            <AppText variant='body-md'>${item.price} / month</AppText>
+          </View>
+          <View style={styles.bottomCTA}> 
+            <AppButton 
+              text="Detail"
+              size="sm"
+              type='primary'
+              onPress={() => router.push(`/home/${item.id}`)}
+            />
+          </View>
         </View>
+        <AppText variant='body-sm-strong' numberOfLines={2}>
+            #{item.city} #{item.province}
+          </AppText>
       </View>
     </Pressable>
   );
@@ -209,10 +221,9 @@ const styles = StyleSheet.create({
   bottomLeft: {
     position: 'absolute',
     left: 20,
-    maxWidth: '70%',
+    maxWidth: '80%',
   },
   bottomCTA: {
-    marginTop: 12,
     width: 67,
   },
   username: {
@@ -220,10 +231,10 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginBottom: 4,
   },
-  question: {
+  tag: {
     color: 'white',
     fontSize: 14,
-    lineHeight: 20,
+    marginTop: 6,
   },
   rightActionsdDropdown: {
     width: 200,
@@ -235,4 +246,15 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     zIndex: 200,
   },
+  bottomInfo:{
+    flex: 1,
+  },
+  bottomRoomInfo:{
+    width: '100%',
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent:'space-between',
+    gap: 10,
+  }
 });

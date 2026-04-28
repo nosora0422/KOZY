@@ -7,6 +7,8 @@ import MapView, { Marker } from 'react-native-maps';
 import { DATA } from '@/data/mockListData';
 import DisplayField from '@/components/ui/displayField';
 import AppButton from '@/components/ui/appButton';
+import Badge from "@/components/ui/badge";
+import AppText from '@/components/ui/appText';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const ITEM_WIDTH = SCREEN_WIDTH * 0.8;
@@ -18,6 +20,7 @@ export default function DetailScreen() {
   const { id } = useLocalSearchParams();
   const insets = useSafeAreaInsets();
   const item = DATA.find(d => d.id === id);
+  const [activeIndex, setActiveIndex] = React.useState(0);
 
   // Helper to format personality and lifestyle arrays into a readable string
   const formatList = (value) => {
@@ -26,30 +29,6 @@ export default function DetailScreen() {
     }
     return value ?? '';
   };
-
-  // useFocusEffect(
-  //     useCallback(() => {
-  //       const parent = navigation.getParent();
-  //       parent?.setOptions({
-  //         tabBarStyle: { display: 'none' },
-  //       });
-  
-  //       return () => {
-  //         parent?.setOptions({
-  //           position: 'absolute',
-  //           alignSelf: 'center', 
-  //           bottom: insets.bottom + 10,
-  //           borderRadius: 16,
-  //           borderTopWidth: 0,
-  //           height: 56,
-  //           backgroundColor: 'rgba(0,0,0,1)',
-  //           maxWidth: 400,
-  //           paddingTop: 7,
-  //           marginHorizontal: 16,
-  //         });
-  //       };
-  //     }, [])
-  //   );
 
   const defaultRegion = useMemo(() => {
       const initialLatitude = Number(item?.latitude);
@@ -75,28 +54,43 @@ export default function DetailScreen() {
       contentContainerStyle={styles.container}
       keyboardShouldPersistTaps="handled"
     >
-      <Text style={styles.sectionTitle}>Room Details</Text>
+      <AppText variant='headline-sm'>{item.title}</AppText>
+      <AppText variant='body-sm'>${item.price}</AppText>
+      {/* Slider */}
       <FlatList
         data={item.images}
         horizontal
         pagingEnabled
         showsHorizontalScrollIndicator={false}
-        snapToInterval={ITEM_WIDTH + ITEM_SPACING}
-        decelerationRate="fast"
-        contentContainerStyle={{
-            paddingRight: (SCREEN_WIDTH - ITEM_WIDTH) / 2,
-        }}
         keyExtractor={(uri, index) => `${uri}-${index}`}
+        onMomentumScrollEnd={(e) => {
+          const index = Math.round(
+            e.nativeEvent.contentOffset.x / SCREEN_WIDTH
+          );
+          setActiveIndex(index);
+        }}
+        style={styles.slider}
         renderItem={({ item: image }) => (
-          <View style={{ width: ITEM_WIDTH, marginRight: ITEM_SPACING }}>
+          <View style={{ width: SCREEN_WIDTH - 32 }}>
             <Image
-                source={{ uri: image }}
-                style={styles.image}
-                resizeMode="cover"
+              source={{ uri: image }}
+              style={styles.fullImage}
+              resizeMode="cover"
             />
           </View>
         )}
       />
+      <View style={styles.pagination}>
+        {item.images.map((_, index) => (
+          <View
+            key={index}
+            style={[
+              styles.dot,
+              activeIndex === index && styles.activeDot,
+            ]}
+          />
+        ))}
+      </View>
       
       {/* Details */}
         <View style={styles.content}>
@@ -118,112 +112,46 @@ export default function DetailScreen() {
               </Marker>
             </MapView>
           </View>
-          <DisplayField title="Price">
-            ${item.price} / month
-          </DisplayField>
-
-          <DisplayField title="Room Type">
-            {item.roomType}
-          </DisplayField>
-
-          <DisplayField title="Bathroom Type">
-            {item.bathroomType}
-          </DisplayField>
-
-          <DisplayField title="Available From">
-            {item.availableFrom}
-          </DisplayField>
-
-          <DisplayField title="Lease Type">
-            {item.leaseType}
-          </DisplayField>
-
-          <DisplayField title="Furnished">
-            {item.furnished ? 'Yes' : 'No'}
-          </DisplayField>
-
-          <DisplayField title="Description">
-            {item.description}
-          </DisplayField>
-
-          {/* Amenities */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Amenities</Text>
-            {item.amenities.map((a, index) => (
-              <Text key={index} style={styles.amenity}>
-                • {a}
-              </Text>
-            ))}
-          </View>
-
-          {/* Specs */}
-          <View style={styles.specRow}>
-            <Text style={styles.spec}>🛏 {item.bedrooms} bed</Text>
-            <Text style={styles.spec}>🛁 {item.bathrooms} bath</Text>
-            <Text style={styles.spec}>📐 {item.sizeSqft} sqft</Text>
-          </View>
-
-          <View style={styles.divider}></View>
 
           {/* Owner */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Roommate Information</Text>
-            <FlatList
-              data={item.owner.avatar}
-              horizontal
-              pagingEnabled
-              showsHorizontalScrollIndicator={false}
-              snapToInterval={ITEM_WIDTH + ITEM_SPACING}
-              decelerationRate="fast"
-              contentContainerStyle={{
-                  paddingRight: (SCREEN_WIDTH - ITEM_WIDTH) / 2,
-              }}
-              keyExtractor={(uri, index) => `${uri}-${index}`}
-              renderItem={({ item: image }) => (
-                <View style={{ width: ITEM_WIDTH, marginRight: ITEM_SPACING }}>
-                  <Image
-                      source={{ uri: image }}
-                      style={styles.image}
-                      resizeMode="cover"
-                  />
-                </View>
-              )}
+            <AppText variant='headline-sm'>Meet Your Roomate</AppText>
+            <Image
+              source={{ uri: item.owner.avatar[0] }}
+              style={styles.avatarImage}
+              resizeMode="cover"
             />
-            <DisplayField title="Name">
-              {item.owner.name}
+            <View style={styles.ownerName}>
+              <AppText variant="headline-md">
+                {item.owner.name} {item.owner.ageGroup ? `, ${item.owner.ageGroup}` : ''}
+              </AppText>
+              <Badge status='varified'/>
+            </View>
+
+            <DisplayField title="Profile" type="pill">
+              {[item.owner.gender, item.owner.occupation]}
             </DisplayField>
 
-            <DisplayField title="Age Group">
-              {item.owner.ageGroup}
+            <DisplayField title="Personality" type="pill">
+              {item.owner.personality}
             </DisplayField>
 
-            <DisplayField title="Gender">
-              {item.owner.gender}
+            <DisplayField title="Lifestyle" type="pill">
+              {item.owner.lifestyle}
             </DisplayField>
 
-            <DisplayField title="Occupation">
-              {item.owner.occupation}
+            <DisplayField title="About Room & House" type="pill">
+              {[`${item.bedrooms} Bed`, `${item.bathrooms} Bath`, `${item.roomType}`, `${item.sizeSqft} sqft`, item.furnished ? 'Furnished' : 'Unfurnished', ...item.amenities]}
             </DisplayField>
 
-            <DisplayField title="Personality">
-              {formatList(item.owner.personality)}
+            <DisplayField title="Looking For" type="pill">
+              {item.owner.lookingFor}
             </DisplayField>
-
-            <DisplayField title="Lifestyle">
-              {formatList(item.owner.lifestyle)}
-            </DisplayField>
-
-            <DisplayField title="About Me">
-              {item.owner.aboutMe}
-            </DisplayField>
-
-            {/* <View style={styles.ownerRow}>
-              <Image
-                source={{ uri: item.owner.avatar[0] }}
-                style={styles.avatar}
-              />
-              <Text style={styles.ownerName}>{item.owner.name}</Text>
-            </View> */}
+            <AppText variant="body-sm-strong">Move-in Details</AppText>
+            <AppText variant='body-sm' style={{lineHeight: 14}}>• {item.availableFrom}</AppText>
+            <AppText variant='body-sm' style={{lineHeight: 14}}>• Rent: ${item.price} / {item.leaseType == "Month-to-Month" ? "Month" : "Fixed Term"}</AppText>
+            <AppText variant='body-sm' style={{lineHeight: 14}}>• Utility: {item.utilityIncluded ? 'Included' : 'Not Included'}</AppText>
+            <AppText variant='body-sm' style={{lineHeight: 14}}>• Deposit: ${item.deposit}</AppText>
           </View>
         </View>
         <AppButton 
@@ -231,8 +159,8 @@ export default function DetailScreen() {
           type="primary" 
           onPress={() => {
             Alert.alert(
-              '',
-              'To send a chat request, please upload a photo and set your preferences. This helps build trust and improves your match quality.',
+              'Complete your profile to start chatting ✨',
+              'Add a few more details so we can build trust and better matches.',
               [{
                 text: 'Close',
                 style: 'cancel',
@@ -254,7 +182,7 @@ const styles = StyleSheet.create({
   container: { 
     backgroundColor: 'black', 
     paddingHorizontal: 16,
-    paddingBottom: Platform.OS === 'ios' ? 100 : 16,
+    paddingBottom: Platform.OS === 'ios' ? 120 : 16,
     overflow: 'hidden'
   },
   title: {
@@ -262,6 +190,11 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '700',
     marginBottom: 6,
+  },
+  slider:{
+    borderRadius: 6,
+    overflow: 'hidden',
+    marginTop: 6,
   },
   price: {
     color: 'white',
@@ -274,7 +207,7 @@ const styles = StyleSheet.create({
   },
   mapContainer: {
     height: 80,
-    borderRadius: 4,
+    borderRadius: 6,
     overflow: 'hidden',
   },
   description: {
@@ -317,18 +250,23 @@ const styles = StyleSheet.create({
     borderRadius: 22,
   },
   ownerName: {
-    color: 'white',
-    fontSize: 16,
+     display: 'flex', 
+     flexDirection: 'column', 
+     justifyContent: 'center', 
+     alignItems: 'center', 
+     gap: 4
   },
   center: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  image: {
-    width: '100%',
-    height: IMAGE_HEIGHT,
-    borderRadius: 4,
+  avatarImage: {
+    width: '50%',
+    height: undefined,
+    aspectRatio: 1,
+    borderRadius: 9999,
+    marginHorizontal: 'auto'
   },
   mapImage: {
     width: '100%',
@@ -345,4 +283,30 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
     marginVertical: 8,
   },
+  fullImage: {
+    width: '100%',
+    height: 260,
+    borderRadius: 0,
+  },
+  
+  pagination: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 8,
+    gap: 6,
+  },
+  
+  dot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#666',
+  },
+  
+  activeDot: {
+    backgroundColor: 'white',
+    width: 8,
+    height: 8,
+  },
+
 });
