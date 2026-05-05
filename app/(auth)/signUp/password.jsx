@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { useSignup } from "@/context/SignupContext";
 import { router } from "expo-router";
-import { StyleSheet, View, Text } from 'react-native';
+import { StyleSheet, View, Text, KeyboardAvoidingView, Platform } from 'react-native';
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 import TextField from "@/components/ui/input/textField";
 import AppButton from "@/components/ui/appButton";
-import AppText from "@/components/ui/appText";
 import { colors } from '@/constants/colors';
 import FormField from "@/components/ui/form/formField";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
@@ -16,6 +17,7 @@ import AppLogo from "@/components/ui/appMainLogo";
 import AuthCard from "@/components/ui/authInputCard";
 
 export default function Password() {
+  var insets = useSafeAreaInsets();
   const { signup, setPassword } = useSignup();
 
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -50,88 +52,100 @@ export default function Password() {
   };
 
   return (
-    <View style={styles.container}>
-      {/* Background shapes */}
-      <LoginBackground />
-      <AppHeader showBack />
-      <View style={styles.content}>
-        <View style={styles.topContent}>
-          <AppLogo />
-        </View>
-        <View style={styles.midContent}>
-            <AuthCard
-              title="Set password"
-            >
-            <View style={styles.inputGroup}>
-              <FormField error={errors.password}>
-                <TextField
-                  value={signup.password}
-                  onChangeText={(text) => {
-                    setPassword(text);
-                    setErrors((e) => ({ ...e, password: null }));
-                  }}
-                  placeholder="Password"
-                  type="auth"
-                  secureTextEntry={!showPassword}
-                  rightIcon={
-                    <MaterialIcons
-                      name={showPassword ? "visibility-off" : "visibility"}
-                      size={20}
-                      color={colors.semantic.text.secondary}
-                    />
-                  }
-                  onRightIconPress={() => setShowPassword((value) => !value)}
-                  rightIconAccessibilityLabel={showPassword ? "Hide password" : "Show password"}
-                  error={!!errors.password}
-                />
-              </FormField>
-              <FormField error={errors.confirmPassword} lastField>
-                <TextField
-                  value={confirmPassword}
-                  onChangeText={(text) => {
-                    setConfirmPassword(text);
-                    setErrors((e) => ({ ...e, confirmPassword: null }));
-                  }}
-                  placeholder="Confirm Password"
-                  type="auth"
-                  secureTextEntry={!showConfirmPassword}
-                  rightIcon={
-                    <MaterialIcons
-                      name={showConfirmPassword ? "visibility-off" : "visibility"}
-                      size={20}
-                      color={colors.semantic.text.secondary}
-                    />
-                  }
-                  onRightIconPress={() => setShowConfirmPassword((value) => !value)}
-                  rightIconAccessibilityLabel={showConfirmPassword ? "Hide password" : "Show password"}
-                  error={!!errors.confirmPassword}
-                />
-              </FormField>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    >
+      <View style={styles.container}>
+        {/* Background shapes */}
+        <LoginBackground />
+        <AppHeader showBack />
+        <KeyboardAwareScrollView
+          contentContainerStyle={{ flexGrow: 1 }}
+          enableOnAndroid
+          keyboardShouldPersistTaps="handled"
+          extraScrollHeight={-50}
+        >
+          <View style={[styles.content, { paddingBottom: insets.bottom }]}>
+            <View style={styles.topContent}>
+              <AppLogo />
             </View>
-          </AuthCard>
+            <View style={styles.midContent}>
+              <AuthCard
+                title="Set password"
+              >
+                <View style={styles.inputGroup}>
+                  <FormField error={errors.password}>
+                    <TextField
+                      value={signup.password}
+                      onChangeText={(text) => {
+                        setPassword(text);
+                        setErrors((e) => ({ ...e, password: null }));
+                      }}
+                      placeholder="Password"
+                      type="auth"
+                      secureTextEntry={!showPassword}
+                      rightIcon={
+                        <MaterialIcons
+                          name={showPassword ? "visibility-off" : "visibility"}
+                          size={20}
+                          color={colors.semantic.text.secondary}
+                        />
+                      }
+                      onRightIconPress={() => setShowPassword((value) => !value)}
+                      rightIconAccessibilityLabel={showPassword ? "Hide password" : "Show password"}
+                      error={!!errors.password}
+                    />
+                  </FormField>
+                  <FormField error={errors.confirmPassword} lastField>
+                    <TextField
+                      value={confirmPassword}
+                      onChangeText={(text) => {
+                        setConfirmPassword(text);
+                        setErrors((e) => ({ ...e, confirmPassword: null }));
+                      }}
+                      placeholder="Confirm Password"
+                      type="auth"
+                      secureTextEntry={!showConfirmPassword}
+                      rightIcon={
+                        <MaterialIcons
+                          name={showConfirmPassword ? "visibility-off" : "visibility"}
+                          size={20}
+                          color={colors.semantic.text.secondary}
+                        />
+                      }
+                      onRightIconPress={() => setShowConfirmPassword((value) => !value)}
+                      rightIconAccessibilityLabel={showConfirmPassword ? "Hide password" : "Show password"}
+                      error={!!errors.confirmPassword}
+                    />
+                  </FormField>
+                </View>
+              </AuthCard>
+            </View>
+            <View style={styles.footerContent}>
+              <AppButton
+                text="Continue"
+                onPress={() => {
+                  if (!validate()) return;
+                  // setPassword(signup.confirmPassword)
+                  router.push("/(auth)/signUp/profile");
+                }}
+              />
+              <Text style={styles.caption}>
+                By continuing you agree to our{" "}
+                <Text style={styles.link} onPress={() => {}}>
+                  Terms of Services
+                </Text>{" "}
+                and {" "}
+                <Text style={styles.link} onPress={() => {}}>
+                  Privacy Policy.
+                </Text>{" "}
+              </Text>
+            </View>
           </View>
-        <View style={styles.footerContent}>
-          <AppButton
-            text="Continue"
-            onPress={() => {
-              if (!validate()) return;
-              // setPassword(signup.confirmPassword)
-              router.push("/(auth)/signUp/profile");
-            }}
-          />
-          <Text style={styles.caption}>
-            By continuing you agree to our{" "}
-            <Text style={styles.link} onPress={() => {}}>
-              Terms of Services
-            </Text>{" "}
-            and {" "} 
-            <Text style={styles.link} onPress={() => {}}>
-              Privacy Policy.
-            </Text>{" "}
-          </Text>
-        </View>
+        </KeyboardAwareScrollView>
       </View>
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -146,16 +160,9 @@ const styles = StyleSheet.create({
     flex: 1, 
     alignItems: "center", 
     justifyContent: "space-between", 
-    paddingVertical: 46, 
-  }, 
-  content: { 
-    flex: 1, 
-    alignItems: "center", 
-    justifyContent: "space-between", 
-    paddingVertical: 46, 
   }, 
     topContent: { 
-      height: 160,
+      height: 100,
       display: 'flex', 
       alignItems: 'center', 
       width: '100%', 

@@ -1,19 +1,20 @@
 import { useSignup } from "@/context/SignupContext";
 import { useState } from "react";
 import { router } from "expo-router";
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, KeyboardAvoidingView, Platform } from 'react-native';
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 import TextField from "@/components/ui/input/textField";
 import AppButton from "@/components/ui/appButton";
-import AppText from "@/components/ui/appText";
 import FormField from "@/components/ui/form/formField";
-import { colors } from '@/constants/colors';
 import { LoginBackground } from "@/components/ui/loginBackground";
 import AppHeader from "@/components/ui/appHeader"; 
 import AuthCard from "@/components/ui/authInputCard";
 import AppLogo from "@/components/ui/appMainLogo";
 
 export default function Profile() {
+  const insets = useSafeAreaInsets();
   const { signup, setProfile } = useSignup();
   const formatDob = (text) => {
     // Remove non-digits
@@ -53,74 +54,86 @@ export default function Profile() {
   };
 
   return (
-    <View style={styles.container}>
-      {/* Background shapes */}
-      <LoginBackground />
-      <AppHeader showBack />
-      <View style={styles.content}>
-        <View style={styles.topContent}>
-          <AppLogo />
-        </View>
-        <View style={styles.midContent}>
-          <AuthCard
-            title="Tell Us About Yourself"
-            description="Make your experience more personal and trustworthy"
-          >
-          <View style={styles.inputGroup}>
-            <FormField error={errors.firstName}>
-                <TextField
-                  value={signup.profile.firstName}
-                onChangeText={(text) => {
-                  setProfile({ firstName: text });
-                  setErrors((e) => ({ ...e, firstName: null }));
-                }}
-                placeholder="First Name"
-                type="auth"
-                error={!!errors.firstName}
-              />
-            </FormField>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    >
+      <View style={styles.container}>
+        {/* Background shapes */}
+        <LoginBackground />
+        <AppHeader showBack />
+        <KeyboardAwareScrollView
+          contentContainerStyle={{ flexGrow: 1 }}
+          enableOnAndroid
+          keyboardShouldPersistTaps="handled"
+          extraScrollHeight={-50}
+        >
+          <View style={[styles.content, { paddingBottom: insets.bottom }]}> 
+            <View style={styles.topContent}>
+              <AppLogo />
+            </View>
+            <View style={styles.midContent}>
+              <AuthCard
+                title="Tell Us About Yourself"
+                description="Make your experience more personal and trustworthy"
+              >
+                <View style={styles.inputGroup}>
+                  <FormField error={errors.firstName}>
+                    <TextField
+                      value={signup.profile.firstName}
+                      onChangeText={(text) => {
+                        setProfile({ firstName: text });
+                        setErrors((e) => ({ ...e, firstName: null }));
+                      }}
+                      placeholder="First Name"
+                      type="auth"
+                      error={!!errors.firstName}
+                    />
+                  </FormField>
 
-            <FormField error={errors.lastName}>
-              <TextField
-                value={signup.profile.lastName}
-                onChangeText={(text) => {
-                  setProfile({ lastName: text });
-                  setErrors((e) => ({ ...e, lastName: null }));
-                }}
-                placeholder="Last Name"
-                type="auth"
-                error={!!errors.lastName}
-              />
-            </FormField>
+                  <FormField error={errors.lastName}>
+                    <TextField
+                      value={signup.profile.lastName}
+                      onChangeText={(text) => {
+                        setProfile({ lastName: text });
+                        setErrors((e) => ({ ...e, lastName: null }));
+                      }}
+                      placeholder="Last Name"
+                      type="auth"
+                      error={!!errors.lastName}
+                    />
+                  </FormField>
 
-            <FormField error={errors.dob} lastField>
-              <TextField
-                value={signup.profile.dob}
-                onChangeText={(text) => {
-                  setProfile({ dob: formatDob(text) });
-                  setErrors((e) => ({ ...e, dob: null }));
+                  <FormField error={errors.dob} lastField>
+                    <TextField
+                      value={signup.profile.dob}
+                      onChangeText={(text) => {
+                        setProfile({ dob: formatDob(text) });
+                        setErrors((e) => ({ ...e, dob: null }));
+                      }}
+                      keyboardType="number-pad"
+                      maxLength={10}
+                      placeholder="Date of Birth (MM/DD/YYYY)"
+                      type="auth"
+                      error={!!errors.dob}
+                    />
+                  </FormField>
+                </View>
+              </AuthCard>
+            </View>
+            <View style={styles.footerContent}>
+              <AppButton
+                text="Continue"
+                onPress={() => {
+                  if (!validate()) return;
+                  router.push("/(auth)/signUp/success");
                 }}
-                keyboardType="number-pad"
-                maxLength={10}
-                placeholder="Date of Birth (MM/DD/YYYY)"
-                type="auth"
-                error={!!errors.dob}
               />
-            </FormField>
+            </View>
           </View>
-          </AuthCard>
-        </View>
-        <View style={styles.footerContent}>
-          <AppButton
-            text="Continue"
-            onPress={() => {
-              if (!validate()) return;
-              router.push("/(auth)/signUp/success");
-            }}
-          />
-        </View>
+        </KeyboardAwareScrollView>
       </View>
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -135,10 +148,9 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "space-between",
-    paddingVertical: 46,
   },
   topContent: { 
-    height: 160,
+    height: 100,
     display: 'flex', 
     alignItems: 'center', 
     width: '100%', 
@@ -157,12 +169,6 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     alignItems: 'center',
     width: '100%',
-  },
-  loginLink: {
-    marginTop: 12,
-    color: colors.semantic.text.primary,
-    textDecorationLine: "underline",
-    textAlign: "center",
   },
   inputGroup: {
     width: '100%',

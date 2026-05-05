@@ -100,6 +100,7 @@ const styles = StyleSheet.create({
 
   barePadding: {
     width: 'auto',
+    height: 'auto',
     paddingHorizontal: 0,
     paddingVertical: 0,
   },
