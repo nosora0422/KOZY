@@ -8,9 +8,20 @@ import AppButton from "@/components/ui/appButton";
 import AppText from "@/components/ui/appText";
 import FormField from "@/components/ui/form/formField";
 import { colors } from '@/constants/colors';
+import { LoginBackground } from "@/components/ui/loginBackground";
+import AppHeader from "@/components/ui/appHeader"; 
+import AuthCard from "@/components/ui/authInputCard";
+import AppLogo from "@/components/ui/appMainLogo";
 
 export default function Profile() {
   const { signup, setProfile } = useSignup();
+  const formatDob = (text) => {
+    // Remove non-digits
+    const digits = text.replace(/\D/g, '');
+    if (digits.length <= 2) return digits;
+    if (digits.length <= 4) return `${digits.slice(0, 2)}/${digits.slice(2)}`;
+    return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4, 8)}`;
+  };
   
   const [errors, setErrors] = useState({
     firstName: null,
@@ -43,18 +54,22 @@ export default function Profile() {
 
   return (
     <View style={styles.container}>
+      {/* Background shapes */}
+      <LoginBackground />
+      <AppHeader showBack />
       <View style={styles.content}>
         <View style={styles.topContent}>
-          <AppText variant="headline-md" color="primary" style={{ marginBottom: 12 }}>
-            Tell Us About Yourself
-          </AppText>
-          <AppText variant="body-sm" color="primary" style={{ marginBottom: 54 }}>
-            This helps us personalize your experience and build trust with other users.
-          </AppText>
+          <AppLogo />
+        </View>
+        <View style={styles.midContent}>
+          <AuthCard
+            title="Tell Us About Yourself"
+            description="Make your experience more personal and trustworthy"
+          >
           <View style={styles.inputGroup}>
             <FormField error={errors.firstName}>
-              <TextField
-                value={signup.profile.firstName}
+                <TextField
+                  value={signup.profile.firstName}
                 onChangeText={(text) => {
                   setProfile({ firstName: text });
                   setErrors((e) => ({ ...e, firstName: null }));
@@ -78,27 +93,28 @@ export default function Profile() {
               />
             </FormField>
 
-            <FormField error={errors.dob}>
+            <FormField error={errors.dob} lastField>
               <TextField
                 value={signup.profile.dob}
                 onChangeText={(text) => {
-                  setProfile({ dob: text });
+                  setProfile({ dob: formatDob(text) });
                   setErrors((e) => ({ ...e, dob: null }));
                 }}
-                placeholder="Date of Birth"
+                keyboardType="number-pad"
+                maxLength={10}
+                placeholder="Date of Birth (MM/DD/YYYY)"
                 type="auth"
                 error={!!errors.dob}
               />
             </FormField>
           </View>
+          </AuthCard>
         </View>
-        <View style={styles.bottomContent}>
+        <View style={styles.footerContent}>
           <AppButton
-            text="Save"
+            text="Continue"
             onPress={() => {
               if (!validate()) return;
-
-              // 다음 단계 or 완료 페이지
               router.push("/(auth)/signUp/success");
             }}
           />
@@ -113,23 +129,34 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 16,
     justifyContent: "center",
+    backgroundColor: "white",
   },
   content: {
     flex: 1,
     alignItems: "center",
     justifyContent: "space-between",
-    paddingVertical: 96,
+    paddingVertical: 46,
   },
-  topContent: {
-    display: 'flex',
-    alignItems: 'center',
-    width: '90%',
-  },
-  bottomContent: {
-    display: 'flex',
+  topContent: { 
+    height: 160,
+    display: 'flex', 
+    alignItems: 'center', 
+    width: '100%', 
+    justifyContent: 'flex-end',
+  }, 
+  
+  midContent: { 
+    flexGrow: 1, 
+    display: 'flex', 
+    alignItems: 'center', 
+    justifyContent: 'center', 
+    width: '100%', 
+  }, 
+  footerContent: {
+    height: 100,
+    justifyContent: 'flex-end',
     alignItems: 'center',
     width: '100%',
-    gap: 12,
   },
   loginLink: {
     marginTop: 12,

@@ -2,14 +2,19 @@ import { useState } from "react";
 import { router, useLocalSearchParams } from "expo-router";
 import { StyleSheet, View, Text, Pressable, Image } from "react-native";
 import { Feather } from "@expo/vector-icons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import TextField from "@/components/ui/input/textField";
 import AppButton from "@/components/ui/appButton";
-import AppText from "@/components/ui/appText";
 import FormField from "@/components/ui/form/formField";
 import { colors } from "@/constants/colors";
+import { LoginBackground } from "@/components/ui/loginBackground";
+import AuthCard from "@/components/ui/authInputCard";
+import AppLogo from "@/components/ui/appMainLogo";
+import AppHeader from "@/components/ui/appHeader";
 
 export default function Login() {
+  var insets = useSafeAreaInsets();
   const { redirect } = useLocalSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -42,24 +47,17 @@ export default function Login() {
   return (
     <View style={styles.container}>
       {/* Background shapes */}
-      <View style={styles.topShape} />
-      <View style={styles.bottomShape} />
-      <View style={styles.content}>
+      <LoginBackground />
+      <AppHeader />
+      <View style={[styles.content, { paddingBottom: insets.bottom }]}>
         <View style={styles.topContent}>
-          <Image
-            source={require('@/assets/images/Horizontal-logo.png')}
-            style={{ width: 200, height: 100, marginBottom: 24 }}
-            resizeMode="contain"
-          />
-          <View style={styles.inputContainer}>
-            <AppText variant="headline-md" style={{ marginBottom: 12 }} textColor={colors.base.gray800}>
-              Log In to Continue
-            </AppText>
-
-            <AppText variant="body-sm" style={{ marginBottom: 32, textAlign: 'center' }} textColor={colors.base.gray800}>
-              Match with the Right Room, Right Roommate
-            </AppText>
-
+          <AppLogo />
+        </View>
+        <View style={styles.midContent}>
+          <AuthCard
+            title="Log In to Continue"
+            description="Match with the Right Room, Right Roommate"
+          >    
             <View style={styles.inputGroup}>
               <FormField error={errors.email}>
                 <TextField
@@ -76,7 +74,7 @@ export default function Login() {
                 />
               </FormField>
 
-              <FormField error={errors.password}>
+              <FormField error={errors.password} lastField>
                 <TextField
                   value={password}
                   onChangeText={(text) => {
@@ -91,10 +89,14 @@ export default function Login() {
                 />
               </FormField>
             </View>
-          </View>
+          </AuthCard>
         </View>
-        <View style={styles.bottomContent}>
-          <Pressable onPress={() => router.replace("/(tabs)/home")}>
+        <View style={styles.footerContent}>
+          {/* Temporary home button for testing */}
+          <Pressable 
+            onPress={() => router.replace("/(tabs)/home")}
+            style={{position: 'absolute', top: 16, }}
+          >
             <Feather name="home" size={22} color="#fff" />
           </Pressable>
           <AppButton
@@ -130,27 +132,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: colors.base.white,
   },
-  topShape: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    height: '40%',
-    backgroundColor: colors.base.accent,
-    borderBottomLeftRadius: 20,
-    borderBottomRightRadius: 20,
-  },
-  
-  bottomShape: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: '40%',
-    backgroundColor: colors.base.accent,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-  },
   inputContainer:{
     width: '100%',
     marginHorizontal: 20,
@@ -171,18 +152,27 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "space-between",
-    paddingVertical: 96,
   },
-  topContent: {
-    display: 'flex',
+  topContent: { 
+    height: 160,
+    display: 'flex', 
+    alignItems: 'center', 
+    width: '100%', 
+    justifyContent: 'flex-end',
+  }, 
+  midContent: { 
+    flexGrow: 1, 
+    display: 'flex', 
+    alignItems: 'center', 
+    justifyContent: 'center', 
+    width: '100%', 
+  }, 
+  footerContent: {
+    height: 160,
+    justifyContent: 'flex-end',
     alignItems: 'center',
-    width: '90%',
-  },
-  bottomContent: {
-    display: 'flex',
-    alignItems: 'center',
-    width: '100%',
     gap: 12,
+    width: '100%',
   },
   caption: {
     width: '80%',

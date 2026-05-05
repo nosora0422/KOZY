@@ -7,32 +7,39 @@ import AppButton from "@/components/ui/appButton";
 import AppText from "@/components/ui/appText";
 import FormField from "@/components/ui/form/formField";
 
+import { LoginBackground } from "@/components/ui/loginBackground";
+import AppHeader from "@/components/ui/appHeader";
+import AuthCard from "@/components/ui/authInputCard";
+import AppLogo from "@/components/ui/appMainLogo";
+
 export default function Varify() {
   const { verificationCode, setVerificationCode } = useSignup();
 
   return (
     <View style={styles.container}>
+      {/* Background shapes */}
+      <LoginBackground />
+      <AppHeader showBack />
       <View style={styles.content}>
         <View style={styles.topContent}>
-          <AppText variant="headline-md" color="primary" style={{ marginBottom: 12 }}>
-            Check Your Email
-          </AppText>
-          <AppText variant="body-sm" color="primary">
-            We’ve sent a 6-digit code to your email.
-          </AppText>
-          <AppText variant="body-sm" color="primary" style={{ marginBottom: 54 }}>
-            Enter the code to verify your email address.
-          </AppText>
-          <FormField>
-            <TextField
-              value={verificationCode}
-              onChangeText={setVerificationCode}
-              placeholder="Enter Verification Code"
-              type="auth"
-            />
-          </FormField>
+          <AppLogo />
         </View>
-        <View style={styles.bottomContent}>
+        <View style={styles.midContent}>
+          <AuthCard
+            title="Check Your Email"
+            description="We’ve sent a 6-digit code to your email. Enter the code to verify your email address."
+          >
+            <FormField lastField>
+              <TextField
+                value={verificationCode}
+                onChangeText={setVerificationCode}
+                placeholder="Enter Verification Code"
+                type="auth"
+              />
+            </FormField>
+          </AuthCard>
+        </View>
+        <View style={styles.footerContent}>
           <AppButton
             text="Verify"
             onPress={() => {
@@ -43,7 +50,8 @@ export default function Varify() {
           <AppButton
             text="Resend Code"
             onPress={() => {}}
-            type="secondary"
+            type="bare"
+            underline
           />
         </View>
       </View>
@@ -56,22 +64,33 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 16,
     justifyContent: "center",
+    backgroundColor: "white",
   },
   content: {
     flex: 1,
     alignItems: "center",
     justifyContent: "space-between",
-    paddingVertical: 96,
+    paddingVertical: 46,
   },
-  topContent: {
-    display: 'flex',
-    alignItems: 'center',
-    width: '90%',
-  },
-  bottomContent: {
-    display: 'flex',
+  topContent: { 
+    height: 160,
+    display: 'flex', 
+    alignItems: 'center', 
+    width: '100%', 
+    justifyContent: 'flex-end',
+  }, 
+  
+  midContent: { 
+    flexGrow: 1, 
+    display: 'flex', 
+    alignItems: 'center', 
+    justifyContent: 'center', 
+    width: '100%', 
+  }, 
+  footerContent: {
+    height: 160,
+    justifyContent: 'flex-end',
     alignItems: 'center',
     width: '100%',
-    gap: 12,
   }
 });

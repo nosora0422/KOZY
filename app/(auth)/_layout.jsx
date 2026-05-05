@@ -2,15 +2,15 @@ import { Stack } from 'expo-router';
 
 export default function SignupLayout() {
   return (
-    <Stack>
+    <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen
         name="login"
         options={{ headerShown: false }}
       />
       <Stack.Screen
-        name="*"
+        name="signUp/email"
         options={{
-          headerShown: true,
+          headerShown: false,
           headerBackTitleVisible: true,
           headerTitle: "",
         }}

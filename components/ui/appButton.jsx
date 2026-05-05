@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pressable, Text, StyleSheet } from 'react-native';
+import { Pressable, Text, StyleSheet, View } from 'react-native';
 import { colors } from '@/constants/colors';
 import { getTypeStyle } from '@/constants/typographyStyles';
 
@@ -14,6 +14,7 @@ export default function AppButton({
   type = 'primary',   // primary | secondary | ghost | bare
   state = 'normal',   // normal | pressed | disabled
   onPress,
+  underline = false,
   style,
   ...props
 }) {
@@ -43,14 +44,27 @@ export default function AppButton({
       ]}
     >
       
-      <Text 
-        style={[
-          getTypeStyle(buttonTextVariantMap[size] ?? 'button-lg'),
-          { color: colorSet.text },
-        ]}
-      >
-        {text}
-      </Text>
+      <View style={{ alignItems: "center" }}>
+        <Text
+          style={[
+            getTypeStyle(buttonTextVariantMap[size] ?? 'button-lg'),
+            { color: colorSet.text },
+          ]}
+        >
+          {text}
+        </Text>
+
+        {underline && (
+          <View
+            style={{
+              marginTop: 4, // 👈 THIS is your gap
+              height: 1.5,  // thickness
+              backgroundColor: colorSet.text,
+              alignSelf: "stretch",
+            }}
+          />
+        )}
+      </View>
     </Pressable>
   );
 }
@@ -62,7 +76,16 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     width: '100%',
     maxWidth: 300,
-    marginHorizontal: 'auto'
+    marginHorizontal: 'auto',
+
+    // ✅ iOS shadow
+    shadowColor: "#1F2937", 
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2, 
+    shadowRadius: 2,
+
+    // ✅ Android shadow
+    elevation: 2,
   },
 
   lg: {
@@ -76,6 +99,8 @@ const styles = StyleSheet.create({
   },
 
   barePadding: {
+    width: 'auto',
     paddingHorizontal: 0,
+    paddingVertical: 0,
   },
 });
