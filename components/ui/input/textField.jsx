@@ -61,7 +61,7 @@ export default function TextField({
           {
             borderColor: border.color,
             borderWidth: border.width,
-            color: isAuth ? colors.base.gray800 : undefined,
+            color: isAuth ? colors.base.gray800 : colors.semantic.input.text,
           },
           rightIcon && styles.inputWithIcon,
           style,

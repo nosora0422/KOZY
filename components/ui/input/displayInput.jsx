@@ -7,18 +7,21 @@ export default function DisplayInput({
   value,
   onPress,
   isMulti = false,
-  max = 3,
   placeholder,
-  style
+  style,
+  inputStyle,
+  rightIcon,
+  accessibilityLabel,
 }) {
-  // normalize value
-  const values = isMulti
-    ? Array.isArray(value) ? value : []
-    : value ? [value] : [];
-
+  const multiValues = Array.isArray(value) ? value.filter(Boolean) : [];
   return (
-    <Pressable onPress={onPress} style={style}>
-      <View style={{ paddingVertical: 12 }}>
+    <Pressable
+      onPress={onPress}
+      style={style}
+      accessibilityRole={onPress ? "button" : undefined}
+      accessibilityLabel={accessibilityLabel || label}
+    >
+      <View style={{ paddingBottom: 12 }}>
         {label && <AppText variant="body-md-strong">
           {label}
         </AppText>}
@@ -31,33 +34,58 @@ export default function DisplayInput({
           }}
         >
           {isMulti
-            ? Array.from({ length: max }).map((_, index) => {
-                const item = values[index];
-
-                return (
+            ? (
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+                {multiValues.map((item) => (
                   <View
-                    key={index}
+                    key={item}
                     style={{
-                      flex: 1,
-                      paddingVertical: 8,
-                      paddingHorizontal: 12,
+                      minHeight: 29,
+                      paddingHorizontal: 16,
+                      paddingVertical: 6,
                       borderWidth: 1,
-                      borderColor: colors.semantic.input.border.normal.color,
+                      borderColor: colors.base.gray800Alpha,
                       borderRadius: 999,
-                      backgroundColor: colors.semantic.input.background,
-                      justifyContent: 'center',
+                      backgroundColor: colors.base.gray800Alpha,
                       alignItems: 'center',
+                      justifyContent: 'center',
+                      ...inputStyle,
                     }}
                   >
                     <AppText
-                      variant="body-xsm"
-                      color={item ? 'primary' : 'secondary'}
+                      variant="button-xsm"
+                      color="primary"
+                      numberOfLines={1}
                     >
-                      {item || placeholder}
+                      {item}
                     </AppText>
                   </View>
-                );
-              })
+                ))}
+
+                <View
+                  style={{
+                    height: 29,
+                    minWidth: 76,
+                    paddingHorizontal: 34,
+                    borderWidth: 1,
+                    borderColor: colors.semantic.input.border.normal.color,
+                    borderRadius: 999,
+                    backgroundColor: colors.base.gray800Alpha,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    ...inputStyle,
+                  }}
+                >
+                  <AppText
+                    variant="button-xsm"
+                    color="primary"
+                    numberOfLines={1}
+                  >
+                    {placeholder || '+'}
+                  </AppText>
+                </View>
+              </View>
+            )
             : (
               <View
                 style={{
@@ -67,16 +95,22 @@ export default function DisplayInput({
                   borderWidth: 1,
                   borderColor: colors.semantic.input.border.normal.color,
                   borderRadius: 999,
-                  backgroundColor: colors.semantic.input.background,
+                  backgroundColor: colors.semantic.input.bg,
                   justifyContent: 'center',
+                  height: 40,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  ...inputStyle,
                 }}
               >
                 <AppText
                   variant="body-xsm"
                   color={value ? 'primary' : 'secondary'}
+                  style={{ flex: 1 }}
                 >
                   {value || placeholder}
                 </AppText>
+                {rightIcon}
               </View>
             )}
         </View>

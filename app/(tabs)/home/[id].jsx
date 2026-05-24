@@ -1,8 +1,8 @@
 import React, { useCallback, useMemo } from 'react';
-import { View, Text, StyleSheet, Platform, FlatList, Image, Dimensions, ScrollView, Alert } from 'react-native';
-import { router, useFocusEffect, useLocalSearchParams, useNavigation} from 'expo-router';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { View, Text, StyleSheet, Platform, FlatList, Image, Dimensions, ScrollView, Alert, Pressable } from 'react-native';
+import { Stack, router, useLocalSearchParams } from 'expo-router';
 import MapView, { Marker } from 'react-native-maps';
+import { Feather } from '@expo/vector-icons';
 
 import { DATA } from '@/data/mockListData';
 import DisplayField from '@/components/ui/displayField';
@@ -10,25 +10,24 @@ import AppButton from '@/components/ui/appButton';
 import Badge from "@/components/ui/badge";
 import AppText from '@/components/ui/appText';
 
+
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const ITEM_WIDTH = SCREEN_WIDTH * 0.8;
-const ITEM_SPACING = 12;
-const IMAGE_HEIGHT = 228;
 
 export default function DetailScreen() {
-  const navigation = useNavigation();
-  const { id } = useLocalSearchParams();
-  const insets = useSafeAreaInsets();
+  const { id, backTo } = useLocalSearchParams();
   const item = DATA.find(d => d.id === id);
   const [activeIndex, setActiveIndex] = React.useState(0);
 
-  // Helper to format personality and lifestyle arrays into a readable string
-  const formatList = (value) => {
-    if (Array.isArray(value)) {
-      return value.filter(Boolean).join(' · ');
+  const handleBack = useCallback(() => {
+    const target = Array.isArray(backTo) ? backTo[0] : backTo;
+
+    if (target) {
+      router.replace(parseBackRoute(target));
+      return;
     }
-    return value ?? '';
-  };
+  
+    router.back();
+  }, [backTo]);
 
   const defaultRegion = useMemo(() => {
       const initialLatitude = Number(item?.latitude);
@@ -50,12 +49,29 @@ export default function DetailScreen() {
   }
 
   return (
-    <ScrollView 
-      contentContainerStyle={styles.container}
-      keyboardShouldPersistTaps="handled"
-    >
-      <AppText variant='headline-sm'>{item.title}</AppText>
-      <AppText variant='body-sm'>${item.price}</AppText>
+    <>
+      <Stack.Screen
+        options={{
+          headerShown: true,
+          headerBackVisible: false,
+          headerLeft: () => (
+            <Pressable
+              onPress={handleBack}
+              accessibilityRole="button"
+              accessibilityLabel="Go back"
+              hitSlop={10}
+            >
+              <Feather name="chevron-left" size={28} color="white" />
+            </Pressable>
+          ),
+        }}
+      />
+      <ScrollView 
+        contentContainerStyle={styles.container}
+        keyboardShouldPersistTaps="handled"
+      >
+        <AppText variant='headline-sm'>{item.title}</AppText>
+        <AppText variant='body-sm'>${item.price}</AppText>
       {/* Slider */}
       <FlatList
         data={item.images}
@@ -149,7 +165,7 @@ export default function DetailScreen() {
             </DisplayField>
             <AppText variant="body-sm-strong">Move-in Details</AppText>
             <AppText variant='body-sm' style={{lineHeight: 14}}>• {item.availableFrom}</AppText>
-            <AppText variant='body-sm' style={{lineHeight: 14}}>• Rent: ${item.price} / {item.leaseType == "Month-to-Month" ? "Month" : "Fixed Term"}</AppText>
+            <AppText variant='body-sm' style={{lineHeight: 14}}>• Rent: ${item.price} / {item.leaseType === "Month-to-Month" ? "Month" : "Fixed Term"}</AppText>
             <AppText variant='body-sm' style={{lineHeight: 14}}>• Utility: {item.utilityIncluded ? 'Included' : 'Not Included'}</AppText>
             <AppText variant='body-sm' style={{lineHeight: 14}}>• Deposit: ${item.deposit}</AppText>
           </View>
@@ -174,8 +190,20 @@ export default function DetailScreen() {
             );
           }}
         />
-    </ScrollView>
+      </ScrollView>
+    </>
   );
+}
+
+function parseBackRoute(target) {
+  try {
+    const parsed = JSON.parse(target);
+    if (parsed?.pathname) return parsed;
+  } catch {
+    // Keep supporting simple string routes.
+  }
+
+  return target;
 }
 
 const styles = StyleSheet.create({

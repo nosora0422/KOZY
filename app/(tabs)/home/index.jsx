@@ -143,32 +143,32 @@ function ReelItem({ item, isActive, insets, isSaved, onToggleSave, onShare, onMo
       />
       
       {/* Right Actions */}
-      <View style={[styles.rightActions, { bottom: insets.bottom + 76 }]}>
+      <View style={[styles.rightActions, { bottom: insets.bottom + 92 }]}>
         <AppIconButton
           icon={<MaterialIcons name={isSaved ? "favorite" : "favorite-border"} />}
           type='bare'
           onPress={() => onToggleSave(item)}
         />
         <AppIconButton icon={<Feather name="share-2" />} type="bare" onPress={() => onShare(item)} />
-         <AppIconButton icon={<Feather name="more-horizontal" />} type="bare" onPress={toggleDropdown} />
-         {isDropdownOpen && (
-          <Pressable 
-            style={styles.rightActionsdDropdown} 
-              onPress={() =>
-                router.push({
-                  pathname: '/(tabs)/account/contactUs',
-                  params: { backTo: '/(tabs)/home' },
-                })
-              }
-          >
-            <AppText varient="caption" color="error">Report</AppText>
-          </Pressable>
-         )}
+        <AppIconButton icon={<Feather name="more-horizontal" />} type="bare" onPress={toggleDropdown} />
+        {isDropdownOpen && (
+        <Pressable 
+          style={styles.rightActionsdDropdown} 
+            onPress={() =>
+              router.push({
+                pathname: '/(tabs)/account/contactUs',
+                params: { backTo: '/(tabs)/home' },
+              })
+            }
+        >
+          <AppText varient="caption" color="error">Report</AppText>
+        </Pressable>
+        )}
          
       </View>
 
       {/* Bottom Left */}
-      <View style={[styles.bottomLeft, { bottom: insets.bottom + 76 }]}>
+      <View style={[styles.bottomLeft, { bottom: insets.bottom + 92 }]}>
         <View style={styles.bottomRoomInfo}>
           <Avatar
             source={{ uri: item.owner.avatar[0] }}
@@ -177,8 +177,8 @@ function ReelItem({ item, isActive, insets, isSaved, onToggleSave, onShare, onMo
             containerStyle={{ backgroundColor: 'gray' }}
           />
           <View style={styles.bottomInfo}>
-            <AppText variant='body-md-strong'>{item.title}</AppText>
-            <AppText variant='body-md'>${item.price} / month</AppText>
+            <AppText variant='body-sm-strong'>{item.title}</AppText>
+            <AppText variant='body-sm'>${item.price} / month</AppText>
           </View>
           <View style={styles.bottomCTA}> 
             <AppButton 
@@ -191,7 +191,7 @@ function ReelItem({ item, isActive, insets, isSaved, onToggleSave, onShare, onMo
         </View>
         <AppText variant='body-sm-strong' numberOfLines={2}>
             #{item.city} #{item.province}
-          </AppText>
+        </AppText>
       </View>
     </Pressable>
   );
@@ -215,7 +215,7 @@ const styles = StyleSheet.create({
   rightActions: {
     position: 'absolute',
     right: 20,
-    gap: 12,
+    gap: 22,
     alignItems: 'center',
   },
   bottomLeft: {
@@ -239,7 +239,7 @@ const styles = StyleSheet.create({
   rightActionsdDropdown: {
     width: 200,
     position: 'absolute',
-    top: 10,
+    top: 28,
     right: 0,
     backgroundColor: colors.base.gray700,
     padding: 12,
@@ -256,5 +256,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent:'space-between',
     gap: 10,
+    marginBottom: 8,
   }
 });
