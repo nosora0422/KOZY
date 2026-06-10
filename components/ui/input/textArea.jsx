@@ -30,7 +30,7 @@ export default function TextArea({
         value={value}
         editable={!disabled}
         placeholder={placeholder}
-        placeholderTextColor={colors.semantic.text.placeholder}
+        placeholderTextColor={colors.semantic.input.textDisabled}
         multiline
         numberOfLines={4}
         onChangeText={onChangeText}

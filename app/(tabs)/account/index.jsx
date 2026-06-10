@@ -37,7 +37,7 @@ export default function AccountScreen() {
             <View style={styles.manuButton}>
               <Feather name="bookmark" size={20} color='#fff' />
               <AppText variant="body-md" color="primary">
-                Saved List
+                Saved Listings
               </AppText>
             </View>
           </Pressable>

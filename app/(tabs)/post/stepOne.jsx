@@ -89,7 +89,7 @@ export default function StepOne() {
                             <TextField
                                 value={roomTitle}
                                 placeholder="e.g., Spacious Master Room in Downtown NYC"
-                                placeholderTextColor={colors.semantic.text.placeholder}
+                                placeholderTextColor={colors.semantic.input.textDisabled}
                                 onChangeText={setRoomTitle}
                             />
                         </FormField>
@@ -97,7 +97,7 @@ export default function StepOne() {
                             <TextField
                                 value={price}
                                 placeholder="Enter the rent (USD)"
-                                placeholderTextColor={colors.semantic.text.placeholder}
+                                placeholderTextColor={colors.semantic.input.textDisabled}
                                 onChangeText={(text) => {
                                     const numbersOnly = text.replace(/[^0-9]/g, '');
                                     setPrice(numbersOnly);
@@ -110,7 +110,7 @@ export default function StepOne() {
                                 <TextField
                                     value={street}
                                     placeholder="Street"
-                                    placeholderTextColor={colors.semantic.text.placeholder}
+                                    placeholderTextColor={colors.semantic.input.textDisabled}
                                     onChangeText={setStreet}
                                 />
                             </InputRow>
@@ -118,7 +118,7 @@ export default function StepOne() {
                                 <TextField
                                     value={additionalAddress}
                                     placeholder="Additional Address (e.g., Apt, Suite)"
-                                    placeholderTextColor={colors.semantic.text.placeholder}
+                                    placeholderTextColor={colors.semantic.input.textDisabled}
                                     onChangeText={setAdditionalAddress}
                                 />
                             </InputRow>
@@ -126,7 +126,7 @@ export default function StepOne() {
                                 <TextField
                                     value={city}
                                     placeholder="City or Town"
-                                    placeholderTextColor={colors.semantic.text.placeholder}
+                                    placeholderTextColor={colors.semantic.input.textDisabled}
                                     onChangeText={setCity}
                                 />
                             </InputRow>
@@ -134,7 +134,7 @@ export default function StepOne() {
                                 <TextField
                                     value={province}
                                     placeholder="State, Province, or Region"
-                                    placeholderTextColor={colors.semantic.text.placeholder}
+                                    placeholderTextColor={colors.semantic.input.textDisabled}
                                     onChangeText={setProvince}
                                 />
                             </InputRow>
@@ -142,7 +142,7 @@ export default function StepOne() {
                                 <TextField
                                     value={postalCode}
                                     placeholder="Postal or ZIP Code"
-                                    placeholderTextColor={colors.semantic.text.placeholder}
+                                    placeholderTextColor={colors.semantic.input.textDisabled}
                                     onChangeText={setPostalCode}
                                 />
                             </InputRow>
@@ -152,14 +152,14 @@ export default function StepOne() {
                                 <TextField
                                     value={availableMonth}
                                     placeholder="Month"
-                                    placeholderTextColor={colors.semantic.text.placeholder}
+                                    placeholderTextColor={colors.semantic.input.textDisabled}
                                     showSoftInputOnFocus={false}
                                     onFocus={() => availableMonthDrawerRef.current?.snapToIndex(0)}
                                 />
                                 <TextField
                                     value={availableDay}
                                     placeholder="Day"
-                                    placeholderTextColor={colors.semantic.text.placeholder}
+                                    placeholderTextColor={colors.semantic.input.textDisabled}
                                     onChangeText={setAvailableDay}
                                     showSoftInputOnFocus={false}
                                     onFocus={() => availableDayDrawerRef.current?.snapToIndex(0)}
@@ -167,7 +167,7 @@ export default function StepOne() {
                                 <TextField
                                     value={availableYear}
                                     placeholder="Year"
-                                    placeholderTextColor={colors.semantic.text.placeholder}
+                                    placeholderTextColor={colors.semantic.input.textDisabled}
                                     onChangeText={setAvailableYear}
                                     showSoftInputOnFocus={false}
                                     onFocus={() => availableYearDrawerRef.current?.snapToIndex(0)}
@@ -220,7 +220,7 @@ export default function StepOne() {
                             {/* <TextField
                                 value={additionalAmenities}
                                 placeholder="Add more amenities"
-                                placeholderTextColor={colors.semantic.text.placeholder}
+                                placeholderTextColor={colors.semantic.input.textDisabled}
                                 onChangeText={setAdditionalAmenities}
                                 style={{ marginTop: 10 }}
                             /> */}
@@ -229,7 +229,7 @@ export default function StepOne() {
                             <TextArea
                                 value={description}
                                 placeholder="Write a brief description about the room"
-                                placeholderTextColor={colors.semantic.text.placeholder}
+                                placeholderTextColor={colors.semantic.input.textDisabled}
                                 onChangeText={setDescription}
                                 style={{ marginTop: 10 }}
                             />

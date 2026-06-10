@@ -44,7 +44,7 @@ export default function TextField({
         value={value}
         editable={!disabled}
         placeholder={placeholder}
-        placeholderTextColor={colors.semantic.text.placeholder}
+        placeholderTextColor={colors.semantic.input.textDisabled}
         onChangeText={onChangeText}
         onFocus={(event) => {
           setFocused(true);

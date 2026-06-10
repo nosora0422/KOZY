@@ -14,7 +14,7 @@ export default function DisplayField({
   return (
     <View {...props}>
       <AppText
-        variant="body-sm-strong"
+        variant="body-md-strong"
         color="primary"
         style={{ marginBottom: 8 }}
       >

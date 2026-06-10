@@ -1,10 +1,10 @@
 import { useMemo } from 'react';
-import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import { VideoView, useVideoPlayer } from 'expo-video';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import AppText from '@/components/ui/appText';
+import ResultVideoCard from '@/components/ui/resultVideoCard';
 import { colors } from '@/constants/colors';
 import { DATA } from '@/data/mockListData';
 
@@ -99,43 +99,6 @@ export default function SearchResultScreen() {
   );
 }
 
-function ResultVideoCard({ item, onPress }) {
-  const player = useVideoPlayer(item.videoUrl, (playerInstance) => {
-    playerInstance.loop = true;
-    playerInstance.muted = true;
-    playerInstance.play();
-  });
-
-  return (
-    <Pressable
-      onPress={onPress}
-      accessibilityRole="button"
-      accessibilityLabel={`Open ${item.title}`}
-      style={({ pressed }) => [styles.card, pressed && styles.pressed]}
-    >
-      <View style={styles.video}>
-        <VideoView
-          player={player}
-          style={StyleSheet.absoluteFill}
-          contentFit="cover"
-          pointerEvents="none"
-        />
-      </View>
-      <View style={styles.cardInfo}>
-        <AppText variant="body-xsm-strong" color="primary" numberOfLines={1}>
-          {item.title}
-        </AppText>
-        <AppText variant="body-xsm" color="placeholder" numberOfLines={1}>
-          {item.city}, {item.province}
-        </AppText>
-        <AppText variant="body-xsm-strong" color="primary">
-          ${item.price} / month
-        </AppText>
-      </View>
-    </Pressable>
-  );
-}
-
 function parseParamArray(value) {
   const stringValue = getParamString(value);
   if (!stringValue) return [];
@@ -169,23 +132,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 12,
-  },
-  card: {
-    width: '47.5%',
-    gap: 8,
-  },
-  video: {
-    width: '100%',
-    aspectRatio: 0.78,
-    borderRadius: 8,
-    overflow: 'hidden',
-    backgroundColor: colors.base.gray800,
-  },
-  cardInfo: {
-    gap: 2,
-  },
-  pressed: {
-    opacity: 0.75,
   },
   emptyResults: {
     minHeight: 360,

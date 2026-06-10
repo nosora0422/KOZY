@@ -17,7 +17,7 @@ export default function ChatInput({ onSend }) {
         value={text}
         onChangeText={setText}
         placeholder="Type a message..."
-        placeholderTextColor={colors.semantic.text.placeholder}
+        placeholderTextColor={colors.semantic.input.textDisabled}
         style={styles.input}
       />
       <TouchableOpacity onPress={handleSend} style={styles.send}>

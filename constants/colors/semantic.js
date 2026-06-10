@@ -5,7 +5,6 @@ export const semanticColors = {
     primary: baseColors.bodyInverted,
     secondary: baseColors.gray800,
     disabled: baseColors.gray400,
-    placeholder: baseColors.gray400,
     error: baseColors.warning,
   },
 
@@ -15,9 +14,19 @@ export const semanticColors = {
     handleIndicator: baseColors.gray400,
   },
 
+  bg:{
+    white: baseColors.white,
+    black: baseColors.black,
+    error: baseColors.warning,
+    success: baseColors.success,
+    grey: baseColors.gray800,
+    greyAlpha: baseColors.gray800Alpha,
+  },
+
   input: {
     bg: baseColors.background,
     text: baseColors.bodyInverted,
+    textDisabled: baseColors.gray400,
     placeholder: baseColors.gray400,
 
     border: {

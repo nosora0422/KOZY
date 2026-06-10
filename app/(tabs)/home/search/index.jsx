@@ -104,7 +104,7 @@ export default function SearchScreen() {
                 <TextInput
                   value={location}
                   placeholder="1423 3rd Ave"
-                  placeholderTextColor={colors.semantic.text.placeholder}
+                  placeholderTextColor={colors.semantic.input.textDisabled}
                   onChangeText={setLocation}
                   returnKeyType="search"
                   accessibilityLabel="Location"
@@ -160,7 +160,6 @@ export default function SearchScreen() {
               label="Gender Preference"
               value={gender}
               onPress={() => genderDrawerRef.current?.snapToIndex(0)}
-              inputStyle={styles.displayInput}
               rightIcon={<Feather name="chevron-down" size={22} color={colors.semantic.text.primary} />}
               accessibilityLabel="Gender Preference filter"
             />
@@ -295,21 +294,6 @@ const styles = StyleSheet.create({
   },
   budgetInput: {
     flex: 1,
-  },
-  displayInput: {
-    height: 38,
-    width: '100%',
-    borderWidth: 1,
-    borderColor: colors.semantic.input.border.normal.color,
-    borderRadius: 999,
-    paddingLeft: 16,
-    paddingRight: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-  },
-  pressed: {
-    opacity: 0.75,
   },
   footer: {
     position: 'absolute',

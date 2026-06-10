@@ -1,24 +1,29 @@
-import { Platform, StyleSheet, View, FlatList, Pressable, Alert } from 'react-native';
-import { Image } from 'expo-image';
+import { Alert, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { router, useFocusEffect } from 'expo-router';
 import { useState, useCallback } from 'react';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Feather } from '@expo/vector-icons';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import AppButton from '@/components/ui/appButton';
 import AppText from '@/components/ui/appText';
-import CheckBox from '@/components/ui/input/checkbox';
+import EmptyListingsState from '@/components/ui/emptyListingsState';
+import ResultVideoCard from '@/components/ui/resultVideoCard';
+import { colors } from '@/constants/colors';
+
+const SAVED_LISTINGS_KEY = 'savedListings';
 
 export default function SavedList() {
+  const insets = useSafeAreaInsets();
   const [listings, setListings] = useState([]);
-  const [isEditMode, setIsEditMode] = useState(null);
-  const [selectedItems, setSelectedItems] = useState([]);
+  const [isEditMode, setIsEditMode] = useState(false);
 
   const loadSavedListings = useCallback(async () => {
     try {
-      const stored = await AsyncStorage.getItem('savedListings');
+      const stored = await AsyncStorage.getItem(SAVED_LISTINGS_KEY);
       const parsed = stored ? JSON.parse(stored) : [];
       setListings(parsed);
-    } catch (error) {
+    } catch (_error) {
       setListings([]);
     }
   }, []);
@@ -29,142 +34,119 @@ export default function SavedList() {
     }, [loadSavedListings])
   );
 
-  const toogleEdit = () => {setIsEditMode(prev => !prev)};
-  const toggleSelectItem = (id) => {
-    setSelectedItems(prev => {
-        if (prev.includes(id)) {
-            return prev.filter(itemId => itemId !== id);
-        } else {
-            return [...prev, id];
-        }
-    });
-    };
+  const toggleEdit = () => {
+    setIsEditMode((prev) => !prev);
+  };
+
+  const handleRequestDelete = (listing) => {
+    Alert.alert(
+      'Delete Saved Listing',
+      `Remove ${listing.title ?? 'this listing'} from your saved listings?`,
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            const nextListings = listings.filter((item) => item.id !== listing.id);
+
+            try {
+              await AsyncStorage.setItem(SAVED_LISTINGS_KEY, JSON.stringify(nextListings));
+              setListings(nextListings);
+            } catch (_error) {
+              Alert.alert('Delete Failed', 'Unable to delete saved listing. Please try again.');
+            }
+          },
+        },
+      ]
+    );
+  };
 
   if (!listings || listings.length === 0) {
     return (
-      <View style={styles.container}>
-        <View style={styles.noItemContainer}>
-            <AppText variant="body-md" color="primary">
-                No Saved Listings Yet
-            </AppText>
-        </View>
+      <View style={[styles.container, { paddingBottom: Math.max(insets.bottom, 16) + 84 }]}>
+        <EmptyListingsState
+          heading="Nothing saved yet"
+          description="Start exploring and save places you like."
+          actionText="Browse listings"
+          onAction={() => router.push('/(tabs)/home')}
+        />
       </View>
     );
   }
 
   return (
     <View style={styles.container}>
-        {/* Buttons */}
-        <View style={styles.buttonContainer}>
-            {!isEditMode && (
-                <AppButton 
-                    text="Edit Listings" 
-                    size="sm" 
-                    type="secondary" 
-                    onPress={toogleEdit}
-                    style={{ width: 104 }}
-                />
-            )}
-            {isEditMode && (
-                <>
-                    <AppButton 
-                        text="Cancel" 
-                        size="sm" 
-                        type="secondary"
-                        style={{ width: 74 }}
-                        onPress={() => {
-                            toogleEdit();
-                            setSelectedItems([]);
-                            }}
-                    />
-                    <AppButton 
-                        text="Delete" 
-                        size="sm" 
-                        type="secondary" 
-                        style={{ width: 74 }}
-                        onPress={() => {
-                            Alert.alert(
-                                'Delete Item',
-                                'Are you sure you want to delete this listing?',
-                                [{
-                                    text: 'Close',
-                                    style: 'cancel',
-                                },
-                                {
-                                    text: 'Delete',
-                                    style: 'destructive',
-                                    onPress: () => {
-                                        toogleEdit();
-                                        //Delete API
-                                    },
-                                },]
-                            );  
-                        }}
-                    />
-                
-                </>
-            )}
-        </View>
-      {/* Saved List */}
-      <FlatList
-        data={listings}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={{ paddingBottom: 24 }}
-        renderItem={({ item }) => (
-          <Pressable 
-            style={styles.card}
-            onPress={() => {
-                if (isEditMode) return;
-                router.push(`account/savedList/${item.id}`);
-            }}
-        >
-            {/* Owner */}
-            <View>
-                <Image
-                    source={{ uri: item.images[0] }}
-                    style={styles.image}
-                    contentFit="cover"
-                />
-                <Image
-                    source={{ uri: item.owner.avatar[0] }}
-                    style={styles.avatar}
-                />
-            </View>
-            {/* Info */}
-            <View style={styles.infoWrapper}>
-                <AppText 
-                    variant="body-sm-strong" 
-                    color="primary"
-                >
-                    ${item.price} / month
-                </AppText>
-                <AppText
-                    variant="body-xsm"
-                    color="primary"
-                    numberOfLines={2}
-                    ellipsizeMode="tail"
-                    style={{ flexShrink: 1 }}
-                >
-                    {item.street}, {item.city}, {item.province}
-                </AppText>
-            
-                <AppText 
-                    variant="body-xsm" 
-                    color="primary"
-                    style={{ marginTop: 4 }}
-                >
-                    Available from {item.availableFrom}
-                </AppText>
-            </View>
-            {isEditMode &&
-                <CheckBox
-                    selected={selectedItems.includes(item.id)}
-                    onPress={() => toggleSelectItem(item.id)}
-                />
-            }
-          </Pressable>
+      <View style={styles.buttonContainer}>
+        <AppText variant="body-xsm" color="primary" style={{flexGrow: 1}}>
+          {listings.length} {listings.length === 1 ? 'Saved Listing' : 'Saved Listings'}
+        </AppText>
+        {!isEditMode && (
+          <AppButton
+            text="Edit Listings"
+            size="sm"
+            type="secondary"
+            onPress={toggleEdit}
+            style={styles.editButton}
+          />
         )}
-      />
+        {isEditMode && (
+          <AppButton
+            text="Done"
+            size="sm"
+            type="secondary"
+            style={styles.actionButton}
+            onPress={toggleEdit}
+          />
+        )}
+      </View>
+      <ScrollView
+        contentContainerStyle={[
+          styles.listContent,
+          { paddingBottom: Math.max(insets.bottom, 16) + 84 },
+        ]}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.grid}>
+          {listings.map((item) => {
+            return (
+              <ResultVideoCard
+                key={item.id}
+                item={item}
+                onPress={() => {
+                  if (isEditMode) {
+                    return;
+                  }
+
+                  router.push(`account/savedList/${item.id}`);
+                }}
+                accessibilityLabel={
+                  isEditMode ? `Saved listing ${item.title}` : `Open saved listing ${item.title}`
+                }
+                accessory={
+                  isEditMode ? (
+                    <Pressable
+                      onPress={() => handleRequestDelete(item)}
+                      accessibilityRole="button"
+                      accessibilityLabel={`Delete saved listing ${item.title}`}
+                      hitSlop={8}
+                      style={({ pressed }) => [
+                        styles.trashButton,
+                        pressed && styles.trashButtonPressed,
+                      ]}
+                    >
+                      <Feather name="trash" size={20} color={colors.base.bodyInverted} />
+                    </Pressable>
+                  ) : null
+                }
+              />
+            );
+          })}
+        </View>
+      </ScrollView>
     </View>
   );
 }
@@ -173,43 +155,41 @@ export default function SavedList() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'black',
+    backgroundColor: colors.base.background,
     paddingHorizontal: 16,
-    paddingBottom: Platform.OS === 'ios' ? 100 : 16,
   },
-  noItemContainer:{
-    flex:1, 
-    alignItems: "center", 
-    justifyContent: "center"
-  },
-  card: {
-    display: 'flex',
+  buttonContainer: {
     flexDirection: 'row',
-    gap: 20,
-    marginVertical: 12,
+    gap: 6,
+    justifyContent: 'space-between',
     alignItems: 'center',
+    marginVertical: 12,
   },
-  image: {
-    width: 55,
-    aspectRatio: 1,
-    borderRadius: 4,
+  editButton: {
+    width: 104,
   },
-  infoWrapper: {
-    flex: 1,
+  actionButton: {
+    width: 74,
   },
-  avatar: {
-    position: 'absolute',
-    top: -10,
-    right: -10,
-    width: 30,
-    height: 30,
-    borderRadius: 999,
+  listContent: {
+    paddingTop: 4,
   },
-  buttonContainer:{
-    display: 'flex', 
-    flexDirection: 'row', 
-    gap: 6, 
-    marginVertical: 12, 
-    marginLeft: 'auto'
-  }
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+  },
+  trashButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.base.gray800Alpha,
+    borderWidth: 1,
+    borderColor: colors.base.white300Alpha,
+  },
+  trashButtonPressed: {
+    opacity: 0.75,
+  },
 });

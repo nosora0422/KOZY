@@ -1,18 +1,14 @@
 import React, { useRef, useState, useCallback, useEffect } from 'react';
-import { View, StyleSheet, Dimensions, Text, Share, Pressable, Image } from 'react-native';
-import { FlatList } from 'react-native'; 
+import { View, StyleSheet, Dimensions, Share, Pressable, FlatList } from 'react-native';
 import { VideoView, useVideoPlayer } from 'expo-video';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router, useFocusEffect } from 'expo-router';
-import { Feather, MaterialIcons } from '@expo/vector-icons';
+import { Feather } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import AppIconButton from '@/components/ui/appIconButton';
-import AppButton from '@/components/ui/appButton';
-import AppText from '@/components/ui/appText';
+import ListingReelOverlay from '@/components/ui/listingReelOverlay';
 import { DATA } from '@/data/mockListData';
-import { colors } from '@/constants/colors';
-import { Avatar } from 'react-native-elements';
 
 const { height } = Dimensions.get('window');
 const SAVED_LISTINGS_KEY = 'savedListings';
@@ -21,7 +17,7 @@ export default function HomeScreen() {
   
   const insets = useSafeAreaInsets();
   const [activeIndex, setActiveIndex] = useState(0);
-  const [savedListings, setSavedListings] = useState([]);
+  const [, setSavedListings] = useState([]);
   const [savedIds, setSavedIds] = useState(new Set());
 
   const loadSavedListings = useCallback(async () => {
@@ -30,7 +26,7 @@ export default function HomeScreen() {
       const parsed = stored ? JSON.parse(stored) : [];
       setSavedListings(parsed);
       setSavedIds(new Set(parsed.map((item) => item.id)));
-    } catch (error) {
+    } catch (_error) {
       // noop
     }
   }, []);
@@ -109,15 +105,11 @@ export default function HomeScreen() {
 }
 
 /* Reel Item*/
-function ReelItem({ item, isActive, insets, isSaved, onToggleSave, onShare, onMorePress }) {
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+function ReelItem({ item, isActive, insets, isSaved, onToggleSave, onShare }) {
   const player = useVideoPlayer(item.videoUrl, (player) => {
     player.loop = true;
     player.muted = true;
   });
-  const toggleDropdown = () => {
-    setIsDropdownOpen((prev) => !prev);
-  }
 
   // 🔑 THIS is what actually starts video playback
   useEffect(() => {
@@ -126,7 +118,7 @@ function ReelItem({ item, isActive, insets, isSaved, onToggleSave, onShare, onMo
     } else {
       player.pause();
     }
-  }, [isActive]);
+  }, [isActive, player]);
 
   const toggleMute = () => {
     player.muted = !player.muted;
@@ -141,58 +133,22 @@ function ReelItem({ item, isActive, insets, isSaved, onToggleSave, onShare, onMo
         contentFit="cover"
         pointerEvents="none"
       />
-      
-      {/* Right Actions */}
-      <View style={[styles.rightActions, { bottom: insets.bottom + 92 }]}>
-        <AppIconButton
-          icon={<MaterialIcons name={isSaved ? "favorite" : "favorite-border"} />}
-          type='bare'
-          onPress={() => onToggleSave(item)}
-        />
-        <AppIconButton icon={<Feather name="share-2" />} type="bare" onPress={() => onShare(item)} />
-        <AppIconButton icon={<Feather name="more-horizontal" />} type="bare" onPress={toggleDropdown} />
-        {isDropdownOpen && (
-        <Pressable 
-          style={styles.rightActionsdDropdown} 
-            onPress={() =>
-              router.push({
-                pathname: '/(tabs)/account/contactUs',
-                params: { backTo: '/(tabs)/home' },
-              })
-            }
-        >
-          <AppText varient="caption" color="error">Report</AppText>
-        </Pressable>
-        )}
-         
-      </View>
 
-      {/* Bottom Left */}
-      <View style={[styles.bottomLeft, { bottom: insets.bottom + 92 }]}>
-        <View style={styles.bottomRoomInfo}>
-          <Avatar
-            source={{ uri: item.owner.avatar[0] }}
-            size={44}
-            rounded
-            containerStyle={{ backgroundColor: 'gray' }}
-          />
-          <View style={styles.bottomInfo}>
-            <AppText variant='body-sm-strong'>{item.title}</AppText>
-            <AppText variant='body-sm'>${item.price} / month</AppText>
-          </View>
-          <View style={styles.bottomCTA}> 
-            <AppButton 
-              text="Detail"
-              size="sm"
-              type='primary'
-              onPress={() => router.push(`/home/${item.id}`)}
-            />
-          </View>
-        </View>
-        <AppText variant='body-sm-strong' numberOfLines={2}>
-            #{item.city} #{item.province}
-        </AppText>
-      </View>
+      <ListingReelOverlay
+        item={item}
+        bottom={insets.bottom + 92}
+        isSaved={isSaved}
+        onToggleSave={onToggleSave}
+        onShare={onShare}
+        onPressDetail={() => router.push(`/home/${item.id}`)}
+        onPressReport={() =>
+          router.push({
+            pathname: '/(tabs)/account/contactUs',
+            params: { backTo: '/(tabs)/home' },
+          })
+        }
+        showMoreAction
+      />
     </Pressable>
   );
 }
@@ -212,50 +168,4 @@ const styles = StyleSheet.create({
     left: 16,
     zIndex: 10,
   },
-  rightActions: {
-    position: 'absolute',
-    right: 20,
-    gap: 22,
-    alignItems: 'center',
-  },
-  bottomLeft: {
-    position: 'absolute',
-    left: 20,
-    maxWidth: '80%',
-  },
-  bottomCTA: {
-    width: 67,
-  },
-  username: {
-    color: 'white',
-    fontWeight: '600',
-    marginBottom: 4,
-  },
-  tag: {
-    color: 'white',
-    fontSize: 14,
-    marginTop: 6,
-  },
-  rightActionsdDropdown: {
-    width: 200,
-    position: 'absolute',
-    top: 28,
-    right: 0,
-    backgroundColor: colors.base.gray700,
-    padding: 12,
-    borderRadius: 10,
-    zIndex: 200,
-  },
-  bottomInfo:{
-    flex: 1,
-  },
-  bottomRoomInfo:{
-    width: '100%',
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent:'space-between',
-    gap: 10,
-    marginBottom: 8,
-  }
 });

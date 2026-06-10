@@ -4,6 +4,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { Platform, StyleSheet, View, Dimensions, ScrollView, FlatList, Alert } from 'react-native';
 import { useLocalSearchParams, useNavigation } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Feather } from '@expo/vector-icons';
 
 import PillGroup from '@/components/ui/pill/pillGroup';
 import AppText from '@/components/ui/appText';
@@ -26,7 +27,6 @@ import validateImage from '@/utils/mediaValidation';
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const ITEM_WIDTH = SCREEN_WIDTH * 0.8;
 const ITEM_SPACING = 12;
-const IMAGE_HEIGHT = 228;
 
 
 export default function EditProfile() {
@@ -162,24 +162,27 @@ export default function EditProfile() {
                 decelerationRate="fast"
                 keyExtractor={(uri, index) => `${uri}-${index}`}
                 contentContainerStyle={{
-                  paddingRight: (SCREEN_WIDTH - ITEM_WIDTH) / 2,
                   paddingVertical: 20,
                 }}
-                renderItem={({ item: image }) => (
-                  <View style={{ width: ITEM_WIDTH, marginRight: ITEM_SPACING }}>
-                    <Image
-                      source={{ uri: image }}
-                      style={styles.image}
-                      contentFit="cover"
-                    />
-                  </View>
-                )}
+                renderItem={({ item: image, index }) => {
+                  const isLastItem = index === item.owner.avatar.length - 1;
+
+                  return (
+                    <View style={{ width: ITEM_WIDTH, marginRight: ITEM_SPACING }}>
+                      <Image
+                        source={{ uri: image }}
+                        style={[styles.image, isLastItem && { marginRight: 0 }]}
+                        contentFit="cover"
+                      />
+                    </View>
+                  );
+                }}
               />
               <View style={styles.uploadButtonContainer}>
                 <AppButton 
                   text="Upload" 
                   onPress={() => photoDrawerRef.current?.snapToIndex(0)} 
-                  type="secondary" 
+                  type="primary" 
                   size='sm'
                 />
               </View>
@@ -195,6 +198,8 @@ export default function EditProfile() {
               value={gender}
               placeholder="Select an option"
               onPress={() => genderDrawerRef.current?.snapToIndex(0)}
+              rightIcon={<Feather name="chevron-down" size={22} color={colors.semantic.text.primary} />}
+              accessibilityLabel="Gender Preference filter"
             />
             <DisplayInput
               label="Job or Profession"
@@ -211,20 +216,20 @@ export default function EditProfile() {
               onPress={() => personalityDrawerRef.current?.snapToIndex(0)}
             />
             <DisplayInput
-              label="Lifestyle Preferences"
+              label="Lifestyle"
               value={lifestylePreferences}
               isMulti={true}
               max={3}
               placeholder="+"
               onPress={() => lifestyleDrawerRef.current?.snapToIndex(0)}
             />
-            <DisplayInput
+            {/* <DisplayInput
               label="About Me"
               value={aboutMe}
               isTextArea={true}
               placeholder="Tap to write"
               onPress={() => aboutMeDrawerRef.current?.snapToIndex(0)}
-            />
+            /> */}
             <View style={styles.idVerificationContainer}>
               <AppText variant="body-sm-strong" color="primary">
                 ID Verification
@@ -233,7 +238,7 @@ export default function EditProfile() {
                 <AppButton 
                   text="Verify"
                   size="sm"
-                  type='secondary'
+                  type='primary'
                   onPress={() => myEmailDrawerRef.current?.snapToIndex(0)}
                 />
               </View>
@@ -250,7 +255,7 @@ export default function EditProfile() {
                   <AppButton 
                     text="Edit Email"
                     size="sm"
-                    type='secondary'
+                    type='primary'
                     onPress={() => emailEditDrawerRef.current?.snapToIndex(0)}
                   />
                 </View>
@@ -279,7 +284,7 @@ export default function EditProfile() {
       </AppDrawer>
       <AppDrawer
             ref={jobDrawerRef}
-            title="What’s your job or profession?"
+            title="What do you do for work?"
             description="Tell us what your profession is."
             primaryAction={() => {
               jobDrawerRef.current?.close(); 
@@ -294,7 +299,7 @@ export default function EditProfile() {
       </AppDrawer>
       <AppDrawer
             ref={personalityDrawerRef}
-            title="What’s your personality?"
+            title="What’s your personality like?"
             description="Let others know your vibe. Select words that reflect your personality."
             primaryAction={() => {
               personalityDrawerRef.current?.close();
@@ -316,7 +321,7 @@ export default function EditProfile() {
       </AppDrawer>
       <AppDrawer
             ref={lifestyleDrawerRef}
-            title="What’s your lifestyle?"
+            title="What’s your lifestyle like?"
             description="Your daily habits matter in shared spaces. Choose your lifestyle preferences."
             primaryAction={() => {
               lifestyleDrawerRef.current?.close(); 
@@ -493,7 +498,7 @@ const styles = StyleSheet.create({
   },
   image: {
     width: '100%',
-    height: IMAGE_HEIGHT,
+    aspectRatio: 1,
     borderRadius: 4,
   },
   sliderContainer: {

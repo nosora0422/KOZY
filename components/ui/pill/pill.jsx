@@ -23,6 +23,7 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     borderWidth: 1,
     borderColor: colors.semantic.input.border.normal.color,
+    backgroundColor: colors.semantic.bg.greyAlpha,
   },
   selected: {
     backgroundColor: "#fff",

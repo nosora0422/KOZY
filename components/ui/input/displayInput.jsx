@@ -105,7 +105,7 @@ export default function DisplayInput({
               >
                 <AppText
                   variant="body-xsm"
-                  color={value ? 'primary' : 'secondary'}
+                  color={value ? 'primary' : 'disabled'}
                   style={{ flex: 1 }}
                 >
                   {value || placeholder}

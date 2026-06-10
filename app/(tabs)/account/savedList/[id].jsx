@@ -1,14 +1,13 @@
-import React, { useRef, useState, useCallback, useEffect } from 'react';
-import { View, StyleSheet, Dimensions, Text, Share, Pressable, Alert } from 'react-native';
+import React, { useState, useCallback } from 'react';
+import { View, StyleSheet, Dimensions, Share, Pressable } from 'react-native';
 import { VideoView, useVideoPlayer } from 'expo-video';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router, useFocusEffect, useLocalSearchParams, useNavigation} from 'expo-router';
 import { Feather } from '@expo/vector-icons';
-import { MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import AppIconButton from '@/components/ui/appIconButton';
-import AppButton from '@/components/ui/appButton';
+import ListingReelOverlay from '@/components/ui/listingReelOverlay';
 import { DATA } from '@/data/mockListData';
 
 const { height } = Dimensions.get('window');
@@ -25,7 +24,7 @@ export default function SavedList() {
       const stored = await AsyncStorage.getItem('savedListings');
       const parsed = stored ? JSON.parse(stored) : [];
       setIsSaved(parsed.some((saved) => saved.id === item?.id));
-    } catch (error) {
+    } catch (_error) {
       setIsSaved(false);
     }
   }, [item?.id]);
@@ -48,7 +47,7 @@ export default function SavedList() {
       await AsyncStorage.setItem('savedListings', JSON.stringify(next));
       setIsSaved(!exists);
       router.back();
-    } catch (error) {
+    } catch (_error) {
       // noop
     }
   }, [item]);
@@ -121,32 +120,15 @@ export default function SavedList() {
         pointerEvents="none"
       />
 
-      {/* Right Actions */}
-      <View style={[styles.rightActions, { bottom: insets.bottom + 20 }]}>
-      <AppIconButton
-          icon={<MaterialIcons name="favorite" />}
-          type='bare'
-          onPress={handleToggleSave}
-        />
-        <AppIconButton icon={<Feather name="share-2" />} type="bare" onPress={onShare} />
-        <AppIconButton icon={<Feather name="repeat" />} type="bare" />
-      </View>
-
-      {/* Bottom Left */}
-      <View style={[styles.bottomLeft, { bottom: insets.bottom + 20 }]}>
-        <Text style={styles.username}>${item.price} / month</Text>
-        <Text style={styles.question} numberOfLines={2}>
-          {item.city}, {item.province}
-        </Text>
-        <View style={styles.bottomCTA}> 
-          <AppButton 
-            text="Detail"
-            size="sm"
-            type='primary'
-            onPress={() => router.push(`/(tabs)/account/savedList/detail/${item.id}`)}
-          />
-        </View>
-      </View>
+      <ListingReelOverlay
+        item={item}
+        bottom={insets.bottom + 20}
+        isSaved={isSaved}
+        onToggleSave={handleToggleSave}
+        onShare={onShare}
+        onPressDetail={() => router.push(`/(tabs)/account/savedList/detail/${item.id}`)}
+        showRepeatAction
+      />
     </Pressable>
     </View>
   );
@@ -167,30 +149,5 @@ const styles = StyleSheet.create({
     position: 'absolute', 
     left: 16,
     zIndex: 10,
-  },
-  bottomLeft: {
-    position: 'absolute',
-    left: 20,
-    maxWidth: '70%',
-  },
-  bottomCTA: {
-    marginTop: 12,
-    width: 67,
-  },
-  rightActions: {
-    position: 'absolute',
-    right: 20,
-    gap: 12,
-    alignItems: 'center',
-  },
-  username: {
-    color: 'white',
-    fontWeight: '600',
-    marginBottom: 4,
-  },
-  question: {
-    color: 'white',
-    fontSize: 14,
-    lineHeight: 20,
   },
 });
