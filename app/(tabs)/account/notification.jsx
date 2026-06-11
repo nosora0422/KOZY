@@ -15,10 +15,7 @@ export default function Notification() {
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
         <View>
-            <AppText variant="body-md-strong" color="primary">
-                Notification Settings
-            </AppText>
-            <DisplayField title="Chat Notifications" style={{ marginTop: 24, marginBottom: 16 }}>
+            <DisplayField title="Chat Notifications" style={{ marginBottom: 16 }}>
                 Receive notifications for all chat messages and chat requests.
             </DisplayField>
             <View style={{ gap: 20 }}>
@@ -63,7 +60,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     backgroundColor: 'black',
     paddingHorizontal: 16,
-    paddingBottom: Platform.OS === 'ios' ? 100 : 16,
+    paddingBottom: Platform.OS === 'ios' ? 120 : 16,
   },
   buttonContainer: {
     flexDirection: 'row',

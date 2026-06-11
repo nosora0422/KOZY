@@ -18,9 +18,12 @@ export default function ListingReelOverlay({
   onPressReport,
   showMoreAction = false,
   showRepeatAction = false,
+  showSaveAction = false,
+  showShareAction = false,
   onRepeat,
 }) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const hasRightActions = showMoreAction || showRepeatAction || showSaveAction || showShareAction;
 
   const handleToggleDropdown = () => {
     setIsDropdownOpen((prev) => !prev);
@@ -33,39 +36,45 @@ export default function ListingReelOverlay({
 
   return (
     <>
-      <View style={[styles.rightActions, { bottom }]}>
-        <AppIconButton
-          icon={<MaterialIcons name={isSaved ? 'favorite' : 'favorite-border'} />}
-          type="bare"
-          onPress={() => onToggleSave?.(item)}
-        />
-        <AppIconButton
-          icon={<Feather name="share-2" />}
-          type="bare"
-          onPress={() => onShare?.(item)}
-        />
-        {showMoreAction ? (
-          <>
+    {hasRightActions ? (
+        <View style={[styles.rightActions, { bottom }]}>
+          {showSaveAction ? (
             <AppIconButton
-              icon={<Feather name="more-horizontal" />}
+              icon={<MaterialIcons name={isSaved ? 'favorite' : 'favorite-border'} />}
               type="bare"
-              onPress={handleToggleDropdown}
+              onPress={() => onToggleSave?.(item)}
             />
-            {isDropdownOpen ? (
-              <Pressable style={styles.dropdown} onPress={handlePressReport}>
-                <AppText variant="caption" color="error">
-                  Report
-                </AppText>
-              </Pressable>
-            ) : null}
-          </>
-        ) : null}
-        {showRepeatAction ? (
-          <AppIconButton icon={<Feather name="repeat" />} type="bare" onPress={onRepeat} />
-        ) : null}
-      </View>
-
-      <View style={[styles.bottomLeft, { bottom }]}>
+          ) : null}
+          {showShareAction ? (
+            <AppIconButton
+              icon={<Feather name="share-2" />}
+              type="bare"
+              onPress={() => onShare?.(item)}
+            />
+          ) : null}
+          {showMoreAction ? (
+            <>
+              <AppIconButton
+                icon={<Feather name="more-horizontal" />}
+                type="bare"
+                onPress={handleToggleDropdown}
+              />
+              {isDropdownOpen ? (
+                <Pressable style={styles.dropdown} onPress={handlePressReport}>
+                  <AppText variant="caption" color="error">
+                    Report
+                  </AppText>
+                </Pressable>
+              ) : null}
+            </>
+          ) : null}
+          {showRepeatAction ? (
+            <AppIconButton icon={<Feather name="repeat" />} type="bare" onPress={onRepeat} />
+          ) : null}
+        </View>
+        ) : null
+      }
+      <View style={[styles.bottomLeft, { bottom, maxWidth: hasRightActions ? '80%' : '90%' }]}>
         <View style={styles.bottomRoomInfo}>
           <Avatar
             source={{ uri: item?.owner?.avatar?.[0] }}
@@ -113,7 +122,6 @@ const styles = StyleSheet.create({
   bottomLeft: {
     position: 'absolute',
     left: 20,
-    maxWidth: '80%',
   },
   bottomRoomInfo: {
     width: '100%',

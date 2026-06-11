@@ -18,7 +18,7 @@ export default function Success() {
       <View style={styles.content}>
         <View style={styles.topContent}>
           <Image
-            source={require('@/assets/images/Sign-up-success.png')}
+            source={require('@/assets/images/3d-house.png')}
             style={{ width: 240, height: 240, marginBottom: 24 }}
           />
         </View>

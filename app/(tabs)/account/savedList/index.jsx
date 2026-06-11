@@ -82,7 +82,7 @@ export default function SavedList() {
     <View style={styles.container}>
       <View style={styles.buttonContainer}>
         <AppText variant="body-xsm" color="primary" style={{flexGrow: 1}}>
-          {listings.length} {listings.length === 1 ? 'Saved Listing' : 'Saved Listings'}
+          Total {listings.length} {listings.length === 1 ? 'Saved Listing' : 'Saved Listings'}
         </AppText>
         {!isEditMode && (
           <AppButton

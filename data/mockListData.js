@@ -29,6 +29,7 @@ export const DATA = [
       'https://picsum.photos/800/1200?random=2',
     ],
     owner: {
+      id: 'u3',
       name: 'Alex Johnson',
       email: 'alex@gmail.com',
       avatar: ['https://i.pravatar.cc/150?img=3', 'https://i.pravatar.cc/150?img=4'],
@@ -74,6 +75,7 @@ export const DATA = [
       'https://picsum.photos/800/1200?random=4',
     ],
     owner: {
+      id: 'u2',
       name: 'Samantha Lee',
       email: 'samantha@gmail.com',
       avatar: ['https://i.pravatar.cc/150?img=5', 'https://i.pravatar.cc/150?img=6'],
@@ -118,6 +120,7 @@ export const DATA = [
       'https://picsum.photos/800/1200?random=6',
     ],
     owner: {
+      id: 'u1',
       name: 'Daniel Kim',
       email: 'daniel@gmail.com',
       avatar: ['https://i.pravatar.cc/150?img=8', 'https://i.pravatar.cc/150?img=9'],
@@ -161,6 +164,7 @@ export const DATA = [
       'https://picsum.photos/800/1200?random=6',
     ],
     owner: {
+      id: 'u4',
       name: 'Daniel Kim',
       email:'Kim@gamil.com',
       avatar: ['https://i.pravatar.cc/150?img=8', 'https://i.pravatar.cc/150?img=9'],

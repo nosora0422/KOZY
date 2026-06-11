@@ -22,21 +22,21 @@ export default function AccountStack() {
       }} />
       <Stack.Screen name="notification" 
         options={{ 
-          title: '',
+          title: 'Notifications',
           headerShown: true,
           headerBackVisible: true,
           headerBackTitleVisible: false
       }} />
       <Stack.Screen name="privacyPolicy" 
         options={{ 
-          title: '',
+          title: 'Privacy Policy',
           headerShown: true,
           headerBackVisible: true,
           headerBackTitleVisible: false
       }} />
       <Stack.Screen name="contactUs" 
         options={({ route }) => ({ 
-          title: '',
+          title: 'Contact Us',
           headerShown: true,
           headerBackVisible: false,
           headerBackTitleVisible: false,

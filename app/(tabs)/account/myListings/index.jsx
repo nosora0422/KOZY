@@ -1,32 +1,40 @@
-import { Platform, StyleSheet, View, FlatList, Alert } from 'react-native';
-import { router} from 'expo-router';
+import { Alert, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { router } from 'expo-router';
 import { useState } from 'react';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Feather } from '@expo/vector-icons';
 
-import SwipeToDeleteRow from '@/components/ui/layout/swipeRow';
+import EmptyListingsState from '@/components/ui/emptyListingsState';
 import AppButton from '@/components/ui/appButton';
+import AppText from '@/components/ui/appText';
+import ResultVideoCard from '@/components/ui/resultVideoCard';
 import { DATA } from '@/data/mockListData';
 import { colors } from '@/constants/colors';
-import AppText from '@/components/ui/appText';
 
 export default function MyListings() {
-  const [listings, setListings] = useState(null);
+  const insets = useSafeAreaInsets();
+  const [listings, setListings] = useState(DATA.filter((item) => item.owner?.id === 'u1')); // Mock: filter to only show listings owned by user 'u1'
+  const [isEditMode, setIsEditMode] = useState(false);
 
-  const handleDeleteListing = (id) => {
+  const toggleEdit = () => {
+    setIsEditMode((prev) => !prev);
+  };
+
+  const handleRequestDelete = (listing) => {
     Alert.alert(
       'Delete Listing',
-      'Are you sure you want to delete this listing?',
+      `Are you sure you want to delete ${listing.title ?? 'this listing'}?`,
       [
         {
           text: 'Cancel',
-          onPress: () => {},
           style: 'cancel',
         },
         {
           text: 'Delete',
-          onPress: () => {
-            setListings((prev) => prev.filter((item) => item.id !== id));
-          },
           style: 'destructive',
+          onPress: () => {
+            setListings((prev) => prev.filter((item) => item.id !== listing.id));
+          },
         },
       ]
     );
@@ -34,42 +42,86 @@ export default function MyListings() {
 
   if (!listings || listings.length === 0) {
     return (
-      <View style={styles.container}>
-        <View style={styles.noItemContainer}>
-            <View style={{ width: 300, height: 150, backgroundColor: 'gray'}}></View>
-            <View>
-              <AppText 
-                  variant="headline-md"
-                  color="primary"
-              >Have a room to share?</AppText>
-              <AppText 
-                  variant="body-sm"
-                  color="primary"
-              >List it and connect with verified seekers.</AppText>
-            </View>
-            <AppButton 
-                text="Share a room"
-                onPress={() => router.push("(tabs)/post")} 
-            />
-        </View>
+      <View style={[styles.container, { paddingBottom: Math.max(insets.bottom, 16) + 84 }]}>
+        <EmptyListingsState
+          heading="Have a room to share?"
+          description="List it and connect with verified seekers."
+          actionText="Share a room"
+          onAction={() => router.push('/(tabs)/post')}
+          imageSource = {require('@/assets/images/3d-house.png')}
+        />
       </View>
     );
   }
 
   return (
-    <FlatList
-      data={listings}
-      keyExtractor={(item) => item.id}
-      contentContainerStyle={{ paddingBottom: 24, paddingHorizontal: 16 }}
-      style={styles.flatList}
-      scrollEnabled={true}
-      renderItem={({ item }) => (
-        <SwipeToDeleteRow
-          item={item}
-          onDelete={handleDeleteListing}
-        />
-      )}
-    />
+    <View style={styles.container}>
+      <View style={styles.buttonContainer}>
+        <AppText variant="body-xsm" color="primary" style={styles.countText}>
+          Total {listings.length} {listings.length === 1 ? 'Listing' : 'Listings'}
+        </AppText>
+        {!isEditMode && (
+          <AppButton
+            text="Edit Listings"
+            size="sm"
+            type="secondary"
+            onPress={toggleEdit}
+            style={styles.editButton}
+          />
+        )}
+        {isEditMode && (
+          <AppButton
+            text="Done"
+            size="sm"
+            type="secondary"
+            style={styles.actionButton}
+            onPress={toggleEdit}
+          />
+        )}
+      </View>
+      <ScrollView
+        contentContainerStyle={[
+          styles.listContent,
+          { paddingBottom: Math.max(insets.bottom, 16) + 84 },
+        ]}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.grid}>
+          {listings.map((item) => (
+            <ResultVideoCard
+              key={item.id}
+              item={item}
+              onPress={() => {
+                if (isEditMode) {
+                  return;
+                }
+
+                router.push(`account/myListings/${item.id}`);
+              }}
+              accessibilityLabel={
+                isEditMode ? `My listing ${item.title}` : `Open my listing ${item.title}`
+              }
+              accessory={
+                isEditMode ? (
+                  <Pressable
+                    onPress={() => handleRequestDelete(item)}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Delete listing ${item.title}`}
+                    hitSlop={8}
+                    style={({ pressed }) => [
+                      styles.trashButton,
+                      pressed && styles.trashButtonPressed,
+                    ]}
+                  >
+                    <Feather name="trash" size={20} color={colors.base.bodyInverted} />
+                  </Pressable>
+                ) : null
+              }
+            />
+          ))}
+        </View>
+      </ScrollView>
+    </View>
   );
 }
 
@@ -78,20 +130,44 @@ export default function MyListings() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: colors.base.background,
     paddingHorizontal: 16,
   },
-  flatList: {
-    flex: 1,
-    backgroundColor: 'black',
-    paddingTop: Platform.OS === 'ios' ? 0 : 16,
-    paddingBottom: Platform.OS === 'ios' ? 100 : 16,
+  buttonContainer: {
+    flexDirection: 'row',
+    gap: 6,
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginVertical: 12,
   },
-  noItemContainer:{
-    width: '100%',
-    alignItems: "center", 
-    justifyContent: "center",
-    gap: 64,
-  }
+  countText: {
+    flexGrow: 1,
+  },
+  editButton: {
+    width: 104,
+  },
+  actionButton: {
+    width: 74,
+  },
+  listContent: {
+    paddingTop: 4,
+  },
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+  },
+  trashButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.base.gray800Alpha,
+    borderWidth: 1,
+    borderColor: colors.base.white300Alpha,
+  },
+  trashButtonPressed: {
+    opacity: 0.75,
+  },
 });

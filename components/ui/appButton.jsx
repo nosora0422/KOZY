@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pressable, Text, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Pressable, Text, StyleSheet, View } from 'react-native';
 import { colors } from '@/constants/colors';
 import { getTypeStyle } from '@/constants/typographyStyles';
 
@@ -15,10 +15,12 @@ export default function AppButton({
   state = 'normal',   // normal | pressed | disabled
   onPress,
   underline = false,
+  loading = false,
+  loadingLabel = 'Updating',
   style,
   ...props
 }) {
-  const isDisabled = state === 'disabled';
+  const isDisabled = state === 'disabled' || loading;
 
   const colorSet =
     colors.semantic.button[type][isDisabled ? 'disabled' : state];
@@ -30,6 +32,8 @@ export default function AppButton({
       {...props}
       disabled={isDisabled}
       onPress={onPress}
+      accessibilityState={{ disabled: isDisabled, busy: loading }}
+      accessibilityLabel={loading ? `${loadingLabel}: ${text}` : props.accessibilityLabel}
       style={({ pressed }) => [
         styles.base,
         styles[size],
@@ -43,25 +47,28 @@ export default function AppButton({
         style
       ]}
     >
-      
-      <View style={{ alignItems: "center" }}>
-        <Text
-          style={[
-            getTypeStyle(buttonTextVariantMap[size] ?? 'button-lg'),
-            { color: colorSet.text },
-          ]}
-        >
-          {text}
-        </Text>
+      <View style={styles.content}>
+        <View style={styles.labelRow}>
+          {loading && (
+            <ActivityIndicator
+              size="small"
+              color={colorSet.text}
+              style={styles.spinner}
+            />
+          )}
+          <Text
+            style={[
+              getTypeStyle(buttonTextVariantMap[size] ?? 'button-lg'),
+              { color: colorSet.text },
+            ]}
+          >
+            {text}
+          </Text>
+        </View>
 
         {underline && (
           <View
-            style={{
-              marginTop: 4, // 👈 THIS is your gap
-              height: 1.5,  // thickness
-              backgroundColor: colorSet.text,
-              alignSelf: "stretch",
-            }}
+            style={[styles.underline, { backgroundColor: colorSet.text }]}
           />
         )}
       </View>
@@ -103,5 +110,26 @@ const styles = StyleSheet.create({
     height: 'auto',
     paddingHorizontal: 0,
     paddingVertical: 0,
+  },
+
+  content: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  labelRow: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+
+  spinner: {
+    marginRight: 8,
+  },
+
+  underline: {
+    alignSelf: 'stretch',
+    height: 1.5,
+    marginTop: 4,
   },
 });

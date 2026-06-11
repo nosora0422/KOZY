@@ -6,7 +6,7 @@ import { router, useFocusEffect, useLocalSearchParams, useNavigation} from 'expo
 import { Feather } from '@expo/vector-icons';
 
 import AppIconButton from '@/components/ui/appIconButton';
-import AppButton from '@/components/ui/appButton';
+import ListingReelOverlay from '@/components/ui/listingReelOverlay';
 import { DATA } from '@/data/mockListData';
 
 const { height } = Dimensions.get('window');
@@ -26,7 +26,25 @@ export default function MyList() {
 
       return () => {
         parent?.setOptions({
-          tabBarStyle: undefined,
+          tabBarStyle: {
+            position: 'absolute',
+            alignSelf: 'center',
+            bottom: insets.bottom + 10,
+            overflow: 'hidden',
+            borderRadius: 16,
+            borderTopWidth: 0,
+            height: 56,
+            maxWidth: 400,
+            width: '100%',
+            paddingTop: 7,
+            marginHorizontal: 16,
+        
+            shadowColor: '#000',
+            shadowOpacity: 0.2,
+            shadowRadius: 10,
+            shadowOffset: { width: 0, height: 5 },
+            elevation: 10,
+          },
         });
       };
     }, [])
@@ -62,21 +80,11 @@ export default function MyList() {
         pointerEvents="none"
       />
 
-      {/* Bottom Left */}
-      <View style={[styles.bottomLeft, { bottom: insets.bottom + 20 }]}>
-        <Text style={styles.username}>${item.price} / month</Text>
-        <Text style={styles.question} numberOfLines={2}>
-          {item.city}, {item.province}
-        </Text>
-        <View style={styles.bottomCTA}> 
-          <AppButton 
-            text="Detail"
-            size="sm"
-            type='primary'
-            onPress={() => router.push(`/(tabs)/account/myListings/detail/${item.id}`)}
-          />
-        </View>
-      </View>
+      <ListingReelOverlay
+        item={item}
+        bottom={insets.bottom + 20}
+        onPressDetail={() => router.push(`/(tabs)/account/myListings/detail/${item.id}`)}
+      />
     </Pressable>
     </View>
   );
