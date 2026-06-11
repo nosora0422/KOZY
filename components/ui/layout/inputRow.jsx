@@ -1,12 +1,12 @@
 // components/layout/InputRow.jsx
 
-import { View, StyleSheet,Text } from "react-native";
+import { View, StyleSheet } from "react-native";
 import React from "react";
 
-export default function InputRow({ children, columns = 3, title }) {
+export default function InputRow({ children, isLast = false, style }) {
   return (
 
-      <View style={styles.row}>
+      <View style={[styles.row, isLast && styles.lastRow, style]}>
         {React.Children.map(children, (child) => (
           <View style={{ flex: 1 }}>{child}</View>
         ))}
@@ -21,6 +21,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 4,
     marginBottom: 12,
+  },
+  lastRow: {
+    marginBottom: 0,
   },
   
 });

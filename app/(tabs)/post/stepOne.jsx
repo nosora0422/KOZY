@@ -1,9 +1,9 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
-import { Platform, StyleSheet, View, FlatList, ScrollView, Alert } from 'react-native';
-import { useLocalSearchParams, useNavigation } from 'expo-router';
+import { Platform, StyleSheet, View, FlatList, Alert } from 'react-native';
+import { router, useNavigation } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { router } from 'expo-router';
+import { Feather } from '@expo/vector-icons';
 
 import PillGroup from '@/components/ui/pill/pillGroup';
 import AppText from '@/components/ui/appText';
@@ -11,15 +11,76 @@ import FormField from '@/components/ui/form/formField';
 import InputRow from '@/components/ui/layout/inputRow';
 import { colors } from '@/constants/colors';
 import TextField from '@/components/ui/input/textField';
-import TextArea from '@/components/ui/input/textArea';
 import AppButton from '@/components/ui/appButton';
 import AppDrawer from '@/components/ui/drawer/AppDrawer';
 import Dropdown from '@/components/ui/input/dropdown';
+import DisplayInput from '@/components/ui/input/displayInput';
+
+const DEPOSIT_INCREMENT = 100;
+const DEPOSIT_TBD_VALUE = 'TBD';
+const TBD_DEPOSIT_OPTION = { label: DEPOSIT_TBD_VALUE, value: DEPOSIT_TBD_VALUE };
+
+{/* dropdown options */}
+const KEYDETAIL_OPTIONS = [
+    { label: 'Wi-Fi', value: 'wifi' },
+    { label: 'Laundry', value: 'laundry' },
+    { label: 'Furnished', value: 'furnished' },
+    { label: 'Unfurnished', value: 'unfurnished' },
+    { label: 'Kitchen access', value: 'kitchen-access' },
+    { label: 'Pet friendly', value: 'pet-friendly' },
+];
+
+const LOOKINGFOR_OPTIONS = [
+    { label: 'Man', value: 'man' },
+    { label: 'Woman', value: 'woman' },
+    { label: 'Non-binary', value: 'non-binary' },
+    { label: 'Open to any', value: 'open-to-any' },
+    { label: 'Clean', value: 'clean' },
+    { label: 'Responsible', value: 'responsible' },
+    { label: 'Pet-friendly', value: 'pet-friendly' },
+    { label: 'Quiet at night', value: 'quiet-at-night' },
+    { label: 'Early schedule', value: 'early-schedule' },
+    { label: 'Non-smoker', value: 'non-smoker' },
+];
+
+{/* utility functions */}
+const formatCurrency = (amount) => `$${Number(amount).toLocaleString()}`;
+
+const getKeyDetailLabel = (value) => (
+    KEYDETAIL_OPTIONS.find((item) => item.value === value)?.label ?? value
+);
+const getLookingForLabel = (value) => (
+    LOOKINGFOR_OPTIONS.find((item) => item.value === value)?.label ?? value
+);
 
 
+const createDepositOptions = (priceValue) => {
+    const maxDeposit = Number(priceValue);
+
+    if (!Number.isFinite(maxDeposit) || maxDeposit <= 0) {
+        return [TBD_DEPOSIT_OPTION, { label: '$0', value: '0' }];
+    }
+
+    const highestIncrement = Math.floor(maxDeposit / DEPOSIT_INCREMENT) * DEPOSIT_INCREMENT;
+    const amounts = [];
+
+    for (let amount = 0; amount <= highestIncrement; amount += DEPOSIT_INCREMENT) {
+        amounts.push(amount);
+    }
+
+    if (highestIncrement !== maxDeposit) {
+        amounts.push(maxDeposit);
+    }
+
+    return [TBD_DEPOSIT_OPTION, ...amounts.map((amount) => ({
+        label: formatCurrency(amount),
+        value: String(amount),
+    }))];
+};
+
+{/* main component */}
 export default function StepOne() {
     const navigation = useNavigation();
-    const { id } = useLocalSearchParams();
     const [roomTitle, setRoomTitle] = useState(null);
     const [price, setPrice] = useState(null);
     const [street, setStreet] = useState(null);
@@ -27,21 +88,57 @@ export default function StepOne() {
     const [city, setCity] = useState(null);
     const [province, setProvince] = useState(null);
     const [postalCode, setPostalCode] = useState(null);
-    const [error, setError] = useState(null);
+    const [error] = useState(null);
     const [leaseType, setLeaseType] = useState('');
+    const [deposit, setDeposit] = useState('');
     const [roomType, setRoomType] = useState('');
     const [bathroomType, setBathroomType] = useState('');
-    const [amenities, setAmenities] = useState([]);
-    const [additionalAmenities, setAdditionalAmenities] = useState([]);
-    const [description, setDescription] = useState('');
+    const [keyDetail, setKeyDetail] = useState([]);
+    const [lookingFor, setLookingFor] = useState([]);
     const [availableMonth, setAvailableMonth] = useState(null);
     const [availableDay, setAvailableDay] = useState(null);
     const [availableYear, setAvailableYear] = useState(null);
+    const [minimumStay, setMinimumStay] = useState('');
     const availableMonthDrawerRef = useRef(null);
     const availableDayDrawerRef = useRef(null);
     const availableYearDrawerRef = useRef(null);
+    const depositDrawerRef = useRef(null);
+    const keyDetailDrawerRef = useRef(null);
+    const lookingForDrawerRef = useRef(null);
 
     const insets = useSafeAreaInsets();
+
+    const depositOptions = useMemo(() => createDepositOptions(price), [price]);
+
+    {/* memoized selected labels for display inputs */}
+    const selectedKeyDetailLabels = useMemo(
+        () => keyDetail.map(getKeyDetailLabel),
+        [keyDetail]
+    );
+    const selectedLookingForLabels = useMemo(
+        () => lookingFor.map(getLookingForLabel),
+        [lookingFor]
+    );
+    {/* formatted price and deposit for display in text fields */}
+    const formattedDeposit = deposit === DEPOSIT_TBD_VALUE
+        ? DEPOSIT_TBD_VALUE
+        : deposit
+            ? formatCurrency(deposit)
+            : '';
+    const formattedPrice = price ? formatCurrency(price) : '';
+
+    useEffect(() => {
+        if (deposit === DEPOSIT_TBD_VALUE) {
+            return;
+        }
+
+        const priceAmount = Number(price);
+        const depositAmount = Number(deposit);
+
+        if (deposit && Number.isFinite(priceAmount) && depositAmount > priceAmount) {
+            setDeposit('');
+        }
+    }, [deposit, price]);
 
     useFocusEffect(
         useCallback(() => {
@@ -79,10 +176,7 @@ export default function StepOne() {
                 <View style={styles.container}>
                     <View style={styles.titleContainer}>
                         <AppText variant='headline-md' color='primary'>Step 1</AppText>
-                        <AppText variant='body-sm' color='primary'>Add Room Details</AppText>
-                        <AppText variant='body-xsm' color='primary' style={{ textAlign: 'center' }}>
-                            Please provide key information about the room to help seekers understand what you're offering.
-                        </AppText>
+                        <AppText variant='body-md' color='primary'>Share key details about your room</AppText>
                     </View>
                     <View style={styles.contentContainer}>
                         <FormField label="Room Title" error={error}>
@@ -91,18 +185,6 @@ export default function StepOne() {
                                 placeholder="e.g., Spacious Master Room in Downtown NYC"
                                 placeholderTextColor={colors.semantic.input.textDisabled}
                                 onChangeText={setRoomTitle}
-                            />
-                        </FormField>
-                        <FormField label="Monthly Rent" error={error}>
-                            <TextField
-                                value={price}
-                                placeholder="Enter the rent (USD)"
-                                placeholderTextColor={colors.semantic.input.textDisabled}
-                                onChangeText={(text) => {
-                                    const numbersOnly = text.replace(/[^0-9]/g, '');
-                                    setPrice(numbersOnly);
-                                }}
-                                keyboardType="number-pad"
                             />
                         </FormField>
                         <FormField label="Address" error={error}>
@@ -138,7 +220,7 @@ export default function StepOne() {
                                     onChangeText={setProvince}
                                 />
                             </InputRow>
-                            <InputRow>
+                            <InputRow isLast>
                                 <TextField
                                     value={postalCode}
                                     placeholder="Postal or ZIP Code"
@@ -149,28 +231,26 @@ export default function StepOne() {
                         </FormField>
                         <FormField label="Available From" error={error}>
                             <InputRow>
-                                <TextField
+                                <DisplayInput
                                     value={availableMonth}
                                     placeholder="Month"
                                     placeholderTextColor={colors.semantic.input.textDisabled}
                                     showSoftInputOnFocus={false}
-                                    onFocus={() => availableMonthDrawerRef.current?.snapToIndex(0)}
+                                    onPress={() => availableMonthDrawerRef.current?.snapToIndex(0)}
                                 />
-                                <TextField
+                                <DisplayInput
                                     value={availableDay}
                                     placeholder="Day"
                                     placeholderTextColor={colors.semantic.input.textDisabled}
-                                    onChangeText={setAvailableDay}
                                     showSoftInputOnFocus={false}
-                                    onFocus={() => availableDayDrawerRef.current?.snapToIndex(0)}
+                                    onPress={() => availableDayDrawerRef.current?.snapToIndex(0)}
                                 />
-                                <TextField
+                                <DisplayInput
                                     value={availableYear}
                                     placeholder="Year"
                                     placeholderTextColor={colors.semantic.input.textDisabled}
-                                    onChangeText={setAvailableYear}
                                     showSoftInputOnFocus={false}
-                                    onFocus={() => availableYearDrawerRef.current?.snapToIndex(0)}
+                                    onPress={() => availableYearDrawerRef.current?.snapToIndex(0)}
                                 />
                             </InputRow>
                         </FormField>
@@ -185,15 +265,26 @@ export default function StepOne() {
                                 isMulti={false}
                             />
                         </FormField>
-                        <FormField label="Room Type" error={error}>
-                            <PillGroup
-                                items={[
-                                    { label: "Private", value: "private" },
-                                    { label: "Shared", value: "shared" },
-                                ]}
-                                value={roomType}
-                                onChange={setRoomType}
-                                isMulti={false}
+                        <FormField label="Monthly Rent" error={error}>
+                            <TextField
+                                value={formattedPrice}
+                                placeholder="Enter the rent (USD)"
+                                placeholderTextColor={colors.semantic.input.textDisabled}
+                                onChangeText={(text) => {
+                                    const numbersOnly = text.replace(/[^0-9]/g, '');
+                                    setPrice(numbersOnly);
+                                }}
+                                keyboardType="number-pad"
+                            />
+                        </FormField>
+                        <FormField label="Deposit" error={error}>
+                            <TextField
+                                value={formattedDeposit}
+                                placeholder="Choose the deposit (USD)"
+                                placeholderTextColor={colors.semantic.input.textDisabled}
+                                showSoftInputOnFocus={false}
+                                rightIcon={<Feather name="chevron-down" size={22} color={colors.semantic.text.primary} />}
+                                onFocus={() => depositDrawerRef.current?.snapToIndex(0)}
                             />
                         </FormField>
                         <FormField label="Bathroom Type" error={error}>
@@ -208,32 +299,46 @@ export default function StepOne() {
 
                             />
                         </FormField>
-                        <FormField label="Amenities" error={error}>
+                        <FormField label="Room Type" error={error}>
                             <PillGroup
                                 items={[
-                                    { label: "Wi-Fi", value: "wifi" },
-                                    { label: "Laundry", value: "laundry" },
+                                    { label: "Private", value: "private" },
+                                    { label: "Shared", value: "shared" },
                                 ]}
-                                value={amenities}
-                                onChange={setAmenities}
-                            />
-                            {/* <TextField
-                                value={additionalAmenities}
-                                placeholder="Add more amenities"
-                                placeholderTextColor={colors.semantic.input.textDisabled}
-                                onChangeText={setAdditionalAmenities}
-                                style={{ marginTop: 10 }}
-                            /> */}
-                        </FormField>
-                        <FormField label="Description" error={error}>
-                            <TextArea
-                                value={description}
-                                placeholder="Write a brief description about the room"
-                                placeholderTextColor={colors.semantic.input.textDisabled}
-                                onChangeText={setDescription}
-                                style={{ marginTop: 10 }}
+                                value={roomType}
+                                onChange={setRoomType}
+                                isMulti={false}
                             />
                         </FormField>
+                        <FormField label="Minimum Stay" error={error}>
+                            <TextField
+                                value={minimumStay}
+                                placeholder="Enter minimum stay (months)"
+                                placeholderTextColor={colors.semantic.input.textDisabled}
+                                showSoftInputOnFocus={false}
+                                onChangeText={setMinimumStay}
+                                suffixText="months"
+                                keyboardType="number-pad"
+                            />
+                        </FormField>
+                        <DisplayInput
+                            label="About Room & House"
+                            error={error}
+                            value={selectedKeyDetailLabels}
+                            isMulti={true}
+                            max={3}
+                            placeholder="+"
+                            onPress={() => keyDetailDrawerRef.current?.snapToIndex(0)}
+                        />
+                        <DisplayInput
+                            label="Looking For"
+                            error={error}
+                            value={selectedLookingForLabels}
+                            isMulti={true}
+                            max={3}
+                            placeholder="+"
+                            onPress={() => lookingForDrawerRef.current?.snapToIndex(0)}
+                        />
                         <View style={styles.buttonContainer}>
                             <View style={{ flex: 1 }}>
                                 <AppButton 
@@ -267,7 +372,6 @@ export default function StepOne() {
         />
         <AppDrawer
             ref={availableMonthDrawerRef}
-            snapPoints={['70%']}
             primaryAction={() => availableMonthDrawerRef.current?.close()}
         >
             <View style={styles.dropdownRow}>
@@ -294,7 +398,6 @@ export default function StepOne() {
         </AppDrawer>
         <AppDrawer
             ref={availableDayDrawerRef}
-            snapPoints={['80%']}
             primaryAction={() => availableDayDrawerRef.current?.close()}
         >
             <Dropdown
@@ -338,7 +441,6 @@ export default function StepOne() {
         </AppDrawer>
         <AppDrawer
             ref={availableYearDrawerRef}
-            snapPoints={['80%']}
             primaryAction={() => availableYearDrawerRef.current?.close()}
         >
             <Dropdown
@@ -357,6 +459,40 @@ export default function StepOne() {
                     { label: "2035", value: "2035" },
                     { label: "2036", value: "2036" },
                 ]}
+            />
+        </AppDrawer>
+        <AppDrawer
+            ref={depositDrawerRef}
+            primaryAction={() => depositDrawerRef.current?.close()}
+        >
+            <Dropdown
+                value={deposit}
+                onChange={setDeposit}
+                options={depositOptions}
+            />
+        </AppDrawer>
+        <AppDrawer
+            ref={keyDetailDrawerRef}
+            title="Describe the room & home"
+            description="Add key details about the room and home. Select all that apply"
+            primaryAction={() => keyDetailDrawerRef.current?.close()}
+        >
+            <PillGroup
+                items={KEYDETAIL_OPTIONS}
+                value={keyDetail}
+                onChange={setKeyDetail}
+            />
+        </AppDrawer>
+        <AppDrawer
+            ref={lookingForDrawerRef}
+            title="Who would you like to live with?"
+            description="Select all your preferred roommate traits"
+            primaryAction={() => lookingForDrawerRef.current?.close()}
+        >
+            <PillGroup
+                items={LOOKINGFOR_OPTIONS}
+                value={lookingFor}
+                onChange={setLookingFor}
             />
         </AppDrawer>
     </View>

@@ -1,6 +1,6 @@
 // components/input/TextField.jsx
 import { useState } from "react";
-import { TextInput, StyleSheet, View, Pressable } from "react-native";
+import { Text, TextInput, StyleSheet, View, Pressable } from "react-native";
 import { colors } from '@/constants/colors';
 import { typography } from '@/constants/typography';
 
@@ -15,6 +15,7 @@ export default function TextField({
   type,
   style,
   containerStyle,
+  suffixText,
   rightIcon,
   onRightIconPress,
   rightIconAccessibilityLabel,
@@ -64,9 +65,22 @@ export default function TextField({
             color: isAuth ? colors.base.gray800 : colors.semantic.input.text,
           },
           rightIcon && styles.inputWithIcon,
+          suffixText && styles.inputWithSuffix,
           style,
         ]}
       />
+      {suffixText ? (
+        <Text
+          style={[
+            styles.suffix,
+            typography.body['body-xsm'],
+            rightIcon && styles.suffixWithIcon,
+          ]}
+          pointerEvents="none"
+        >
+          {suffixText}
+        </Text>
+      ) : null}
       {rightIcon ? (
         onRightIconPress ? (
           <Pressable
@@ -101,6 +115,17 @@ const styles = StyleSheet.create({
   },
   inputWithIcon: {
     paddingRight: 44,
+  },
+  inputWithSuffix: {
+    paddingRight: 72,
+  },
+  suffix: {
+    position: 'absolute',
+    right: 14,
+    color: colors.semantic.input.textDisabled,
+  },
+  suffixWithIcon: {
+    right: 44,
   },
   iconButton: {
     position: 'absolute',

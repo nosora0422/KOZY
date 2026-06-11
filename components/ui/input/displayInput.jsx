@@ -28,7 +28,7 @@ export default function DisplayInput({
 
         <View
           style={{
-            marginTop: 4,
+            marginTop: 8,
             flexDirection: 'row',
             gap: 8,
           }}
@@ -40,7 +40,7 @@ export default function DisplayInput({
                   <View
                     key={item}
                     style={{
-                      minHeight: 29,
+                      minHeight: 34,
                       paddingHorizontal: 16,
                       paddingVertical: 6,
                       borderWidth: 1,
@@ -64,7 +64,7 @@ export default function DisplayInput({
 
                 <View
                   style={{
-                    height: 29,
+                    height: 34,
                     minWidth: 76,
                     paddingHorizontal: 34,
                     borderWidth: 1,
@@ -97,7 +97,7 @@ export default function DisplayInput({
                   borderRadius: 999,
                   backgroundColor: colors.semantic.input.bg,
                   justifyContent: 'center',
-                  height: 40,
+                  height: 36,
                   flexDirection: 'row',
                   alignItems: 'center',
                   ...inputStyle,
