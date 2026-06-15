@@ -20,6 +20,7 @@ export const semanticColors = {
     black: baseColors.black,
     error: baseColors.warning,
     success: baseColors.success,
+    info: baseColors.accent,
     grey: baseColors.gray800,
     greyAlpha: baseColors.gray800Alpha,
   },

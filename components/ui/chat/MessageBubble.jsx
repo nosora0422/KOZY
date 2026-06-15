@@ -1,7 +1,11 @@
-import { View, Text, StyleSheet, Image } from "react-native";
+import { View, StyleSheet, Image, Pressable } from "react-native";
 import AppText from "../appText";
+import { colors } from "@/constants/colors";
 
-export default function MessageBubble({ message, isMine, avatar }) {
+const MINE_BUBBLE_COLOR = colors.semantic.bg.info;
+const THEIRS_BUBBLE_COLOR = "#1F2937";
+
+export default function MessageBubble({ message, isMine, avatar, onAvatarPress }) {
   const formatTime = (dateString) => {
     const date = new Date(dateString);
     let hours = date.getHours();
@@ -12,10 +16,24 @@ export default function MessageBubble({ message, isMine, avatar }) {
     return `${hours}:${minsStr}${ampm}`;
   };
 
+
+
+  if (message.type === "system") {
+    return (
+      <View style={styles.systemContainer}>
+        <AppText variant="caption" color="secondary" style={styles.systemText}>
+          {message.text}
+        </AppText>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
         {!isMine && avatar && (
+          <Pressable onPress={onAvatarPress}>
             <Image source={{ uri: avatar }} style={styles.avatar} />
+          </Pressable>
         )}
         <View style={[styles.messageContainer, isMine ? { alignItems: "flex-end" } : { alignItems: "flex-start" }]}>
             <View
@@ -24,6 +42,12 @@ export default function MessageBubble({ message, isMine, avatar }) {
                     isMine ? styles.mine : styles.theirs,
                 ]}
             >
+                <View
+                    style={[
+                        styles.tail,
+                        isMine ? styles.mineTail : styles.theirsTail,
+                    ]}
+                />
                 <AppText variant="body-xs">{message.text}</AppText>
             </View>
             <AppText variant="caption" color="primary" style={{textAlign: isMine ? "right" : "left"}}>
@@ -49,18 +73,49 @@ messageContainer: {
     padding: 12,
     borderRadius: 16,
     alignSelf: "flex-start",
+    position: "relative",
   },
   mine: {
     alignSelf: "flex-end",
-    backgroundColor: "#4F46E5",
+    backgroundColor: MINE_BUBBLE_COLOR,
   },
   theirs: {
     alignSelf: "flex-start",
-    backgroundColor: "#1F2937",
+    backgroundColor: THEIRS_BUBBLE_COLOR,
+  },
+  tail: {
+    position: "absolute",
+    bottom: 0,
+    width: 14,
+    height: 14,
+  },
+  mineTail: {
+    right: -2,
+    backgroundColor: MINE_BUBBLE_COLOR,
+    borderBottomLeftRadius: 16,
+    transform: [{ rotate: "-28deg" }],
+  },
+  theirsTail: {
+    left: -2,
+    backgroundColor: THEIRS_BUBBLE_COLOR,
+    borderBottomRightRadius: 16,
+    transform: [{ rotate: "28deg" }],
   },
   avatar: {
     width: 32,
     height: 32,
     borderRadius: 16,
+  },
+  systemContainer: {
+    alignItems: "center",
+    marginVertical: 12,
+  },
+  systemText: {
+    backgroundColor: colors.semantic.bg.greyAlpha,
+    color: colors.semantic.text.primary,
+    borderRadius: 999,
+    overflow: "hidden",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
   },
 });

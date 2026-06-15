@@ -5,7 +5,9 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import AppText from '@/components/ui/appText';
 import AppButton from '@/components/ui/appButton';
+import EmptyListingsState from '@/components/ui/emptyListingsState';
 import { DATA } from '@/data/mockListData';
+import { mockChatThreads } from '@/data/mockChatData';
 import CheckBox from '@/components/ui/input/checkbox';
 import { colors } from '@/constants/colors';
 
@@ -17,7 +19,10 @@ export default function Chat() {
   const isLoggedIn = true; // Replace with actual authentication logic
   const [isEditMode, setIsEditMode] = useState(null);
   const [selectedItems, setSelectedItems] = useState([]);
-  const listings = DATA; // Replace with actual message owner data
+  const listings = DATA.map((item) => ({
+    ...item,
+    chatThread: mockChatThreads[item.id],
+  })); // Replace with actual message owner data
   
 
   if (!isLoggedIn) {
@@ -38,6 +43,19 @@ export default function Chat() {
         </View>
     </View>
     )
+  }
+
+  if (!listings || listings.length === 0) {
+    return (
+      <View style={[styles.container, { paddingTop: insets.top }]}>
+        <EmptyListingsState
+          heading="Nothing here yet"
+          description="Browse matches and start your first chat."
+          actionText="Browse listings"
+          onAction={() => router.push('/(tabs)/home')}
+        />
+      </View>
+    );
   }
 
   const toogleEdit = () => {setIsEditMode(prev => !prev)};
@@ -124,13 +142,9 @@ export default function Chat() {
                     {/* Owner */}
                     <View>
                         <Image
-                            source={{ uri: item.images[0] }}
+                            source={{ uri: item.owner.avatar[0] }}
                             style={styles.image}
                             contentFit="cover"
-                        />
-                        <Image
-                            source={{ uri: item.owner.avatar[0] }}
-                            style={styles.avatar}
                         />
                     </View>
                     {/* Info */}
@@ -138,17 +152,10 @@ export default function Chat() {
                         <AppText 
                             variant="body-sm-strong" 
                             color="primary"
-                        >
-                            {item.owner.name}
-                        </AppText>
-                        <AppText
-                            variant="body-xsm"
-                            color="primary"
-                            numberOfLines={2}
+                            numberOfLines={1}
                             ellipsizeMode="tail"
-                            style={{ flexShrink: 1 }}
                         >
-                            {item.street}, {item.city}
+                            {item.owner.name}, {item.title}
                         </AppText>
                         <AppText 
                             variant="body-xsm" 
@@ -157,7 +164,9 @@ export default function Chat() {
                             ellipsizeMode="tail"
                             style={{ marginTop: 4, flexShrink: 1 }}
                           >
-                            Hi, I'm interested in your listing at {item.street}, {item.city}. Is it still available?
+                            {item.chatThread?.requestStatus?.startsWith("pending")
+                              ? item.chatThread.requestLabel
+                              : `Hi, I'm interested in your listing at ${item.street}, ${item.city}. Is it still available?`}
                         </AppText>
                     </View>
                     <AppText variant="body-xsm" >17mins ago</AppText>
@@ -206,7 +215,7 @@ const styles = StyleSheet.create({
     image: {
       width: 55,
       aspectRatio: 1,
-      borderRadius: 4,
+      borderRadius: 999,
     },
     infoWrapper: {
       flex: 1,

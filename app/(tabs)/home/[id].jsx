@@ -7,8 +7,8 @@ import { Feather } from '@expo/vector-icons';
 import { DATA } from '@/data/mockListData';
 import DisplayField from '@/components/ui/displayField';
 import AppButton from '@/components/ui/appButton';
-import Badge from "@/components/ui/badge";
 import AppText from '@/components/ui/appText';
+import ProfileSection from '@/components/ui/profileSection';
 
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -132,29 +132,8 @@ export default function DetailScreen() {
           {/* Owner */}
           <View style={styles.section}>
             <AppText variant='headline-sm'>Meet Your Roomate</AppText>
-            <Image
-              source={{ uri: item.owner.avatar[0] }}
-              style={styles.avatarImage}
-              resizeMode="cover"
-            />
-            <View style={styles.ownerName}>
-              <AppText variant="headline-md">
-                {item.owner.name} {item.owner.ageGroup ? `, ${item.owner.ageGroup}` : ''}
-              </AppText>
-              <Badge status='varified'/>
-            </View>
 
-            <DisplayField title="Profile" type="pill">
-              {[item.owner.gender, item.owner.occupation]}
-            </DisplayField>
-
-            <DisplayField title="Personality" type="pill">
-              {item.owner.personality}
-            </DisplayField>
-
-            <DisplayField title="Lifestyle" type="pill">
-              {item.owner.lifestyle}
-            </DisplayField>
+            <ProfileSection userId={item.owner.id} listing={item}/>
 
             <DisplayField title="About Room & House" type="pill">
               {[`${item.bedrooms} Bed`, `${item.bathrooms} Bath`, `${item.roomType}`, `${item.sizeSqft} sqft`, item.furnished ? 'Furnished' : 'Unfurnished', ...item.roomDetail]}

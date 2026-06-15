@@ -1,12 +1,13 @@
-import { View, TextInput, TouchableOpacity, Text, StyleSheet } from "react-native";
+import { View, TextInput, StyleSheet } from "react-native";
 import { useState } from "react";
 import { colors } from '@/constants/colors';
+import AppButton from "../appButton";
 
-export default function ChatInput({ onSend }) {
+export default function ChatInput({ onSend, disabled = false }) {
   const [text, setText] = useState("");
 
   const handleSend = () => {
-    if (!text.trim()) return;
+    if (disabled || !text.trim()) return;
     onSend(text.trim());
     setText("");
   };
@@ -16,13 +17,19 @@ export default function ChatInput({ onSend }) {
       <TextInput
         value={text}
         onChangeText={setText}
-        placeholder="Type a message..."
+        editable={!disabled}
+        placeholder={disabled ? "Chat request pending..." : "Type a message..."}
         placeholderTextColor={colors.semantic.input.textDisabled}
         style={styles.input}
       />
-      <TouchableOpacity onPress={handleSend} style={styles.send}>
-        <Text style={styles.sendText}>Send</Text>
-      </TouchableOpacity>
+      <AppButton 
+        onPress={handleSend} 
+        type="secondary" 
+        size="sm" 
+        text="Send"
+        state={disabled ? "disabled" : "normal"}
+        style={styles.send}
+      />
     </View>
   );
 }
@@ -30,6 +37,8 @@ export default function ChatInput({ onSend }) {
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     padding: 12,
     borderTopWidth: 1,
     borderColor: colors.base.primary,
@@ -43,12 +52,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     marginRight: 8,
   },
-  send: {
-    justifyContent: "center",
-    paddingHorizontal: 16,
-  },
-  sendText: {
-    color: colors.semantic.text.primary,
-    fontWeight: "600",
-  },
+  send:{
+    width: 80,
+  }
 });
