@@ -1,7 +1,7 @@
-import { useState, useCallback, useRef } from 'react';
-import { useFocusEffect } from '@react-navigation/native';
-import { Platform, StyleSheet, View, Dimensions, ScrollView, Alert, FlatList, Pressable } from 'react-native';
-import { useLocalSearchParams, useNavigation, router } from 'expo-router';
+import { useState, useCallback, useEffect, useRef } from 'react';
+import { useFocusEffect, useIsFocused } from '@react-navigation/native';
+import { Platform, StyleSheet, View, Alert, FlatList, Pressable, useWindowDimensions } from 'react-native';
+import { useNavigation, router } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { VideoView, useVideoPlayer } from 'expo-video';
 import * as ImagePicker from 'expo-image-picker';
@@ -13,16 +13,54 @@ import AppButton from '@/components/ui/appButton';
 import InfoList from '@/components/ui/appList';
 import AppDrawer from '@/components/ui/drawer/AppDrawer';
 import { colors } from '@/constants/colors';
-import AppIconButton from '@/components/ui/appIconButton';
-import { Feather } from '@expo/vector-icons';
+import ListingReelOverlay from '@/components/ui/listingReelOverlay';
 
+const SAMPLE_VIDEOS = [
+    {
+        id: 'sample-room-1',
+        source: require('@/assets/videos/sample-room1.mp4'),
+    },
+    {
+        id: 'sample-room-2',
+        source: require('@/assets/videos/sample-room2.mp4'),
+    },
+];
+
+function SampleVideo({ source, isActive, isScreenFocused, width }) {
+    const player = useVideoPlayer(source, (videoPlayer) => {
+        videoPlayer.loop = true;
+        videoPlayer.muted = true;
+    });
+
+    useEffect(() => {
+        if (isActive && isScreenFocused) {
+            player.play();
+        } else {
+            player.pause();
+        }
+    }, [isActive, isScreenFocused, player]);
+
+    return (
+        <View style={[styles.sampleVideoFrame, { width }]}>
+            <VideoView
+                player={player}
+                style={styles.sampleVideo}
+                contentFit="cover"
+                nativeControls={false}
+            />
+        </View>
+    );
+}
 
 export default function StepThree() {
     const navigation = useNavigation();
-    const { id } = useLocalSearchParams();
-    const [error, setError] = useState(null);
+    const isScreenFocused = useIsFocused();
     const [selectedVideo, setSelectedVideo] = useState(null);
-    const item = DATA[0]
+    const [activeSampleIndex, setActiveSampleIndex] = useState(0);
+    const { width: screenWidth } = useWindowDimensions();
+    const insets = useSafeAreaInsets();
+    const sampleVideoWidth = Math.min(screenWidth - 96, 360);
+    const item = DATA[0];
     const drawerRef = useRef(null);
     const selectedVideoPlayer = useVideoPlayer(
             selectedVideo?.uri ?? null,
@@ -30,19 +68,6 @@ export default function StepThree() {
                 player.loop = true;
             }
             );
-
-    const exampleVideo1 = useVideoPlayer(
-        'https://www.w3schools.com/html/mov_bbb.mp4',
-        (player) => {
-        player.loop = true;
-        }
-    );
-    const exampleVideo2 = useVideoPlayer(
-        'https://www.w3schools.com/html/mov_bbb.mp4',
-        (player) => {
-        player.loop = true;
-        }
-    );
 
     const openAlbum = async () => {
         const permissionResult =
@@ -88,17 +113,16 @@ export default function StepThree() {
             keyExtractor={(item) => item.key}
             keyboardShouldPersistTaps="always"
             renderItem={() => (
-                <View style={[styles.container]}>
+                <View style={[styles.container, { paddingTop: insets.top }]}>
                     <View style={{ paddingHorizontal: 24, gap: 40 }}>
                         <View style={styles.titleContainer}>
                             <AppText variant='headline-md' color='primary'>Step 3</AppText>
-                            <AppText variant='body-sm' color='primary'>Capture a Vertical Walkthrough Room Video</AppText>
-                            <AppText variant='body-xsm' color='primary' style={{ textAlign: 'center' }}>
-                                Show the entire space clearly in a single take. Record a vertical (portrait) video that captures all areas the room seeker will have access to — just like a real-time tour.
-                            </AppText>
+                            <AppText variant='body-md' color='primary' style={{ textAlign: 'center' }}>Show your space in motion. One smooth, vertical video that shows the full space.</AppText>
                         </View>
                         <InfoList
-                            title="Video Requirements"
+                            listStyle={{color: colors.semantic.text.tertiary}}
+                            titleStyle={{color: colors.semantic.text.tertiary}}
+                            title="💡 Video Requirements"
                             items={[
                                 'Shoot in portrait mode (vertical)',
                                 'Walk steadily through the space (like a live tour)',
@@ -107,33 +131,46 @@ export default function StepThree() {
                             ]}
                         />
                         <View>
-                            <AppText variant='body-sm-strong' color='primary' style={{ marginBottom: 16 }}>
-                                Sample Tour Videos
+                            <AppText variant='body-sm-strong' color='primary' style={{ marginBottom: 16, color: colors.semantic.text.tertiary }}>
+                            💿 Sample Tour Videos
                             </AppText>
-                            <View style={styles.videoContainer}>
-                                <View>
-                                    <VideoView
-                                        player={exampleVideo1}
-                                        style={styles.video}
-                                        contentFit="cover"
-                                    />
-                                    <View style={styles.overlay}>
-                                        <AppText variant="body-sm" style={styles.overlayText}>
-                                        Good Example Video
-                                        </AppText>
-                                    </View>
-                                </View>
-                                <View>
-                                    <VideoView
-                                        player={exampleVideo2}
-                                        style={styles.video}
-                                        contentFit="cover"
-                                    />
-                                    <View style={styles.overlay}>
-                                        <AppText variant="body-sm" style={styles.overlayText}>
-                                        Bad Example Video
-                                        </AppText>
-                                    </View>
+                            <View style={styles.carousel}>
+                                <FlatList
+                                    data={SAMPLE_VIDEOS}
+                                    horizontal
+                                    pagingEnabled
+                                    bounces={false}
+                                    showsHorizontalScrollIndicator={false}
+                                    keyExtractor={(sample) => sample.id}
+                                    style={{ width: sampleVideoWidth }}
+                                    onMomentumScrollEnd={(event) => {
+                                        const nextIndex = Math.round(
+                                            event.nativeEvent.contentOffset.x / sampleVideoWidth
+                                        );
+                                        setActiveSampleIndex(nextIndex);
+                                    }}
+                                    renderItem={({ item: sample, index }) => (
+                                        <SampleVideo
+                                            source={sample.source}
+                                            isActive={index === activeSampleIndex}
+                                            isScreenFocused={isScreenFocused}
+                                            width={sampleVideoWidth}
+                                        />
+                                    )}
+                                />
+                                <View
+                                    style={styles.pagination}
+                                    accessibilityLabel={`Sample video ${activeSampleIndex + 1} of ${SAMPLE_VIDEOS.length}`}
+                                >
+                                    {SAMPLE_VIDEOS.map((sample, index) => (
+                                        <View
+                                            key={sample.id}
+                                            style={[
+                                                styles.paginationDot,
+                                                index === activeSampleIndex && styles.paginationDotActive,
+                                            ]}
+                                        />
+                                    ))}
                                 </View>
                             </View>
                         </View>
@@ -159,27 +196,14 @@ export default function StepThree() {
                         style={styles.previewVideo}
                         contentFit="cover"
                     />
-                    {/* Right Actions */}
-                    <View style={[styles.rightActions, { bottom: 16 }]}>
-                        <AppIconButton icon={<Feather name="heart" />} type="bare" />
-                        <AppIconButton icon={<Feather name="message-circle" />} type="bare" />
-                        <AppIconButton icon={<Feather name="repeat" />} type="bare" />
-                    </View>
-
-                    {/* Bottom Left */}
-                    <View style={[styles.bottomLeft, { bottom: 16 }]}>
-                        <AppText variant='body-md-strong'>${item.price} / month</AppText>
-                        <AppText variant='body-sm' numberOfLines={2}>
-                            {item.city}, {item.province}
-                        </AppText>
-                        <View style={styles.bottomCTA}> 
-                        <AppButton 
-                            text="Detail"
-                            size="sm"
-                            type='primary'
-                        />
-                        </View>
-                    </View>
+                    <ListingReelOverlay
+                        item={item}
+                        bottom={20}
+                        onPressDetail={() => router.push(`/(tabs)/account/myListings/detail/${item.id}`)}
+                        showMoreAction
+                        showSaveAction
+                        showShareAction
+                    />
                 </View>
                 )}
                 <Pressable 
@@ -237,27 +261,37 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
   },
-  videoContainer:{
-    paddingHorizontal: 56,
-    gap: 12,
-  },
-  video: {
-    width: '100%',
-    aspectRatio: '9/16',
-    backgroundColor: 'black',
-  },
-  overlay: {
-    ...StyleSheet.absoluteFillObject, // fills the video
-    justifyContent: 'center',
+  carousel: {
     alignItems: 'center',
-},
-    overlayText: {
-        color: 'white',
-        backgroundColor: 'rgba(0,0,0,0.5)',
-        paddingHorizontal: 12,
-        paddingVertical: 6,
-        borderRadius: 8,
-    },
+  },
+  sampleVideoFrame: {
+    aspectRatio: 9 / 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: colors.semantic.text.tertiary,
+    overflow: 'hidden',
+    backgroundColor: colors.semantic.bg.grey,
+  },
+  sampleVideo: {
+    width: '100%',
+    height: '100%',
+  },
+  pagination: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 4,
+    marginTop: 12,
+  },
+  paginationDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: colors.base.gray700,
+  },
+  paginationDotActive: {
+    backgroundColor: colors.base.white,
+  },
     sheetContent: {
         marginTop: -20,
         gap: 20,

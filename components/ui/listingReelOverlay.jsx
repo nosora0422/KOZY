@@ -11,19 +11,17 @@ import { colors } from '@/constants/colors';
 export default function ListingReelOverlay({
   item,
   bottom,
+  isPreview = true,
   isSaved,
   onToggleSave,
   onShare,
   onPressDetail,
   onPressReport,
   showMoreAction = false,
-  showRepeatAction = false,
-  showSaveAction = false,
-  showShareAction = false,
   onRepeat,
 }) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const hasRightActions = showMoreAction || showRepeatAction || showSaveAction || showShareAction;
+  const hasRightActions = showMoreAction || onToggleSave || onShare;
 
   const handleToggleDropdown = () => {
     setIsDropdownOpen((prev) => !prev);
@@ -37,15 +35,15 @@ export default function ListingReelOverlay({
   return (
     <>
     {hasRightActions ? (
-        <View style={[styles.rightActions, { bottom }]}>
-          {showSaveAction ? (
+        <View style={[styles.rightActions, { bottom, transformOrigin: "top right" }, { transform: isPreview ? [{ scale: 0.9 }] : [{ scale: 1 }] }]}>
+          {onToggleSave ? (
             <AppIconButton
               icon={<MaterialIcons name={isSaved ? 'favorite' : 'favorite-border'} />}
               type="bare"
               onPress={() => onToggleSave?.(item)}
             />
           ) : null}
-          {showShareAction ? (
+          {onShare ? (
             <AppIconButton
               icon={<Feather name="share-2" />}
               type="bare"
@@ -68,13 +66,10 @@ export default function ListingReelOverlay({
               ) : null}
             </>
           ) : null}
-          {showRepeatAction ? (
-            <AppIconButton icon={<Feather name="repeat" />} type="bare" onPress={onRepeat} />
-          ) : null}
         </View>
         ) : null
       }
-      <View style={[styles.bottomLeft, { bottom, maxWidth: hasRightActions ? '80%' : '90%' }]}>
+      <View style={[styles.bottomLeft, { bottom, maxWidth: hasRightActions ? '80%' : '90%', transformOrigin: "top left", transform: isPreview ? [{ scale: 0.9 }] : [{ scale: 1 }] }]}>
         <View style={styles.bottomRoomInfo}>
           <Avatar
             source={{ uri: item?.owner?.avatar?.[0] }}

@@ -1,14 +1,33 @@
 import { router, usePathname } from "expo-router";
-import { Pressable, StyleSheet, View} from 'react-native';
+import { Pressable, StyleSheet, View, Image} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Feather } from "@expo/vector-icons";
 
 import AppText from '@/components/ui/appText';
 import Badge from "@/components/ui/badge";
+import { DATA } from "@/data/mockListData";
+import EmptyListingsState from "@/components/ui/emptyListingsState";
+import TrustLevelInfo from "./trustLevelInfo";
 
 
 export default function AccountScreen() {
   const insets = useSafeAreaInsets();
+  const isLogedIn = TrustLevelInfo; // Replace with actual authentication logic
+  const currUser = DATA[0].owner; // Replace with actual user data fetching logic
+  
+  if( !isLogedIn ) {
+    return (
+      <View style={[styles.container, { paddingTop: insets.top,paddingBottom: Math.max(insets.bottom, 16) + 84 }]}>
+        <AppText variant="headline-sm" color="primary">My Page</AppText>
+        <EmptyListingsState
+          heading="Make it yours"
+          description="Sign Up or Log In to save and view listings, and manage your profile."
+          actionText="Sign Up / Log In"
+          onAction={() => router.push('/(auth)/login')}
+      />
+      </View>
+      )
+  }
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
@@ -16,9 +35,12 @@ export default function AccountScreen() {
         <View style={styles.content}>
           <View style={styles.userInfo}>
             <View style={styles.name}>
-              <View style={styles.imgPlaceHolder}></View>
+              <Image
+                source={{ uri: currUser.avatar[0] }}
+                style={{ width: 55, height: 55, borderRadius: 999 }}
+              />
               <AppText variant="body-md" color="primary">
-                Tim Holand
+                {currUser.name}
               </AppText>
               </View>
             <Badge status='varified' onPress={() => router.push('/(tabs)/account/trustLevelInfo')}/>

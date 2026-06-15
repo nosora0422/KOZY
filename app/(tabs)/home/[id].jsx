@@ -157,11 +157,11 @@ export default function DetailScreen() {
             </DisplayField>
 
             <DisplayField title="About Room & House" type="pill">
-              {[`${item.bedrooms} Bed`, `${item.bathrooms} Bath`, `${item.roomType}`, `${item.sizeSqft} sqft`, item.furnished ? 'Furnished' : 'Unfurnished', ...item.amenities]}
+              {[`${item.bedrooms} Bed`, `${item.bathrooms} Bath`, `${item.roomType}`, `${item.sizeSqft} sqft`, item.furnished ? 'Furnished' : 'Unfurnished', ...item.roomDetail]}
             </DisplayField>
 
             <DisplayField title="Looking For" type="pill">
-              {item.owner.lookingFor}
+              {item.lookingFor}
             </DisplayField>
             <AppText variant="body-sm-strong">Move-in Details</AppText>
             <AppText variant='body-sm' style={{lineHeight: 14}}>• {item.availableFrom}</AppText>

@@ -41,6 +41,12 @@
           }
         }
       ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow KOZY to access your photos so you can add images to your listing."
+        }
+      ],
       "expo-video"
     ],
     "experiments": {

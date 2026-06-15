@@ -1,12 +1,12 @@
 import React, { useRef, useState, useCallback, useEffect } from 'react';
-import { View, StyleSheet, Dimensions, Text, AppState, Pressable } from 'react-native';
+import { View, StyleSheet, Dimensions, Share, AppState, Pressable } from 'react-native';
 import { VideoView, useVideoPlayer } from 'expo-video';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router, useFocusEffect, useLocalSearchParams, useNavigation} from 'expo-router';
 import { Feather } from '@expo/vector-icons';
 
 import AppIconButton from '@/components/ui/appIconButton';
-import AppButton from '@/components/ui/appButton';
+import ListingReelOverlay from '@/components/ui/listingReelOverlay';
 import { DATA } from '@/data/mockListData';
 
 const { height } = Dimensions.get('window');
@@ -18,31 +18,31 @@ export default function UploadedPost() {
   const item = id ? DATA.find(d => d.id === id) : DATA[0];
 
   useFocusEffect(
-          useCallback(() => {
-            const parent = navigation.getParent();
-            parent?.setOptions({
-              tabBarStyle: { display: 'none' },
-            });
-    
-            return () => {
-              parent?.setOptions({
-                tabBarStyle: { 
-                  display: 'flex',
-                  position: 'absolute',
-                  alignSelf: 'center', 
-                  bottom: insets.bottom + 10,
-                  borderRadius: 16,
-                  borderTopWidth: 0,
-                  height: 56,
-                  backgroundColor: 'rgba(0,0,0,1)',
-                  maxWidth: 400,
-                  paddingTop: 7,
-                  marginHorizontal: 16,
-                },
-              });
-            };
-          }, [navigation, insets])
-        );
+    useCallback(() => {
+      const parent = navigation.getParent();
+      parent?.setOptions({
+        tabBarStyle: { display: 'none' },
+      });
+
+      return () => {
+        parent?.setOptions({
+          tabBarStyle: { 
+            display: 'flex',
+            position: 'absolute',
+            alignSelf: 'center', 
+            bottom: insets.bottom + 10,
+            borderRadius: 16,
+            borderTopWidth: 0,
+            height: 56,
+            backgroundColor: 'rgba(0,0,0,1)',
+            maxWidth: 400,
+            paddingTop: 7,
+            marginHorizontal: 16,
+          },
+        });
+      };
+    }, [navigation, insets])
+  );
   
 
   const player = useVideoPlayer(item?.videoUrl, (player) => {
@@ -54,6 +54,20 @@ export default function UploadedPost() {
   const toggleMute = () => {
     player.muted = !player.muted;
   };
+
+
+    const onShare = async () => {
+        try {
+          await Share.share({
+            message: "Check this out! 👀",
+            url: "https://example.com", // iOS
+            title: "Share link",        // Android
+          });
+        } catch (error) {
+          console.error("Share error:", error);
+        }
+      };
+    
 
   return (
     <View style={styles.container}>
@@ -75,21 +89,14 @@ export default function UploadedPost() {
         pointerEvents="none"
       />
 
-      {/* Bottom Left */}
-      <View style={[styles.bottomLeft, { bottom: insets.bottom + 20 }]}>
-        <Text style={styles.username}>${item.price} / month</Text>
-        <Text style={styles.question} numberOfLines={2}>
-          {item.city}, {item.province}
-        </Text>
-        <View style={styles.bottomCTA}> 
-          <AppButton 
-            text="Detail"
-            size="sm"
-            type='primary'
-            onPress={() => router.push(`/(tabs)/post/uploadedPost/detail/${item.id}`)}
-          />
-        </View>
-      </View>
+      <ListingReelOverlay
+        item={item}
+        bottom={insets.bottom}
+        onShare={onShare}
+        onPressDetail={() => router.push(`/(tabs)/post/uploadedPost/detail/${item.id}`)}
+        showMoreAction
+        showShareAction
+      />
     </Pressable>
     </View>
   );

@@ -32,8 +32,11 @@ const ITEM_SPACING = 12;
 export default function EditProfile() {
     const insets = useSafeAreaInsets();
     const navigation = useNavigation();
-    const { id } = useLocalSearchParams();
-    const item = DATA[0];
+    const { ownerId } = useLocalSearchParams();
+    const normalizedOwnerId = Array.isArray(ownerId) ? ownerId[0] : ownerId;
+    const item = DATA.find(
+      (listing) => listing.owner.id === normalizedOwnerId
+    ) ?? DATA[0];
     const genderDrawerRef = useRef(null);
     const personalityDrawerRef = useRef(null);
     const jobDrawerRef = useRef(null);
@@ -53,13 +56,6 @@ export default function EditProfile() {
     const [error, setError] = useState(null);
     const [myEmail, setMyEmail] = useState(null);
     const [verified, setVerified] = useState(false);
-    // const [photos, setPhotos] = useState(
-    //       (item.owner.avatar ?? []).slice(0, 2).map(uri => ({
-    //         uri,
-    //         type: 'image/jpeg',
-    //         fileSize: 0, // existing avatar, not newly uploaded
-    //       }))
-    //     );
     const [photos, setPhotos] = useState([]);
     const [photoError, setPhotoError] = useState(null);
 

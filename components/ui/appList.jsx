@@ -1,11 +1,13 @@
 import { View, StyleSheet } from 'react-native';
 import AppText from '@/components/ui/appText';
+import { Feather } from '@expo/vector-icons';
+import { colors } from '@/constants/colors';
 
-export default function InfoList({ title, items }) {
+export default function InfoList({ title, items, listStyle, titleStyle }) {
   return (
     <View style={styles.container}>
       {title && (
-        <AppText variant="body-sm-strong" color="primary" style={styles.title}>
+        <AppText variant="body-sm-strong" color="primary" style={[styles.title, titleStyle]}>
           {title}
         </AppText>
       )}
@@ -14,9 +16,9 @@ export default function InfoList({ title, items }) {
         {items.map((item, index) => (
           <View key={index} style={styles.listItem}>
             <AppText variant="body-sm" color="primary" style={styles.bullet}>
-              •
+              <Feather name="check" size={16} color={listStyle?.color || colors.semantic.text.primary} />
             </AppText>
-            <AppText variant="body-sm" color="primary" style={styles.text}>
+            <AppText variant="body-sm" color="primary" style={[styles.text, listStyle]}>
               {item}
             </AppText>
           </View>

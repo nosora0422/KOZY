@@ -1,10 +1,10 @@
 // colors/base.js
 export const baseColors = {
-  primary: '#FFFFFF',
+  primary: '#ffffff',
   background: '#000000',
   black: '#000000',
   white: '#FFFFFF',
-  secondary: '#B4FF9F',
+  tertiary: '#B4FF9F',
   body: '#121212',
   bodyInverted: '#FFFFFF',
   accent: '#2656FB',

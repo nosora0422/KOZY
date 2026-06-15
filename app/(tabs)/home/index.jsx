@@ -148,6 +148,8 @@ function ReelItem({ item, isActive, insets, isSaved, onToggleSave, onShare }) {
           })
         }
         showMoreAction
+        showShareAction
+        showSaveAction
       />
     </Pressable>
   );

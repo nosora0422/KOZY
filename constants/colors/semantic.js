@@ -6,6 +6,7 @@ export const semanticColors = {
     secondary: baseColors.gray800,
     disabled: baseColors.gray400,
     error: baseColors.warning,
+    tertiary: baseColors.tertiary,
   },
 
   bottomSheet: {

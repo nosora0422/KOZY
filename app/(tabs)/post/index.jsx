@@ -10,17 +10,23 @@ export default function PostScreen() {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const pathname = usePathname();
-  const isLogedIn = true;
+  const isLogedIn = true; // Replace with actual authentication logic
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
         <AppText variant="headline-sm" color="primary">Add New Listing</AppText>
          <View style={{ flex: 1, paddingBottom: Math.max(insets.bottom, 16) + 84 }}>
            <EmptyListingsState
-            heading="Have a room to share?"
-            description="List it and connect with verified seekers."
-            actionText="Share a room"
-            onAction={() => router.push('/(tabs)/post/stepOne')}
+            heading="Let’s List Your Space"
+            description="Just a few quick steps to share your room with the right people."
+            actionText={isLogedIn ? "Share a room" : "Sign up / Log in"}
+            onAction={() => {
+              if (isLogedIn) {
+                router.push('/(tabs)/post/stepOne');
+              } else {
+                router.push('/(auth)/login');
+              }
+            }}
             imageSource = {require('@/assets/images/3d-house.png')}
           />
         </View>

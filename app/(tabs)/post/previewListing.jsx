@@ -1,10 +1,13 @@
 import { View, Text, StyleSheet, Platform, FlatList, Image, Dimensions, ScrollView, Alert } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
+import React, { useCallback, useMemo } from 'react';
+import MapView, { Marker } from 'react-native-maps';
 
 import { DATA } from '@/data/mockListData';
 import DisplayField from '@/components/ui/displayField';
 import AppButton from '@/components/ui/appButton';
 import AppText from '@/components/ui/appText';
+import Badge from "@/components/ui/badge";
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const ITEM_WIDTH = SCREEN_WIDTH * 0.8;
@@ -14,6 +17,18 @@ const IMAGE_HEIGHT = 228;
 export default function PreviewListing() {
   //const { id } = useLocalSearchParams();
   const item = DATA[0];
+  const [activeIndex, setActiveIndex] = React.useState(0);
+
+  const defaultRegion = useMemo(() => {
+  const initialLatitude = Number(item?.latitude);
+  const initialLongitude = Number(item?.longitude);
+    return {
+      latitude: Number.isFinite(initialLatitude) ? initialLatitude : 49.2827,
+      longitude: Number.isFinite(initialLongitude) ? initialLongitude : -123.1207,
+      latitudeDelta: 0.08,
+      longitudeDelta: 0.08,
+    };
+  }, [item]);
 
   if (!item) {
     return (
@@ -25,151 +40,107 @@ export default function PreviewListing() {
 
   return (
     <ScrollView 
-      contentContainerStyle={styles.container}
-      keyboardShouldPersistTaps="handled"
-    >
-      <AppText variant='body-xsm' style={{ marginBottom: 16 }}>
-        Review your room listing before publishing. You can go back to edit any section if needed. Once published, your listing will be visible to seekers.
-      </AppText>
-      <Text style={styles.sectionTitle}>Room Details</Text>
+        contentContainerStyle={styles.container}
+        keyboardShouldPersistTaps="handled"
+      >
+        <AppText variant='headline-sm'>{item.title}</AppText>
+        <AppText variant='body-sm'>${item.price}</AppText>
+      {/* Slider */}
       <FlatList
         data={item.images}
         horizontal
         pagingEnabled
         showsHorizontalScrollIndicator={false}
-        snapToInterval={ITEM_WIDTH + ITEM_SPACING}
-        decelerationRate="fast"
-        contentContainerStyle={{
-            paddingRight: (SCREEN_WIDTH - ITEM_WIDTH) / 2,
-        }}
         keyExtractor={(uri, index) => `${uri}-${index}`}
+        onMomentumScrollEnd={(e) => {
+          const index = Math.round(
+            e.nativeEvent.contentOffset.x / SCREEN_WIDTH
+          );
+          setActiveIndex(index);
+        }}
+        style={styles.slider}
         renderItem={({ item: image }) => (
-          <View style={{ width: ITEM_WIDTH, marginRight: ITEM_SPACING }}>
+          <View style={{ width: SCREEN_WIDTH - 32 }}>
             <Image
-                source={{ uri: image }}
-                style={styles.image}
-                resizeMode="cover"
+              source={{ uri: image }}
+              style={styles.fullImage}
+              resizeMode="cover"
             />
           </View>
         )}
       />
+      <View style={styles.pagination}>
+        {item.images.map((_, index) => (
+          <View
+            key={index}
+            style={[
+              styles.dot,
+              activeIndex === index && styles.activeDot,
+            ]}
+          />
+        ))}
+      </View>
       
       {/* Details */}
         <View style={styles.content}>
           <DisplayField title="Location">
             {`${item.street}, ${item.city}, ${item.province}`}
           </DisplayField>
-          <Image 
-            source={require('@/assets/images/map-placeholder.png')}
-            style={styles.mapImage}
-            resizeMode="cover"
-            />
-          <DisplayField title="Price">
-            ${item.price} / month
-          </DisplayField>
-
-          <DisplayField title="Room Type">
-            {item.roomType}
-          </DisplayField>
-
-          <DisplayField title="Bathroom Type">
-            {item.bathroomType}
-          </DisplayField>
-
-          <DisplayField title="Available From">
-            {item.availableFrom}
-          </DisplayField>
-
-          <DisplayField title="Lease Type">
-            {item.leaseType}
-          </DisplayField>
-
-          <DisplayField title="Furnished">
-            {item.furnished ? 'Yes' : 'No'}
-          </DisplayField>
-
-          <DisplayField title="Description">
-            {item.description}
-          </DisplayField>
-
-          {/* Amenities */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Amenities</Text>
-            {item.amenities.map((a, index) => (
-              <Text key={index} style={styles.amenity}>
-                • {a}
-              </Text>
-            ))}
+          <View style={styles.mapContainer}>
+            <MapView 
+              style={StyleSheet.absoluteFill} 
+              initialRegion={defaultRegion}
+            >
+              <Marker
+                key={item.id}
+                coordinate={{
+                  latitude: Number(item.latitude),
+                  longitude: Number(item.longitude),
+                }}
+              >
+              </Marker>
+            </MapView>
           </View>
-
-          {/* Specs */}
-          <View style={styles.specRow}>
-            <Text style={styles.spec}>🛏 {item.bedrooms} bed</Text>
-            <Text style={styles.spec}>🛁 {item.bathrooms} bath</Text>
-            <Text style={styles.spec}>📐 {item.sizeSqft} sqft</Text>
-          </View>
-
-          <View style={styles.divider}></View>
 
           {/* Owner */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Roommate Information</Text>
-            <FlatList
-              data={item.owner.avatar}
-              horizontal
-              pagingEnabled
-              showsHorizontalScrollIndicator={false}
-              snapToInterval={ITEM_WIDTH + ITEM_SPACING}
-              decelerationRate="fast"
-              contentContainerStyle={{
-                  paddingRight: (SCREEN_WIDTH - ITEM_WIDTH) / 2,
-              }}
-              keyExtractor={(uri, index) => `${uri}-${index}`}
-              renderItem={({ item: image }) => (
-                <View style={{ width: ITEM_WIDTH, marginRight: ITEM_SPACING }}>
-                  <Image
-                      source={{ uri: image }}
-                      style={styles.image}
-                      resizeMode="cover"
-                  />
-                </View>
-              )}
+            <AppText variant='headline-sm'>Meet Your Roomate</AppText>
+            <Image
+              source={{ uri: item.owner.avatar[0] }}
+              style={styles.avatarImage}
+              resizeMode="cover"
             />
-            <DisplayField title="Name">
-              {item.owner.name}
+            <View style={styles.ownerName}>
+              <AppText variant="headline-md">
+                {item.owner.name} {item.owner.ageGroup ? `, ${item.owner.ageGroup}` : ''}
+              </AppText>
+              <Badge status='varified'/>
+            </View>
+
+            <DisplayField title="Profile" type="pill">
+              {[item.owner.gender, item.owner.occupation]}
             </DisplayField>
 
-            <DisplayField title="Age Group">
-              {item.owner.ageGroup}
-            </DisplayField>
-
-            <DisplayField title="Gender">
-              {item.owner.gender}
-            </DisplayField>
-
-            <DisplayField title="Occupation">
-              {item.owner.occupation}
-            </DisplayField>
-
-            <DisplayField title="Personality">
+            <DisplayField title="Personality" type="pill">
               {item.owner.personality}
             </DisplayField>
 
-            <DisplayField title="Lifestyle">
+            <DisplayField title="Lifestyle" type="pill">
               {item.owner.lifestyle}
             </DisplayField>
 
-            <DisplayField title="About Me">
-              {item.owner.aboutMe}
+            <DisplayField title="About Room & House" type="pill">
+              {[`${item.bedrooms} Bed`, `${item.bathrooms} Bath`, `${item.roomType}`, `${item.sizeSqft} sqft`, item.furnished ? 'Furnished' : 'Unfurnished', ...item.roomDetail]}
             </DisplayField>
 
-            {/* <View style={styles.ownerRow}>
-              <Image
-                source={{ uri: item.owner.avatar[0] }}
-                style={styles.avatar}
-              />
-              <Text style={styles.ownerName}>{item.owner.name}</Text>
-            </View> */}
+            <DisplayField title="Looking For" type="pill">
+              {item.lookingFor}
+            </DisplayField>
+            <AppText variant="body-sm-strong">Move-in Details</AppText>
+            <AppText variant='body-sm' style={{lineHeight: 14}}>• {item.availableFrom}</AppText>
+            <AppText variant='body-sm' style={{lineHeight: 14}}>• Rent: ${item.price} / {item.leaseType === "Month-to-Month" ? "Month" : "Fixed Term"}</AppText>
+            <AppText variant='body-sm' style={{lineHeight: 14}}>• Utility: {item.utilityIncluded ? 'Included' : 'Not Included'}</AppText>
+            <AppText variant='body-sm' style={{lineHeight: 14}}>• Deposit: ${item.deposit}</AppText>
           </View>
         </View>
         <AppButton 
@@ -185,13 +156,25 @@ export default function PreviewListing() {
           text="Confirm & Publish" 
           type="primary" 
           onPress={() => {
-            router.push({
-              pathname: '/(tabs)/post/confirmPublish',
-              params: { id: item.id }
-            })
+            Alert.alert(
+              'Your listing is live 🎉',
+              'Your room is ready to be discovered. You can update it anytime.',
+              [{
+                text: 'Close',
+                style: 'cancel',
+              },
+              {
+                text: 'View My listing',
+                onPress: () => {
+                  router.push({
+                    pathname: '/(tabs)/account'
+                  });
+                },
+              },]
+            );
           }}
         />
-    </ScrollView>
+      </ScrollView>
   );
 }
 
@@ -199,7 +182,7 @@ const styles = StyleSheet.create({
   container: { 
     backgroundColor: 'black', 
     paddingHorizontal: 16,
-    paddingBottom: Platform.OS === 'ios' ? 100 : 16,
+    paddingBottom: Platform.OS === 'ios' ? 50 : 16,
     overflow: 'hidden'
   },
   title: {
@@ -207,6 +190,11 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '700',
     marginBottom: 6,
+  },
+  slider:{
+    borderRadius: 6,
+    overflow: 'hidden',
+    marginTop: 6,
   },
   price: {
     color: 'white',
@@ -216,6 +204,11 @@ const styles = StyleSheet.create({
   location: {
     color: '#bbb',
     marginBottom: 12,
+  },
+  mapContainer: {
+    height: 80,
+    borderRadius: 6,
+    overflow: 'hidden',
   },
   description: {
     color: 'white',
@@ -257,18 +250,23 @@ const styles = StyleSheet.create({
     borderRadius: 22,
   },
   ownerName: {
-    color: 'white',
-    fontSize: 16,
+     display: 'flex', 
+     flexDirection: 'column', 
+     justifyContent: 'center', 
+     alignItems: 'center', 
+     gap: 4
   },
   center: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  image: {
-    width: '100%',
-    height: IMAGE_HEIGHT,
-    borderRadius: 4,
+  avatarImage: {
+    width: '50%',
+    height: undefined,
+    aspectRatio: 1,
+    borderRadius: 9999,
+    marginHorizontal: 'auto'
   },
   mapImage: {
     width: '100%',
@@ -284,5 +282,30 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: '#ffffff',
     marginVertical: 8,
+  },
+  fullImage: {
+    width: '100%',
+    height: 260,
+    borderRadius: 0,
+  },
+  
+  pagination: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 8,
+    gap: 6,
+  },
+  
+  dot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#666',
+  },
+  
+  activeDot: {
+    backgroundColor: 'white',
+    width: 8,
+    height: 8,
   },
 });

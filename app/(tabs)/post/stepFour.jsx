@@ -1,9 +1,8 @@
-import { useState, useCallback, useRef } from 'react';
+import { useCallback } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
-import { Platform, StyleSheet, View, Dimensions, ScrollView, Alert, FlatList, Pressable } from 'react-native';
+import { Platform, StyleSheet, View, Alert, FlatList, Pressable } from 'react-native';
 import { Image } from 'expo-image';
-import { useLocalSearchParams, useNavigation, router } from 'expo-router';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useNavigation, router } from 'expo-router';
 
 import { DATA } from '@/data/mockListData';
 import AppText from '@/components/ui/appText';
@@ -11,16 +10,9 @@ import AppButton from '@/components/ui/appButton';
 import DisplayField from '@/components/ui/displayField';
 import Badge from '@/components/ui/badge';
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const ITEM_WIDTH = SCREEN_WIDTH * 0.8;
-const ITEM_SPACING = 12;
-
 export default function StepFour() {
     const navigation = useNavigation();
-    const { id } = useLocalSearchParams();
-    const [error, setError] = useState(null);
-    const [selectedVideo, setSelectedVideo] = useState(null);
-    const item = DATA[0]
+    const item = DATA[0];
 
     useFocusEffect(
         useCallback(() => {
@@ -48,70 +40,45 @@ export default function StepFour() {
                                 Your profile will appear with your listing. Make sure it looks just right.
                             </AppText>
                         </View>
-                        <View>
-                            <AppText variant='headline-sm' color='primary'>Roommate Information</AppText>
-                            <FlatList
-                                data={item.owner.avatar}
-                                horizontal
-                                pagingEnabled
-                                showsHorizontalScrollIndicator={false}
-                                snapToInterval={ITEM_WIDTH + ITEM_SPACING}
-                                decelerationRate="fast"
-                                keyExtractor={(uri, index) => `${uri}-${index}`}
-                                contentContainerStyle={{
-                                    paddingRight: (SCREEN_WIDTH - ITEM_WIDTH) / 2,
-                                    paddingVertical: 16,
-                                }}
-                                renderItem={({ item: image }) => (
-                                    <View style={{ width: ITEM_WIDTH, marginRight: ITEM_SPACING }}>
-                                    <Image
-                                        source={{ uri: image }}
-                                        style={styles.image}
-                                        contentFit="cover"
-                                    />
-                                    </View>
-                                )}
-                                />
-                        </View>
-                        <View style={styles.content}>
-                            <View style={{ 
-                                    flexDirection: 'row',
-                                    justifyContent: 'space-between',
-                                }}
-                            >
-                                <DisplayField title="Name">
-                                    {item.owner.name}
-                                </DisplayField>
-                                <Badge status='varified' />
+                        {/* Owner */}
+                        <View style={styles.section}>
+                            <Image
+                                source={{ uri: item.owner.avatar[0] }}
+                                style={styles.avatarImage}
+                                resizeMode="cover"
+                            />
+                            <View style={styles.ownerName}>
+                                <AppText variant="headline-md">
+                                {item.owner.name} {item.owner.ageGroup ? `, ${item.owner.ageGroup}` : ''}
+                                </AppText>
+                                <Badge status='varified'/>
                             </View>
                 
-                            <DisplayField title="Age Group">
-                                {item.owner.ageGroup}
+                            <DisplayField title="Profile" type="pill">
+                                {[item.owner.gender, item.owner.occupation]}
                             </DisplayField>
                 
-                            <DisplayField title="Gender">
-                                {item.owner.gender}
-                            </DisplayField>
-                
-                            <DisplayField title="Occupation">
-                                {item.owner.occupation}
-                            </DisplayField>
-                
-                            <DisplayField title="Personality">
+                            <DisplayField title="Personality" type="pill">
                                 {item.owner.personality}
                             </DisplayField>
                 
-                            <DisplayField title="Lifestyle">
+                            <DisplayField title="Lifestyle" type="pill">
                                 {item.owner.lifestyle}
                             </DisplayField>
                 
-                            <DisplayField title="About Me">
-                                {item.owner.aboutMe}
+                            <DisplayField title="About Room & House" type="pill">
+                                {[`${item.bedrooms} Bed`, `${item.bathrooms} Bath`, `${item.roomType}`, `${item.sizeSqft} sqft`, item.furnished ? 'Furnished' : 'Unfurnished', ...item.roomDetail]}
                             </DisplayField>
                         </View>
                         <Pressable 
                             style={styles.replaceButton} 
-                            onPress={() => {}}
+                            onPress={() => {router.push({
+                                pathname: '/(tabs)/account/editProfile',
+                                params: {
+                                    ownerId: item.owner.id,
+                                    backTo: '/(tabs)/post/stepFour',
+                                }
+                            })}}
                         >
                             <AppText variant='button-sm'>Edit Profile</AppText>
                         </Pressable>
@@ -181,5 +148,40 @@ const styles = StyleSheet.create({
         margin: 'auto',
         borderBottomWidth:1,
         borderColor: '#ffffff'
+  },
+  section: {
+    marginBottom: 16,
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 20,
+  },
+    ownerRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 12,
+    },
+    avatar: {
+        width: 44,
+        height: 44,
+        borderRadius: 22,
+    },
+    ownerName: {
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        gap: 4
+    },
+    center: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    avatarImage: {
+        width: '50%',
+        height: undefined,
+        aspectRatio: 1,
+        borderRadius: 9999,
+        marginHorizontal: 'auto'
     },
 });

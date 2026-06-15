@@ -14,12 +14,42 @@ export default function AccountStack() {
           headerBackTitleVisible: false
       }} />
       <Stack.Screen name="editProfile" 
-        options={{ 
-          title: '',
+        options={({ route }) => ({
+          title: 'Edit Profile',
           headerShown: true,
-          headerBackVisible: true,
-          headerBackTitleVisible: false
-      }} />
+          headerBackVisible: false,
+          headerBackTitleVisible: false,
+          headerLeft: () => (
+            <Pressable
+              onPress={() => {
+                const backTo = route?.params?.backTo;
+
+                if (typeof backTo === 'string' && backTo.length > 0) {
+                  router.replace(backTo);
+                  return;
+                }
+
+                if (router.canGoBack()) {
+                  router.back();
+                  return;
+                }
+
+                router.replace('/(tabs)/account');
+              }}
+              accessibilityRole="button"
+              accessibilityLabel="Go back"
+              hitSlop={10}
+              style={{
+                width: 32,
+                height: 32,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+            >
+              <Ionicons name="chevron-back" size={24} color="#ffffff" />
+            </Pressable>
+          ),
+      })} />
       <Stack.Screen name="notification" 
         options={{ 
           title: 'Notifications',
