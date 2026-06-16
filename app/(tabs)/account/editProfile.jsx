@@ -189,43 +189,40 @@ export default function EditProfile() {
             </DisplayField>
 
             {/* Inputs */}
-            <DisplayInput
-              label="Gender"
-              value={gender}
-              placeholder="Select an option"
-              onPress={() => genderDrawerRef.current?.snapToIndex(0)}
-              rightIcon={<Feather name="chevron-down" size={22} color={colors.semantic.text.primary} />}
-              accessibilityLabel="Gender Preference filter"
-            />
-            <DisplayInput
-              label="Job or Profession"
-              value={job}
-              placeholder="Enter your job or profession"
-              onPress={() => jobDrawerRef.current?.snapToIndex(0)}
-            />
-            <DisplayInput
-              label="Personality"
-              value={personality}
-              isMulti={true}
-              max={3}
-              placeholder="+"
-              onPress={() => personalityDrawerRef.current?.snapToIndex(0)}
-            />
-            <DisplayInput
-              label="Lifestyle"
-              value={lifestylePreferences}
-              isMulti={true}
-              max={3}
-              placeholder="+"
-              onPress={() => lifestyleDrawerRef.current?.snapToIndex(0)}
-            />
-            {/* <DisplayInput
-              label="About Me"
-              value={aboutMe}
-              isTextArea={true}
-              placeholder="Tap to write"
-              onPress={() => aboutMeDrawerRef.current?.snapToIndex(0)}
-            /> */}
+            <FormField label="Gender" error={error}>
+              <DisplayInput
+                value={gender}
+                placeholder="Select an option"
+                onPress={() => genderDrawerRef.current?.snapToIndex(0)}
+                rightIcon={<Feather name="chevron-down" size={22} color={colors.semantic.text.primary} />}
+                accessibilityLabel="Gender Preference filter"
+              />
+            </FormField>
+            <FormField label="Job or Profession" error={error}>
+              <DisplayInput
+                value={job}
+                placeholder="Enter your job or profession"
+                onPress={() => jobDrawerRef.current?.snapToIndex(0)}
+              />
+            </FormField>
+            <FormField label="Personality" error={error}>
+              <DisplayInput
+                value={personality}
+                isMulti={true}
+                max={3}
+                placeholder="+"
+                onPress={() => personalityDrawerRef.current?.snapToIndex(0)}
+              />
+            </FormField>
+            <FormField label="Lifestyle" error={error}>
+              <DisplayInput
+                value={lifestylePreferences}
+                isMulti={true}
+                max={3}
+                placeholder="+"
+                onPress={() => lifestyleDrawerRef.current?.snapToIndex(0)}
+              />
+            </FormField>
             <View style={styles.idVerificationContainer}>
               <AppText variant="body-sm-strong" color="primary">
                 ID Verification
@@ -240,14 +237,14 @@ export default function EditProfile() {
               </View>
             </View>
             <View style={styles.emailContainer}>
-              <DisplayInput
-                label="My Email"
-                value={myEmail}
-                onChangeText={setMyEmail}
-                placeholder="Please Verify your email."
-                style={{ flex: 1 }}
-              />
-              <View style={{ width: 92, marginBottom: 14 }}>
+              <FormField label="My Email" error={error} style={styles.emailField}>
+                <DisplayInput
+                  value={myEmail}
+                  onChangeText={setMyEmail}
+                  placeholder="Please Verify your email."
+                />
+              </FormField>
+              <View style={styles.emailButtonContainer}>
                   <AppButton 
                     text="Edit Email"
                     size="sm"
@@ -488,9 +485,19 @@ const styles = StyleSheet.create({
     borderColor: colors.semantic.input.border.normal.color,
   },
   emailContainer:{
+    width: '100%',
     flexDirection: 'row',
     gap: 12,
     alignItems: 'flex-end',
+  },
+  emailField: {
+    flex: 1,
+    minWidth: 0,
+  },
+  emailButtonContainer: {
+    width: 104,
+    flexShrink: 0,
+    marginBottom: 20,
   },
   image: {
     width: '100%',

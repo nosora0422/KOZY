@@ -12,6 +12,7 @@ import DisplayInput from '@/components/ui/input/displayInput';
 import PillGroup from '@/components/ui/pill/pillGroup';
 import TextField from '@/components/ui/input/textField';
 import Dropdown from '@/components/ui/input/dropdown';
+import FormField from '@/components/ui/form/formField';
 import { colors } from '@/constants/colors';
 import { DATA } from '@/data/mockListData';
 
@@ -53,6 +54,8 @@ export default function SearchScreen() {
   const [gender, setGender] = useState('Male');
   const [roomTypes, setRoomTypes] = useState([]);
   const [lifestyleMatches, setLifestyleMatches] = useState([]);
+
+  const [error, setError] = useState(null);
 
   const mapListings = useMemo(() => {
     return DATA.filter((item) => {
@@ -156,25 +159,28 @@ export default function SearchScreen() {
                 />
               </View>
             </SearchSection>
-            <DisplayInput
-              label="Gender Preference"
-              value={gender}
-              onPress={() => genderDrawerRef.current?.snapToIndex(0)}
-              rightIcon={<Feather name="chevron-down" size={22} color={colors.semantic.text.primary} />}
-              accessibilityLabel="Gender Preference filter"
-            />
-            <DisplayInput
-              label="Room & House Type"
-              value={roomTypes}
-              onPress={() => roomTypeDrawerRef.current?.snapToIndex(0)}
-              isMulti
-            />
-            <DisplayInput
-              label="Lifestyle Match"
-              value={lifestyleMatches}
-              onPress={() => lifestyleDrawerRef.current?.snapToIndex(0)}
-              isMulti
-            />
+            <FormField label="Gender Preference" error={error}>
+              <DisplayInput
+                value={gender}
+                onPress={() => genderDrawerRef.current?.snapToIndex(0)}
+                rightIcon={<Feather name="chevron-down" size={22} color={colors.semantic.text.primary} />}
+                accessibilityLabel="Gender Preference filter"
+              />
+            </FormField>
+            <FormField label="Room & House Type" error={error}>
+              <DisplayInput
+                value={roomTypes}
+                onPress={() => roomTypeDrawerRef.current?.snapToIndex(0)}
+                isMulti
+              />
+            </FormField>
+            <FormField label="Lifestyle Match" error={error}>
+              <DisplayInput
+                value={lifestyleMatches}
+                onPress={() => lifestyleDrawerRef.current?.snapToIndex(0)}
+                isMulti
+              />
+            </FormField>
             <AppButton text="Search" onPress={handleOpenResults} style={styles.searchButton} />
           </View>
         </ScrollView>

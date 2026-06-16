@@ -2,7 +2,6 @@ import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import { Platform, StyleSheet, View, FlatList, Alert } from 'react-native';
 import { router, useNavigation } from 'expo-router';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 
 import PillGroup from '@/components/ui/pill/pillGroup';
@@ -91,6 +90,7 @@ export default function StepOne() {
     const [error] = useState(null);
     const [leaseType, setLeaseType] = useState('');
     const [deposit, setDeposit] = useState('');
+    const [draftDeposit, setDraftDeposit] = useState('');
     const [roomType, setRoomType] = useState('');
     const [bathroomType, setBathroomType] = useState('');
     const [keyDetail, setKeyDetail] = useState([]);
@@ -99,14 +99,15 @@ export default function StepOne() {
     const [availableDay, setAvailableDay] = useState(null);
     const [availableYear, setAvailableYear] = useState(null);
     const [minimumStay, setMinimumStay] = useState('');
+    const [isUtilityIncluded, setIsUtilityIncluded] = useState(true);
+    const [draftIsUtilityIncluded, setDraftIsUtilityIncluded] = useState(true);
     const availableMonthDrawerRef = useRef(null);
     const availableDayDrawerRef = useRef(null);
     const availableYearDrawerRef = useRef(null);
     const depositDrawerRef = useRef(null);
     const keyDetailDrawerRef = useRef(null);
     const lookingForDrawerRef = useRef(null);
-
-    const insets = useSafeAreaInsets();
+    const utilitiesDrawerRef = useRef(null);
 
     const depositOptions = useMemo(() => createDepositOptions(price), [price]);
 
@@ -149,22 +150,31 @@ export default function StepOne() {
 
         return () => {
             parent?.setOptions({
-                tabBarStyle: {
-                    position: 'absolute',
-                    alignSelf: 'center', 
-                    bottom: insets.bottom + 10,
-                    borderRadius: 16,
-                    borderTopWidth: 0,
-                    height: 56,
-                    backgroundColor: 'rgba(0,0,0,1)',
-                    maxWidth: 400,
-                    paddingTop: 7,
-                    marginHorizontal: 16,
-                },
+                tabBarStyle: undefined,
             });
         };
-        }, [navigation, insets.bottom])
+        }, [navigation])
     );
+
+    const openDepositDrawer = () => {
+        setDraftDeposit(deposit);
+        depositDrawerRef.current?.snapToIndex(0);
+    };
+
+    const saveDeposit = () => {
+        setDeposit(draftDeposit);
+        depositDrawerRef.current?.close();
+    };
+
+    const openUtilitiesDrawer = () => {
+        setDraftIsUtilityIncluded(isUtilityIncluded);
+        utilitiesDrawerRef.current?.snapToIndex(0);
+    };
+
+    const saveUtilities = () => {
+        setIsUtilityIncluded(draftIsUtilityIncluded);
+        utilitiesDrawerRef.current?.close();
+    };
 
   return (
     <View style={{ flex: 1, overflow: 'visible' }}>
@@ -278,13 +288,23 @@ export default function StepOne() {
                             />
                         </FormField>
                         <FormField label="Deposit" error={error}>
-                            <TextField
+                            <DisplayInput
                                 value={formattedDeposit}
                                 placeholder="Choose the deposit (USD)"
                                 placeholderTextColor={colors.semantic.input.textDisabled}
                                 showSoftInputOnFocus={false}
                                 rightIcon={<Feather name="chevron-down" size={22} color={colors.semantic.text.primary} />}
-                                onFocus={() => depositDrawerRef.current?.snapToIndex(0)}
+                                onPress={openDepositDrawer}
+                            />
+                        </FormField>
+                        <FormField label="Utilities" error={error}>
+                            <DisplayInput
+                                value={isUtilityIncluded ? 'Included' : 'Not Included'}
+                                placeholder="Select Options"
+                                placeholderTextColor={colors.semantic.input.textDisabled}
+                                showSoftInputOnFocus={false}
+                                onPress={openUtilitiesDrawer}
+                                rightIcon={<Feather name="chevron-down" size={22} color={colors.semantic.text.primary} />}
                             />
                         </FormField>
                         <FormField label="Bathroom Type" error={error}>
@@ -321,24 +341,26 @@ export default function StepOne() {
                                 keyboardType="number-pad"
                             />
                         </FormField>
-                        <DisplayInput
-                            label="About Room & House"
-                            error={error}
-                            value={selectedKeyDetailLabels}
-                            isMulti={true}
-                            max={3}
-                            placeholder="+"
-                            onPress={() => keyDetailDrawerRef.current?.snapToIndex(0)}
-                        />
-                        <DisplayInput
-                            label="Looking For"
-                            error={error}
-                            value={selectedLookingForLabels}
-                            isMulti={true}
-                            max={3}
-                            placeholder="+"
-                            onPress={() => lookingForDrawerRef.current?.snapToIndex(0)}
-                        />
+                        <FormField label="About Room & House" error={error}>
+                            <DisplayInput
+                                error={error}
+                                value={selectedKeyDetailLabels}
+                                isMulti={true}
+                                max={3}
+                                placeholder="+"
+                                onPress={() => keyDetailDrawerRef.current?.snapToIndex(0)}
+                            />
+                        </FormField>
+                        <FormField label="Looking For" error={error}>
+                            <DisplayInput
+                                error={error}
+                                value={selectedLookingForLabels}
+                                isMulti={true}
+                                max={3}
+                                placeholder="+"
+                                onPress={() => lookingForDrawerRef.current?.snapToIndex(0)}
+                            />
+                        </FormField>
                         <View style={styles.buttonContainer}>
                             <View style={{ flex: 1 }}>
                                 <AppButton 
@@ -463,12 +485,25 @@ export default function StepOne() {
         </AppDrawer>
         <AppDrawer
             ref={depositDrawerRef}
-            primaryAction={() => depositDrawerRef.current?.close()}
+            primaryAction={saveDeposit}
         >
             <Dropdown
-                value={deposit}
-                onChange={setDeposit}
+                value={draftDeposit}
+                onChange={setDraftDeposit}
                 options={depositOptions}
+            />
+        </AppDrawer>
+        <AppDrawer
+            ref={utilitiesDrawerRef}
+            primaryAction={saveUtilities}
+        >
+            <Dropdown
+                value={draftIsUtilityIncluded}
+                onChange={setDraftIsUtilityIncluded}
+                options={[
+                    { label: "Included", value: true },
+                    { label: "Not Included", value: false },
+                ]}
             />
         </AppDrawer>
         <AppDrawer

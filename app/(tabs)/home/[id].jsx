@@ -61,7 +61,7 @@ export default function DetailScreen() {
               accessibilityLabel="Go back"
               hitSlop={10}
             >
-              <Feather name="chevron-left" size={28} color="white" />
+              <Feather name="chevron-left" size={28} color="white" style={{marginLeft: 2}}/>
             </Pressable>
           ),
         }}

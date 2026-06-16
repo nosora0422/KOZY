@@ -18,7 +18,12 @@ export default function SearchStack() {
               accessibilityLabel="Back to home"
               hitSlop={10}
             >
-              <Feather name="chevron-left" size={28} color="white" />
+              <Feather 
+                name="chevron-left" 
+                size={28} 
+                color="white"
+                style={{ marginLeft: 2 }} 
+              />
             </Pressable>
           ),
         }}

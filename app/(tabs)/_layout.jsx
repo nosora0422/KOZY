@@ -1,4 +1,4 @@
-import { Tabs } from 'expo-router';
+import { router, Tabs, usePathname, useSegments } from 'expo-router';
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 
@@ -9,10 +9,25 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BlurView } from 'expo-blur';
 
+const HIDDEN_TAB_BAR_STYLE = {
+  display: 'none',
+  height: 0,
+  opacity: 0,
+  pointerEvents: 'none',
+};
+
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
   const insets = useSafeAreaInsets();
+  const pathname = usePathname();
+  const segments = useSegments();
+  const hiddenTabPaths = ['/home/search', '/post/stepTwo'];
+  const shouldHideTabBar =
+    hiddenTabPaths.includes(pathname) ||
+    /^\/home\/search\/[^/]+$/.test(pathname) ||
+    (segments.includes('home') && segments.includes('search')) ||
+    (segments.includes('post') && segments.includes('stepTwo'));
 
   return (
     <Tabs
@@ -24,43 +39,47 @@ export default function TabLayout() {
         tabBarContainerStyle: {
           alignItems: 'center',
         },
-        tabBarStyle: {
-          position: 'absolute',
-          alignSelf: 'center',
-          bottom: insets.bottom + 10,
-          overflow: 'hidden',
-          borderRadius: 16,
-          borderTopWidth: 0,
-          height: 56,
-          maxWidth: 400,
-          width: '100%',
-          paddingTop: 7,
-          marginHorizontal: 16,
-          shadowColor: '#000',
-          shadowOpacity: 0.2,
-          shadowRadius: 10,
-          shadowOffset: { width: 0, height: 5 },
-          elevation: 10,
-        },
-        tabBarBackground: () => (
-          <BlurView
-            intensity={60}
-            tint="dark"
-            style={{
-              flex: 1,
-              borderRadius: 16,
+        tabBarStyle: shouldHideTabBar
+          ? HIDDEN_TAB_BAR_STYLE
+          : {
+              position: 'absolute',
+              alignSelf: 'center',
+              bottom: insets.bottom + 10,
               overflow: 'hidden',
-            }}
-          >
-            {/* 👇 This gives the dark glass look */}
-            <View
-              style={{
-                ...StyleSheet.absoluteFillObject,
-                backgroundColor: 'rgba(0,0,0,0.4)', // tweak 0.3–0.5
-              }}
-            />
-          </BlurView>
-        ),
+              borderRadius: 16,
+              borderTopWidth: 0,
+              height: 56,
+              maxWidth: 400,
+              width: '100%',
+              paddingTop: 7,
+              marginHorizontal: 16,
+              shadowColor: '#000',
+              shadowOpacity: 0.2,
+              shadowRadius: 10,
+              shadowOffset: { width: 0, height: 5 },
+              elevation: 10,
+            },
+        tabBarBackground: shouldHideTabBar
+          ? () => null
+          : () => (
+              <BlurView
+                intensity={60}
+                tint="dark"
+                style={{
+                  flex: 1,
+                  borderRadius: 16,
+                  overflow: 'hidden',
+                }}
+              >
+                {/* 👇 This gives the dark glass look */}
+                <View
+                  style={{
+                    ...StyleSheet.absoluteFillObject,
+                    backgroundColor: 'rgba(0,0,0,0.4)', // tweak 0.3–0.5
+                  }}
+                />
+              </BlurView>
+            ),
       }}>
       <Tabs.Screen
         name="home"
@@ -76,7 +95,14 @@ export default function TabLayout() {
       />
       <Tabs.Screen
         name="post"
+        listeners={{
+          tabPress: (event) => {
+            event.preventDefault();
+            router.replace('/(tabs)/post');
+          },
+        }}
         options={{
+          popToTopOnBlur: true,
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="plus.square" color={color} />,
         }}
       />

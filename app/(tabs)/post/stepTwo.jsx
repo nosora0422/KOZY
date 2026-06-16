@@ -1,7 +1,6 @@
-import { useState, useCallback } from 'react';
-import { useFocusEffect } from '@react-navigation/native';
+import { useState } from 'react';
 import { Platform, StyleSheet, View, ScrollView, Alert } from 'react-native';
-import { router, useNavigation } from 'expo-router';
+import { router } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
 
@@ -32,20 +31,10 @@ function createPendingPhoto(asset, index) {
 }
 
 export default function StepTwo() {
-    const navigation = useNavigation();
     const [error, setError] = useState(null);
     const [photos, setPhotos] = useState([]);
 
     const insets = useSafeAreaInsets();
-
-    useFocusEffect(
-        useCallback(() => {
-          const parent = navigation.getParent();
-          parent?.setOptions({
-            tabBarStyle: { display: 'none' },
-          });
-        }, [navigation])
-      );
 
     const openGallery = async () => {
         const availableSlots = MAX_PHOTOS - photos.length;

@@ -21,14 +21,13 @@ export default function DisplayInput({
       accessibilityRole={onPress ? "button" : undefined}
       accessibilityLabel={accessibilityLabel || label}
     >
-      <View style={{ paddingBottom: 12 }}>
+      <View>
         {label && <AppText variant="body-md-strong">
           {label}
         </AppText>}
 
         <View
           style={{
-            marginTop: 8,
             flexDirection: 'row',
             gap: 8,
           }}
@@ -42,7 +41,7 @@ export default function DisplayInput({
                     style={{
                       minHeight: 34,
                       paddingHorizontal: 16,
-                      paddingVertical: 6,
+                      paddingVertical: 8,
                       borderWidth: 1,
                       borderColor: colors.base.gray800Alpha,
                       borderRadius: 999,
@@ -97,7 +96,7 @@ export default function DisplayInput({
                   borderRadius: 999,
                   backgroundColor: colors.semantic.input.bg,
                   justifyContent: 'center',
-                  height: 36,
+                  height: 40,
                   flexDirection: 'row',
                   alignItems: 'center',
                   ...inputStyle,

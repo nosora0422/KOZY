@@ -1,14 +1,13 @@
 import { useCallback } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import { Platform, StyleSheet, View, Alert, FlatList, Pressable } from 'react-native';
-import { Image } from 'expo-image';
 import { useNavigation, router } from 'expo-router';
 
 import { DATA } from '@/data/mockListData';
 import AppText from '@/components/ui/appText';
 import AppButton from '@/components/ui/appButton';
 import DisplayField from '@/components/ui/displayField';
-import Badge from '@/components/ui/badge';
+import ProfileSection from '@/components/ui/profileSection';
 
 export default function StepFour() {
     const navigation = useNavigation();
@@ -42,30 +41,7 @@ export default function StepFour() {
                         </View>
                         {/* Owner */}
                         <View style={styles.section}>
-                            <Image
-                                source={{ uri: item.owner.avatar[0] }}
-                                style={styles.avatarImage}
-                                resizeMode="cover"
-                            />
-                            <View style={styles.ownerName}>
-                                <AppText variant="headline-md">
-                                {item.owner.name} {item.owner.ageGroup ? `, ${item.owner.ageGroup}` : ''}
-                                </AppText>
-                                <Badge status='varified'/>
-                            </View>
-                
-                            <DisplayField title="Profile" type="pill">
-                                {[item.owner.gender, item.owner.occupation]}
-                            </DisplayField>
-                
-                            <DisplayField title="Personality" type="pill">
-                                {item.owner.personality}
-                            </DisplayField>
-                
-                            <DisplayField title="Lifestyle" type="pill">
-                                {item.owner.lifestyle}
-                            </DisplayField>
-                
+                            <ProfileSection userId={item.owner.id} listing={item}/>
                             <DisplayField title="About Room & House" type="pill">
                                 {[`${item.bedrooms} Bed`, `${item.bathrooms} Bath`, `${item.roomType}`, `${item.sizeSqft} sqft`, item.furnished ? 'Furnished' : 'Unfurnished', ...item.roomDetail]}
                             </DisplayField>

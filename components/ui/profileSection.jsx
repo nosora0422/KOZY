@@ -24,7 +24,6 @@ export default function ProfileSection({ userId, listing, title = 'Meet Your Roo
         <AppText variant="headline-md">
           {owner.name} {owner.ageGroup ? `, ${owner.ageGroup}` : ''}
         </AppText>
-        <Badge status="varified" />
       </View>
 
       <DisplayField title="Profile" type="pill">

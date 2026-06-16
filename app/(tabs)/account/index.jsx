@@ -42,8 +42,7 @@ export default function AccountScreen() {
               <AppText variant="body-md" color="primary">
                 {currUser.name}
               </AppText>
-              </View>
-            <Badge status='varified' onPress={() => router.push('/(tabs)/account/trustLevelInfo')}/>
+            </View>
           </View>
         </View>
         <View style={styles.manuContainer}>

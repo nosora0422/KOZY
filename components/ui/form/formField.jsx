@@ -9,9 +9,10 @@ export default function FormField({
   error,
   children,
   lastField = false,
+  style,
 }) {
   return (
-    <View style={[styles.container, lastField && { marginBottom: 0 }]}>
+    <View style={[styles.container, lastField && { marginBottom: 0 }, style]}>
       {label && <Text style={[styles.label, typography.bodyStrong['body-md-strong']]}>{label}</Text>}
 
       {children}

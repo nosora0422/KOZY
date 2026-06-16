@@ -14,7 +14,7 @@ export default function Dropdown({ value, options, onChange, style }) {
         
         {options.map((o) => (
           <Picker.Item
-            key={o.value}
+            key={String(o.value)}
             label={o.label}
             value={o.value}
           />
