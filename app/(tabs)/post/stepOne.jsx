@@ -3,6 +3,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { Platform, StyleSheet, View, FlatList, Alert } from 'react-native';
 import { router, useNavigation } from 'expo-router';
 import { Feather } from '@expo/vector-icons';
+import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 
 import PillGroup from '@/components/ui/pill/pillGroup';
 import AppText from '@/components/ui/appText';
@@ -52,6 +53,29 @@ const getLookingForLabel = (value) => (
     LOOKINGFOR_OPTIONS.find((item) => item.value === value)?.label ?? value
 );
 
+const normalizeAddressPart = (value) => value?.trim?.() ?? '';
+const GOOGLE_PLACES_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_PLACES_API_KEY;
+
+const getAddressComponent = (components, type, name = 'long_name') => (
+    components.find((component) => component.types.includes(type))?.[name] ?? ''
+);
+
+const getAddressParts = (components) => {
+    const streetNumber = getAddressComponent(components, 'street_number');
+    const route = getAddressComponent(components, 'route');
+
+    return {
+        street: [streetNumber, route].filter(Boolean).join(' '),
+        city:
+            getAddressComponent(components, 'locality') ||
+            getAddressComponent(components, 'postal_town') ||
+            getAddressComponent(components, 'sublocality') ||
+            getAddressComponent(components, 'administrative_area_level_2'),
+        province: getAddressComponent(components, 'administrative_area_level_1', 'short_name'),
+        postalCode: getAddressComponent(components, 'postal_code'),
+        country: getAddressComponent(components, 'country', 'short_name'),
+    };
+};
 
 const createDepositOptions = (priceValue) => {
     const maxDeposit = Number(priceValue);
@@ -87,7 +111,10 @@ export default function StepOne() {
     const [city, setCity] = useState(null);
     const [province, setProvince] = useState(null);
     const [postalCode, setPostalCode] = useState(null);
-    const [error] = useState(null);
+    const [error, setError] = useState(null);
+    const [placeId, setPlaceId] = useState(null);
+    const [latitude, setLatitude] = useState(null);
+    const [longitude, setLongitude] = useState(null);
     const [leaseType, setLeaseType] = useState('');
     const [deposit, setDeposit] = useState('');
     const [draftDeposit, setDraftDeposit] = useState('');
@@ -176,6 +203,65 @@ export default function StepOne() {
         utilitiesDrawerRef.current?.close();
     };
 
+    {/* Google Places Autocomplete handlers */}
+    const clearSelectedPlace = () => {
+        setPlaceId(null);
+        setLatitude(null);
+        setLongitude(null);
+    };
+
+    const handlePlaceSelect = (data, details = null) => {
+        const location = details?.geometry?.location;
+        const addressParts = getAddressParts(details?.address_components ?? []);
+        const nextStreet = addressParts.street || data.description;
+
+        setStreet(nextStreet);
+        setCity(addressParts.city);
+        setProvince(addressParts.province);
+        setPostalCode(addressParts.postalCode);
+        setPlaceId(data.place_id);
+        setLatitude(location?.lat ?? null);
+        setLongitude(location?.lng ?? null);
+        setError(null);
+
+        console.log('[StepOne] Google place selected', {
+            description: data.description,
+            placeId: data.place_id,
+            addressParts,
+            coordinates: {
+                latitude: location?.lat ?? null,
+                longitude: location?.lng ?? null,
+            },
+            rawData: data,
+            rawDetails: details,
+        });
+    };
+
+    const continueToStepTwo = () => {
+        if (!GOOGLE_PLACES_API_KEY) {
+            setError('Google Places API key is missing.');
+            return;
+        }
+
+        if (!placeId || !Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+            setError('Select an address from the suggestions before continuing.');
+            return;
+        }
+
+        console.log('[StepOne] Continue with selected address', {
+            street: normalizeAddressPart(street),
+            additionalAddress: normalizeAddressPart(additionalAddress),
+            city: normalizeAddressPart(city),
+            province: normalizeAddressPart(province),
+            postalCode: normalizeAddressPart(postalCode),
+            placeId,
+            latitude,
+            longitude,
+        });
+
+        router.push('/post/stepTwo');
+    };
+
   return (
     <View style={{ flex: 1, overflow: 'visible' }}>
         <FlatList 
@@ -198,12 +284,47 @@ export default function StepOne() {
                             />
                         </FormField>
                         <FormField label="Address" error={error}>
-                            <InputRow>
-                                <TextField
-                                    value={street}
+                            <InputRow style={styles.addressAutocompleteRow}>
+                                <GooglePlacesAutocomplete
                                     placeholder="Street"
-                                    placeholderTextColor={colors.semantic.input.textDisabled}
-                                    onChangeText={setStreet}
+                                    fetchDetails
+                                    debounce={300}
+                                    minLength={2}
+                                    enablePoweredByContainer={false}
+                                    keyboardShouldPersistTaps="always"
+                                    listViewDisplayed="auto"
+                                    query={{
+                                        key: process.env.EXPO_PUBLIC_GOOGLE_PLACES_API_KEY,
+                                        language: 'en',
+                                        components: 'country:ca|country:us',
+                                    }}
+                                    textInputProps={{
+                                        value: street ?? '',
+                                        placeholderTextColor: colors.semantic.input.textDisabled,
+                                        onChangeText: (text) => {
+                                            setStreet(text);
+                                            clearSelectedPlace();
+                                        },
+                                        accessibilityLabel: 'Street address',
+                                    }}
+                                    onPress={handlePlaceSelect}
+                                    onFail={(placesError) => {
+                                        console.log('[StepOne] Google Places autocomplete failed', placesError);
+                                        setError('Address lookup failed. Please try again.');
+                                    }}
+                                    onNotFound={() => {
+                                        setError('No matching address found. Try a more specific address.');
+                                    }}
+                                    styles={{
+                                        container: styles.placesContainer,
+                                        textInputContainer: styles.placesTextInputContainer,
+                                        textInput: styles.placesTextInput,
+                                        listView: styles.placesList,
+                                        row: styles.placesRow,
+                                        separator: styles.placesSeparator,
+                                        description: styles.placesDescription,
+                                        predefinedPlacesDescription: styles.placesDescription,
+                                    }}
                                 />
                             </InputRow>
                             <InputRow>
@@ -385,7 +506,10 @@ export default function StepOne() {
                                 />
                             </View>
                             <View style={{ flex: 1 }}>
-                                <AppButton text="Continue" onPress={() => router.push('/post/stepTwo')}/>
+                                <AppButton
+                                    text="Continue"
+                                    onPress={continueToStepTwo}
+                                />
                             </View>
                         </View>
                     </View>
@@ -551,6 +675,52 @@ const styles = StyleSheet.create({
   },
   contentContainer:{
     marginTop: 24,
+  },
+  addressAutocompleteRow: {
+    zIndex: 20,
+    elevation: 20,
+  },
+  placesContainer: {
+    flex: 1,
+    zIndex: 20,
+  },
+  placesTextInputContainer: {
+    flexDirection: 'row',
+  },
+  placesTextInput: {
+    width: '100%',
+    height: 40,
+    paddingHorizontal: 14,
+    borderRadius: 999,
+    borderColor: colors.semantic.input.border.normal.color,
+    borderWidth: colors.semantic.input.border.normal.width,
+    backgroundColor: colors.semantic.input.bg,
+    color: colors.semantic.input.text,
+    fontSize: 12,
+    marginBottom: 0,
+  },
+  placesList: {
+    marginTop: 8,
+    borderRadius: 12,
+    backgroundColor: colors.semantic.bottomSheet.background,
+    borderWidth: 1,
+    borderColor: colors.base.gray800,
+    overflow: 'hidden',
+    zIndex: 30,
+    elevation: 30,
+  },
+  placesRow: {
+    backgroundColor: colors.semantic.bottomSheet.background,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+  },
+  placesSeparator: {
+    height: 1,
+    backgroundColor: colors.base.gray800,
+  },
+  placesDescription: {
+    color: colors.semantic.text.primary,
+    fontSize: 12,
   },
     dropdownRow: {
         flexDirection: 'row',
