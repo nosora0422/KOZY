@@ -1,10 +1,11 @@
 import { useRef, useState, useCallback } from 'react';
 import { Image } from 'expo-image';
 import { useFocusEffect } from '@react-navigation/native';
-import { Platform, StyleSheet, View, Dimensions, ScrollView, FlatList, Alert } from 'react-native';
+import { Platform, StyleSheet, View, Dimensions, FlatList, Alert } from 'react-native';
 import { useLocalSearchParams, useNavigation } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
+import { startPersonaVerification } from '@/services/personaVerification';
 
 import PillGroup from '@/components/ui/pill/pillGroup';
 import AppText from '@/components/ui/appText';
@@ -42,8 +43,8 @@ export default function EditProfile() {
     const jobDrawerRef = useRef(null);
     const lifestyleDrawerRef = useRef(null);
     const aboutMeDrawerRef = useRef(null);
-    const myEmailDrawerRef = useRef(null);
-    const emailConfirmDrawerRef = useRef(null);
+    const myVerificationDrawerRef = useRef(null);
+    const verificationConfirmDrawerRef = useRef(null);
     const emailEditDrawerRef = useRef(null);
     const emailCheckDrawerRef = useRef(null);
     const photoDrawerRef = useRef(null);
@@ -232,7 +233,7 @@ export default function EditProfile() {
                   text="Verify"
                   size="sm"
                   type='primary'
-                  onPress={() => myEmailDrawerRef.current?.snapToIndex(0)}
+                  onPress={() => myVerificationDrawerRef.current?.snapToIndex(0)}
                 />
               </View>
             </View>
@@ -358,29 +359,35 @@ export default function EditProfile() {
             </FormField>
       </AppDrawer>
       <AppDrawer
-            ref={myEmailDrawerRef}
+            ref={myVerificationDrawerRef}
             title="Verify Your Identity"
             align="center"
             primaryActionText="Start Verification"
-            primaryAction={() => {
-              myEmailDrawerRef.current?.close()
-              emailConfirmDrawerRef.current?.snapToIndex(0)
+            primaryAction={async () => {
+              myVerificationDrawerRef.current?.close();
+            
+              const result = await startPersonaVerification(normalizedOwnerId ?? 'kozy-test-user');
+            
+              if (result.type === 'success') {
+                setVerified(true);
+                verificationConfirmDrawerRef.current?.snapToIndex(0);
+              }
             }}
           >
             <AppText variant='body-xsm' style={{ marginBottom: 16, textAlign: 'center' }}>
               For security and trust, please verify your identity. This only takes a few minutes.
             </AppText>
             <AppText variant='body-xsm' style={{ textAlign: 'center' }}>
-            *We use [서비스명] to securely verify your ID.
+            *We use Persona to securely verify your ID.
             </AppText>
       </AppDrawer>
       <AppDrawer
-            ref={emailConfirmDrawerRef}
+            ref={verificationConfirmDrawerRef}
             title="Your Identity verified"
             description="Your ID has been verified successfully."
             align="center"
             primaryActionText="Done"
-            primaryAction={() => emailConfirmDrawerRef.current?.close()}
+            primaryAction={() => verificationConfirmDrawerRef.current?.close()}
           >
       </AppDrawer>
       <AppDrawer
