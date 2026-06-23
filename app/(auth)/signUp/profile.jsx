@@ -8,14 +8,19 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import TextField from "@/components/ui/input/textField";
 import AppButton from "@/components/ui/appButton";
 import FormField from "@/components/ui/form/formField";
+import ErrorMessage from "@/components/ui/form/errorMessage";
 import { LoginBackground } from "@/components/ui/loginBackground";
-import AppHeader from "@/components/ui/appHeader"; 
+import AppHeader from "@/components/ui/appHeader";
 import AuthCard from "@/components/ui/authInputCard";
 import AppLogo from "@/components/ui/appMainLogo";
+import { signUpWithEmail } from "@/lib/auth";
+import { authErrorMessage } from "@/lib/auth/errors";
 
 export default function Profile() {
   const insets = useSafeAreaInsets();
   const { signup, setProfile } = useSignup();
+  const [submitting, setSubmitting] = useState(false);
+  const [authError, setAuthError] = useState(null);
   const formatDob = (text) => {
     // Remove non-digits
     const digits = text.replace(/\D/g, '');
@@ -51,6 +56,25 @@ export default function Profile() {
 
     setErrors(nextErrors);
     return !nextErrors.firstName && !nextErrors.lastName && !nextErrors.dob;
+  };
+
+  // Account is created here (end of the flow), which also sends the email verification link.
+  const handleSubmit = async () => {
+    if (!validate()) return;
+    setSubmitting(true);
+    setAuthError(null);
+    try {
+      await signUpWithEmail({
+        email: signup.email.trim(),
+        password: signup.password,
+        profile: signup.profile,
+      });
+      router.replace("/(auth)/signUp/verify");
+    } catch (e) {
+      setAuthError(authErrorMessage(e));
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -122,12 +146,12 @@ export default function Profile() {
               </AuthCard>
             </View>
             <View style={styles.footerContent}>
+              {authError ? <ErrorMessage message={authError} /> : null}
               <AppButton
                 text="Continue"
-                onPress={() => {
-                  if (!validate()) return;
-                  router.push("/(auth)/signUp/success");
-                }}
+                loading={submitting}
+                loadingLabel="Creating account"
+                onPress={handleSubmit}
               />
             </View>
           </View>

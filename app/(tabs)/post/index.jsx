@@ -5,13 +5,14 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import AppText from '@/components/ui/appText';
 import EmptyListingsState from '@/components/ui/emptyListingsState';
+import { useAuth } from '@/context/AuthContext';
 
 
 export default function PostScreen() {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const pathname = usePathname();
-  const isLogedIn = true; // Replace with actual authentication logic
+  const { isLoggedIn } = useAuth();
 
   useFocusEffect(
     useCallback(() => {
@@ -47,9 +48,9 @@ export default function PostScreen() {
            <EmptyListingsState
             heading="Let’s List Your Space"
             description="Just a few quick steps to share your room with the right people."
-            actionText={isLogedIn ? "Share a room" : "Sign up / Log in"}
+            actionText={isLoggedIn ? "Share a room" : "Sign up / Log in"}
             onAction={() => {
-              if (isLogedIn) {
+              if (isLoggedIn) {
                 router.push('/(tabs)/post/stepOne');
               } else {
                 router.push('/(auth)/login');

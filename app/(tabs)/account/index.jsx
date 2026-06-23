@@ -5,17 +5,16 @@ import { Feather } from "@expo/vector-icons";
 
 import AppText from '@/components/ui/appText';
 import Badge from "@/components/ui/badge";
-import { DATA } from "@/data/mockListData";
 import EmptyListingsState from "@/components/ui/emptyListingsState";
-import TrustLevelInfo from "./trustLevelInfo";
+import { useAuth } from "@/context/AuthContext";
 
 
 export default function AccountScreen() {
   const insets = useSafeAreaInsets();
-  const isLogedIn = TrustLevelInfo; // Replace with actual authentication logic
-  const currUser = DATA[0].owner; // Replace with actual user data fetching logic
-  
-  if( !isLogedIn ) {
+  const { isLoggedIn, profile } = useAuth();
+  const currUser = profile;
+
+  if( !isLoggedIn ) {
     return (
       <View style={[styles.container, { paddingTop: insets.top,paddingBottom: Math.max(insets.bottom, 16) + 84 }]}>
         <AppText variant="headline-sm" color="primary">My Page</AppText>
@@ -36,11 +35,11 @@ export default function AccountScreen() {
           <View style={styles.userInfo}>
             <View style={styles.name}>
               <Image
-                source={{ uri: currUser.avatar[0] }}
+                source={{ uri: currUser?.avatar?.[0] }}
                 style={{ width: 55, height: 55, borderRadius: 999 }}
               />
               <AppText variant="body-md" color="primary">
-                {currUser.name}
+                {currUser?.name}
               </AppText>
             </View>
           </View>

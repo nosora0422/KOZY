@@ -1,5 +1,5 @@
 import React, { useRef, useState, useCallback, useEffect } from 'react';
-import { View, StyleSheet, Dimensions, Share, Pressable, FlatList } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, Share, Pressable, FlatList, ActivityIndicator } from 'react-native';
 import { VideoView, useVideoPlayer } from 'expo-video';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router, useFocusEffect } from 'expo-router';
@@ -8,7 +8,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import AppIconButton from '@/components/ui/appIconButton';
 import ListingReelOverlay from '@/components/ui/listingReelOverlay';
-import { DATA } from '@/data/mockListData';
+import { useListings } from '@/hooks/use-listings';
 
 const { height } = Dimensions.get('window');
 const SAVED_LISTINGS_KEY = 'savedListings';
@@ -16,6 +16,7 @@ const SAVED_LISTINGS_KEY = 'savedListings';
 export default function HomeScreen() {
   
   const insets = useSafeAreaInsets();
+  const { data: listings, loading, error, reload } = useListings();
   const [activeIndex, setActiveIndex] = useState(0);
   const [, setSavedListings] = useState([]);
   const [savedIds, setSavedIds] = useState(new Set());
@@ -79,27 +80,44 @@ export default function HomeScreen() {
           onPress={() => router.push('/home/search')}
         />
       </View>
-      <FlatList
-        data={DATA}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item: reel, index }) => (
-          <ReelItem
-            item={reel}
-            isActive={index === activeIndex}
-            insets={insets}
-            isSaved={savedIds.has(reel.id)}
-            onToggleSave={handleToggleSave}
-            onShare={onShare}
-          />
-        )}
-        pagingEnabled
-        showsVerticalScrollIndicator={false}
-        onViewableItemsChanged={onViewableItemsChanged}
-        viewabilityConfig={{ itemVisiblePercentThreshold: 80 }}
-        windowSize={3}
-        initialNumToRender={1}
-        maxToRenderPerBatch={1}
-      />
+      {loading ? (
+        <View style={styles.center}>
+          <ActivityIndicator color="#fff" />
+        </View>
+      ) : error ? (
+        <View style={styles.center}>
+          <Text style={styles.statusText}>Couldn’t load listings.</Text>
+          <Pressable onPress={reload} hitSlop={10}>
+            <Text style={styles.retryText}>Tap to retry</Text>
+          </Pressable>
+        </View>
+      ) : listings.length === 0 ? (
+        <View style={styles.center}>
+          <Text style={styles.statusText}>No listings yet.</Text>
+        </View>
+      ) : (
+        <FlatList
+          data={listings}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item: reel, index }) => (
+            <ReelItem
+              item={reel}
+              isActive={index === activeIndex}
+              insets={insets}
+              isSaved={savedIds.has(reel.id)}
+              onToggleSave={handleToggleSave}
+              onShare={onShare}
+            />
+          )}
+          pagingEnabled
+          showsVerticalScrollIndicator={false}
+          onViewableItemsChanged={onViewableItemsChanged}
+          viewabilityConfig={{ itemVisiblePercentThreshold: 80 }}
+          windowSize={3}
+          initialNumToRender={1}
+          maxToRenderPerBatch={1}
+        />
+      )}
     </View>
   );
 }
@@ -169,5 +187,20 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 16,
     zIndex: 10,
+  },
+  center: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 12,
+  },
+  statusText: {
+    color: '#fff',
+    fontSize: 15,
+  },
+  retryText: {
+    color: '#fff',
+    fontSize: 14,
+    textDecorationLine: 'underline',
   },
 });

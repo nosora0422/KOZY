@@ -1,21 +1,98 @@
+import { useEffect, useRef } from "react";
 import { useSignup } from "@/context/SignupContext";
 import { router } from "expo-router";
-import { StyleSheet, View, KeyboardAvoidingView, Platform, Alert } from 'react-native';
+import {
+  StyleSheet,
+  View,
+  KeyboardAvoidingView,
+  Platform,
+  Alert,
+  AppState,
+  ActivityIndicator,
+} from 'react-native';
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
-import TextField from "@/components/ui/input/textField";
+import AppText from "@/components/ui/appText";
 import AppButton from "@/components/ui/appButton";
-import FormField from "@/components/ui/form/formField";
-
 import { LoginBackground } from "@/components/ui/loginBackground";
 import AppHeader from "@/components/ui/appHeader";
 import AuthCard from "@/components/ui/authInputCard";
 import AppLogo from "@/components/ui/appMainLogo";
+import { colors } from "@/constants/colors";
+import { resendVerificationEmail, reloadUser, isEmailVerified } from "@/lib/auth";
 
-export default function Varify() {
+const POLL_INTERVAL_MS = 5000;
+const POLL_TIMEOUT_MS = 5 * 60 * 1000; // stop auto-polling after 5 minutes
+
+// Firebase verifies email via a link (not a 6-digit code). The account was created on the
+// previous step, which sent the link. Here we poll the server every 5s and, the moment the
+// link is clicked, auto-advance to the success screen — no manual button needed.
+export default function Verify() {
   const insets = useSafeAreaInsets();
-  const { verificationCode, setVerificationCode } = useSignup();
+  const { signup } = useSignup();
+  const navigatedRef = useRef(false); // guard so poll + foreground checks can't double-navigate
+
+  const goNext = () => {
+    if (navigatedRef.current) return;
+    navigatedRef.current = true;
+    router.replace("/(auth)/signUp/verifyComplete");
+  };
+
+  const checkVerified = async () => {
+    if (navigatedRef.current) return true;
+    try {
+      await reloadUser();
+      if (isEmailVerified()) {
+        goNext();
+        return true;
+      }
+    } catch {
+      // transient error (e.g. network) — keep polling
+    }
+    return false;
+  };
+
+  // Poll every 5s while this screen is mounted.
+  useEffect(() => {
+    const startedAt = Date.now();
+    const id = setInterval(async () => {
+      const done = await checkVerified();
+      if (done) {
+        clearInterval(id);
+        return;
+      }
+      if (Date.now() - startedAt > POLL_TIMEOUT_MS) {
+        clearInterval(id);
+        Alert.alert(
+          "Still not verified",
+          "Please open the verification link in your email, or resend it."
+        );
+      }
+    }, POLL_INTERVAL_MS);
+
+    checkVerified(); // also check immediately on mount
+    return () => clearInterval(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Re-check the instant the user returns from their email app.
+  useEffect(() => {
+    const sub = AppState.addEventListener("change", (state) => {
+      if (state === "active") checkVerified();
+    });
+    return () => sub.remove();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleResend = async () => {
+    try {
+      await resendVerificationEmail();
+      Alert.alert("Email sent", "A new verification link has been sent to your email.");
+    } catch {
+      Alert.alert("Couldn't resend", "Please wait a moment and try again.");
+    }
+  };
 
   return (
     <KeyboardAvoidingView
@@ -32,41 +109,35 @@ export default function Varify() {
           keyboardShouldPersistTaps="handled"
           extraScrollHeight={-80}
         >
-          <View style={[styles.content, { paddingBottom: insets.bottom }]}> 
+          <View style={[styles.content, { paddingBottom: insets.bottom }]}>
             <View style={styles.topContent}>
               <AppLogo />
             </View>
             <View style={styles.midContent}>
               <AuthCard
                 title="Check Your Email"
-                description="We’ve sent a 6-digit code to your email. Enter the code to verify your email address."
-              >
-                <FormField lastField>
-                  <TextField
-                    value={verificationCode}
-                    onChangeText={setVerificationCode}
-                    placeholder="Enter Verification Code"
-                    type="auth"
-                  />
-                </FormField>
-              </AuthCard>
+                description={`We’ve sent a verification link to ${
+                  signup.email || "your email"
+                }. Open it to verify — this screen updates automatically.`}
+              />
+              <View style={styles.statusRow}>
+                <ActivityIndicator color={colors.base.accent} />
+                <AppText variant="body-sm" color="primary" style={styles.statusText}>
+                  Waiting for verification…
+                </AppText>
+              </View>
             </View>
             <View style={styles.footerContent}>
               <AppButton
-                text="Verify"
-                onPress={() => {
-                  // varifyCode(signup.verificationCode)
-                  router.push("/(auth)/signUp/password");
-                }}
-              />
-              <AppButton
-                text="Resend Code"
-                onPress={() => {
-                  // await resendCode()
-                  Alert.alert("Code Sent", "A new verification code has been sent to your email.");
-                }}
+                text="Resend Email"
+                onPress={handleResend}
                 type="bare"
                 underline
+              />
+              <AppButton
+                text="Skip for now"
+                onPress={() => router.replace("/(tabs)/home")}
+                type="bare"
               />
             </View>
           </View>
@@ -88,21 +159,29 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
   },
-  topContent: { 
+  topContent: {
     height: 100,
-    display: 'flex', 
-    alignItems: 'center', 
-    width: '100%', 
+    display: 'flex',
+    alignItems: 'center',
+    width: '100%',
     justifyContent: 'flex-end',
-  }, 
-  
-  midContent: { 
-    flexGrow: 1, 
-    display: 'flex', 
-    alignItems: 'center', 
-    justifyContent: 'center', 
-    width: '100%', 
-  }, 
+  },
+  midContent: {
+    flexGrow: 1,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+  },
+  statusRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginTop: 20,
+  },
+  statusText: {
+    marginLeft: 4,
+  },
   footerContent: {
     height: 160,
     justifyContent: 'flex-end',

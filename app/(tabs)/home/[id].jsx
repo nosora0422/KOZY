@@ -1,10 +1,10 @@
 import React, { useCallback, useMemo } from 'react';
-import { View, Text, StyleSheet, Platform, FlatList, Image, Dimensions, ScrollView, Alert, Pressable } from 'react-native';
+import { View, Text, StyleSheet, Platform, FlatList, Image, Dimensions, ScrollView, Alert, Pressable, ActivityIndicator } from 'react-native';
 import { Stack, router, useLocalSearchParams } from 'expo-router';
 import MapView, { Marker } from 'react-native-maps';
 import { Feather } from '@expo/vector-icons';
 
-import { DATA } from '@/data/mockListData';
+import { useListing } from '@/hooks/use-listings';
 import DisplayField from '@/components/ui/displayField';
 import AppButton from '@/components/ui/appButton';
 import AppText from '@/components/ui/appText';
@@ -15,7 +15,8 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 export default function DetailScreen() {
   const { id, backTo } = useLocalSearchParams();
-  const item = DATA.find(d => d.id === id);
+  const listingId = Array.isArray(id) ? id[0] : id;
+  const { data: item, loading } = useListing(listingId);
   const [activeIndex, setActiveIndex] = React.useState(0);
 
   const handleBack = useCallback(() => {
@@ -40,13 +41,23 @@ export default function DetailScreen() {
       };
     }, [item]);
 
-  if (!item) {
+  if (loading) {
     return (
       <View style={styles.center}>
-        <Text>Item not found</Text>
+        <ActivityIndicator color="#fff" />
       </View>
     );
   }
+
+  if (!item) {
+    return (
+      <View style={styles.center}>
+        <Text style={{ color: '#fff' }}>Item not found</Text>
+      </View>
+    );
+  }
+
+  const images = item.images ?? [];
 
   return (
     <>
@@ -74,7 +85,7 @@ export default function DetailScreen() {
         <AppText variant='body-sm'>${item.price}</AppText>
       {/* Slider */}
       <FlatList
-        data={item.images}
+        data={images}
         horizontal
         pagingEnabled
         showsHorizontalScrollIndicator={false}
@@ -97,7 +108,7 @@ export default function DetailScreen() {
         )}
       />
       <View style={styles.pagination}>
-        {item.images.map((_, index) => (
+        {images.map((_, index) => (
           <View
             key={index}
             style={[
@@ -133,10 +144,10 @@ export default function DetailScreen() {
           <View style={styles.section}>
             <AppText variant='headline-sm'>Meet Your Roomate</AppText>
 
-            <ProfileSection userId={item.owner.id} listing={item}/>
+            <ProfileSection userId={item.owner?.id} listing={item}/>
 
             <DisplayField title="About Room & House" type="pill">
-              {[`${item.bedrooms} Bed`, `${item.bathrooms} Bath`, `${item.roomType}`, `${item.sizeSqft} sqft`, item.furnished ? 'Furnished' : 'Unfurnished', ...item.roomDetail]}
+              {[`${item.bedrooms} Bed`, `${item.bathrooms} Bath`, `${item.roomType}`, `${item.sizeSqft} sqft`, item.furnished ? 'Furnished' : 'Unfurnished', ...(item.roomDetail ?? [])]}
             </DisplayField>
 
             <DisplayField title="Looking For" type="pill">

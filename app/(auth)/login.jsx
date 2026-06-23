@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { router, useLocalSearchParams } from "expo-router";
-import { StyleSheet, View, Text, Pressable, Image } from "react-native";
-import { Feather } from "@expo/vector-icons";
+import { StyleSheet, View, Text, Image } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { KeyboardAvoidingView, Platform } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
@@ -9,17 +8,22 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import TextField from "@/components/ui/input/textField";
 import AppButton from "@/components/ui/appButton";
 import FormField from "@/components/ui/form/formField";
+import ErrorMessage from "@/components/ui/form/errorMessage";
 import { colors } from "@/constants/colors";
 import { LoginBackground } from "@/components/ui/loginBackground";
 import AuthCard from "@/components/ui/authInputCard";
 import AppLogo from "@/components/ui/appMainLogo";
 import AppHeader from "@/components/ui/appHeader";
+import { loginWithEmail } from "@/lib/auth";
+import { authErrorMessage } from "@/lib/auth/errors";
 
 export default function Login() {
-  var insets = useSafeAreaInsets();
+  const insets = useSafeAreaInsets();
   const { redirect } = useLocalSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [authError, setAuthError] = useState(null);
 
   const [errors, setErrors] = useState({
     email: null,
@@ -44,6 +48,20 @@ export default function Login() {
 
     setErrors(nextErrors);
     return !nextErrors.email && !nextErrors.password;
+  };
+
+  const handleLogin = async () => {
+    if (!validate()) return;
+    setSubmitting(true);
+    setAuthError(null);
+    try {
+      await loginWithEmail(email.trim(), password);
+      router.replace(redirect ?? "/(tabs)/home");
+    } catch (e) {
+      setAuthError(authErrorMessage(e));
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -104,21 +122,12 @@ export default function Login() {
               </AuthCard>
             </View>
             <View style={styles.footerContent}>
-              {/* Temporary home button for testing */}
-              <Pressable 
-                onPress={() => router.replace("/(tabs)/home")}
-                style={{position: 'absolute', top: 16, }}
-              >
-                <Feather name="home" size={22} color="#fff" />
-              </Pressable>
+              {authError ? <ErrorMessage message={authError} /> : null}
               <AppButton
                 text="Log In"
-                onPress={() => {
-                  if (!validate()) return;
-
-                  // integrate API
-                  router.replace(redirect ?? "/(tabs)/home");
-                }}
+                loading={submitting}
+                loadingLabel="Logging in"
+                onPress={handleLogin}
               />
 
               <Text style={styles.caption}>

@@ -10,13 +10,14 @@ import { DATA } from '@/data/mockListData';
 import { mockChatThreads } from '@/data/mockChatData';
 import CheckBox from '@/components/ui/input/checkbox';
 import { colors } from '@/constants/colors';
+import { useAuth } from '@/context/AuthContext';
 
 
 
 export default function Chat() {
   const insets = useSafeAreaInsets();
   const pathname = usePathname();
-  const isLoggedIn = true; // Replace with actual authentication logic
+  const { isLoggedIn } = useAuth();
   const [isEditMode, setIsEditMode] = useState(null);
   const [selectedItems, setSelectedItems] = useState([]);
   const listings = DATA.map((item) => ({

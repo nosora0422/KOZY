@@ -1,0 +1,77 @@
+// Data hooks for listings — centralize fetch + loading/empty/error so screens stay clean.
+import { useState, useEffect, useCallback } from 'react';
+import { listListings, listMyListings, getListing } from '@/lib/db/listings';
+
+// Browse/feed listings. `options` is passed to listListings (e.g. { max, status }).
+export function useListings(options) {
+  const key = JSON.stringify(options ?? {});
+  const [state, setState] = useState({ data: [], loading: true, error: null });
+
+  const load = useCallback(async () => {
+    setState((s) => ({ ...s, loading: true, error: null }));
+    try {
+      const data = await listListings(options ?? {});
+      setState({ data, loading: false, error: null });
+    } catch (error) {
+      setState({ data: [], loading: false, error });
+    }
+    // options is captured via the serialized `key` to avoid identity churn.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key]);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  return { ...state, reload: load };
+}
+
+// A single listing by id.
+export function useListing(id) {
+  const [state, setState] = useState({ data: null, loading: true, error: null });
+
+  const load = useCallback(async () => {
+    if (!id) {
+      setState({ data: null, loading: false, error: null });
+      return;
+    }
+    setState((s) => ({ ...s, loading: true, error: null }));
+    try {
+      const data = await getListing(id);
+      setState({ data, loading: false, error: null });
+    } catch (error) {
+      setState({ data: null, loading: false, error });
+    }
+  }, [id]);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  return { ...state, reload: load };
+}
+
+// Listings owned by a user (all statuses), for My Listings.
+export function useMyListings(ownerId) {
+  const [state, setState] = useState({ data: [], loading: true, error: null });
+
+  const load = useCallback(async () => {
+    if (!ownerId) {
+      setState({ data: [], loading: false, error: null });
+      return;
+    }
+    setState((s) => ({ ...s, loading: true, error: null }));
+    try {
+      const data = await listMyListings(ownerId);
+      setState({ data, loading: false, error: null });
+    } catch (error) {
+      setState({ data: [], loading: false, error });
+    }
+  }, [ownerId]);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  return { ...state, reload: load };
+}

@@ -16,7 +16,7 @@ import AppHeader from "@/components/ui/appHeader";
 import AppLogo from "@/components/ui/appMainLogo";
 
 export default function EmailScreen() {
-  var insets = useSafeAreaInsets();
+  const insets = useSafeAreaInsets();
   const { signup, setEmail } = useSignup();
   const [error, setError] = useState("");
 
@@ -57,7 +57,7 @@ export default function EmailScreen() {
             <View style={styles.midContent}>
               <AuthCard
                 title="Sign Up Now"
-                description="Enter your school or work email. We’ll send a code to verify."
+                description="Enter your school or work email to get started."
               >
                 <FormField error={error} lastField>
                   <TextField
@@ -76,11 +76,10 @@ export default function EmailScreen() {
             </View>
             <View style={styles.footerContent}>
               <AppButton
-                text="Send Verification Code"
+                text="Continue"
                 onPress={() => {
                   if (!validate()) return;
-                  // await sendCode(signup.email)
-                  router.push("/(auth)/signUp/verify");
+                  router.push("/(auth)/signUp/password");
                 }}
               />
               <AppText variant="body-sm" color="primary" style={{ textAlign: "center", marginBottom: 8, marginTop: 20 }}>

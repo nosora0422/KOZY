@@ -1,4 +1,4 @@
-
+import { useEffect, useRef } from "react";
 import { router } from "expo-router";
 import { StyleSheet, View, Image } from 'react-native';
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -6,13 +6,37 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import AppButton from "@/components/ui/appButton";
 import AppText from "@/components/ui/appText";
 import { colors } from '@/constants/colors';
+import { currentUid } from "@/lib/auth";
+import { updateUserDoc } from "@/lib/db/users";
 
+const AUTO_ADVANCE_MS = 3000;
 
-export default function Success() {
+// Success screen shown once email verification is detected. Auto-advances to the final
+// onboarding screen after a short celebration, with a Continue button as a fallback.
+export default function VerifyComplete() {
   const insets = useSafeAreaInsets();
+  const advancedRef = useRef(false);
+
+  const goNext = () => {
+    if (advancedRef.current) return;
+    advancedRef.current = true;
+    router.replace("/(auth)/signUp/success");
+  };
+
+  // Persist verified=true on the user profile (best-effort; auth is the source of truth).
+  useEffect(() => {
+    const uid = currentUid();
+    if (uid) updateUserDoc(uid, { verified: true }).catch(() => {});
+  }, []);
+
+  // Auto-advance after a brief celebration.
+  useEffect(() => {
+    const timer = setTimeout(goNext, AUTO_ADVANCE_MS);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
-    <View style={[styles.container, {paddingBottom: insets.bottom }]}>
-      {/* custom Background shapes */}
+    <View style={[styles.container, { paddingBottom: insets.bottom }]}>
       <View style={styles.topShape} />
       <View style={styles.bottomShape} />
       <View style={styles.content}>
@@ -22,22 +46,22 @@ export default function Success() {
             style={{ width: 240, height: 240, marginBottom: 24 }}
           />
         </View>
-        <View style={[styles.bottomContent]}>
+        <View style={styles.bottomContent}>
           <View style={styles.headerContent}>
             <AppText variant="headline-lg" color="secondary" style={{ marginBottom: 12 }}>
-                🎉 You're all set!
+              ✅ Email Verified!
             </AppText>
-            <AppText variant="body-sm" color="secondary" style={{ marginBottom: 24, textAlign: 'center' }}>
-            Start exploring and connect with your future roommate now!
+            <AppText
+              variant="body-sm"
+              color="secondary"
+              style={{ marginBottom: 24, textAlign: 'center' }}
+            >
+              Your email has been verified. Redirecting you…
             </AppText>
           </View>
           <AppButton
-            text="Boost My Profile"
-            onPress={() => router.push("/(tabs)/account/editProfile")}
-          />
-          <AppButton
-            text="Later & Back to Home"
-            onPress={() => router.push("/(tabs)/home")}
+            text="Continue"
+            onPress={goNext}
           />
         </View>
       </View>
@@ -56,15 +80,14 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "space-between",
-
   },
   topContent: {
-    width: "100%", 
-    height:"50%", 
-    alignItems: "center", 
+    width: "100%",
+    height: "50%",
+    alignItems: "center",
     justifyContent: "flex-end",
   },
-  headerContent:{
+  headerContent: {
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -76,11 +99,6 @@ const styles = StyleSheet.create({
     width: '100%',
     gap: 12,
   },
-  imagePlaceHolder: {
-    width: 120,   
-    height: 120,
-    backgroundColor: '#E0E0E0',
-  },
   topShape: {
     position: 'absolute',
     top: 0,
@@ -91,7 +109,6 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 999,
     borderBottomRightRadius: 999,
   },
-  
   bottomShape: {
     position: 'absolute',
     bottom: 0,
